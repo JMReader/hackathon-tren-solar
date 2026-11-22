@@ -8,7 +8,6 @@ import { Button, buttonStyles } from "@/components/ui/button"
 import { Radio, RadioGroup } from "@/components/ui/radio"
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control"
 import { Switch } from "@/components/ui/switch"
-import { Toaster } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 import { findPalette, findTemplate, palettes, templates } from "../catalog"
 import { PortfolioView } from "../templates"
@@ -153,7 +152,6 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
       </main>
 
       <ProDoor request={proDoor} onClose={() => setProDoor(null)} />
-      <Toaster />
     </div>
   )
 }
