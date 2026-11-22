@@ -18,6 +18,9 @@ class Settings:
     gemini_api_key: str | None = None
     groq_api_key: str | None = None
     xai_api_key: str | None = None
+    postgres_dsn: str | None = None
+    supabase_url: str | None = None
+    supabase_service_role_key: str | None = None
     openai_model: str = "gpt-4o-mini"
     gemini_model: str = "gemini-3-flash-preview"
     groq_model: str = "llama-3.3-70b-versatile"
@@ -54,6 +57,9 @@ class Settings:
             gemini_api_key=env.get("GEMINI_API_KEY"),
             groq_api_key=env.get("GROQ_API_KEY"),
             xai_api_key=env.get("XAI_API_KEY"),
+            postgres_dsn=env.get("POSTGRES_URL"),
+            supabase_url=env.get("SUPABASE_URL"),
+            supabase_service_role_key=env.get("SUPABASE_SERVICE_ROLE_KEY"),
             openai_model=env.get("OPENAI_MODEL", "gpt-4o-mini"),
             gemini_model=env.get("GEMINI_MODEL", "gemini-3-flash-preview"),
             groq_model=env.get("GROQ_MODEL", "llama-3.3-70b-versatile"),

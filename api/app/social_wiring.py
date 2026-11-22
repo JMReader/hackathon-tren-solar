@@ -10,6 +10,7 @@ from social.crypto import TokenCipher
 from social.linkedin import LinkedInAdapter
 from social.models import ConnectionState, Platform, PublishableDraft
 from social.oauth import ConnectionFlow
+from social.pg_store import PgConnectionStore, PgDatabase, PgOAuthStateStore, PgPublicationStore
 from social.service import SocialService
 from social.settings import Settings as SocialSettings
 from social.sqlite import SqliteConnectionStore, SqliteDatabase, SqlitePublicationStore
@@ -61,19 +62,28 @@ def build_social(
     data_dir: Path,
     settings: SocialSettings | None = None,
     http: httpx2.Client | None = None,
+    pg_dsn: str | None = None,
 ) -> SocialModule:
     settings = settings or SocialSettings.from_env()
-    db = SqliteDatabase(data_dir / "social.db")
-    connections = SqliteConnectionStore(db, TokenCipher(settings.token_key or TokenCipher.generate_key()))
+    cipher = TokenCipher(settings.token_key or TokenCipher.generate_key())
+    if pg_dsn:
+        db = PgDatabase(pg_dsn)
+        connections = PgConnectionStore(db, cipher)
+        publications = PgPublicationStore(db)
+        state_store = PgOAuthStateStore(db)
+    else:
+        db = SqliteDatabase(data_dir / "social.db")
+        connections = SqliteConnectionStore(db, cipher)
+        publications = SqlitePublicationStore(db)
+        state_store = None
     linkedin = (
         LinkedInAdapter(settings.linkedin, http or httpx2.Client(timeout=httpx2.Timeout(20.0, connect=5.0)))
         if settings.linkedin
         else None
     )
-    service = SocialService(
-        default_adapters(linkedin), connections, SqlitePublicationStore(db), CoreDraftSource(core)
-    )
+    service = SocialService(default_adapters(linkedin), connections, publications, CoreDraftSource(core))
     flow = ConnectionFlow(
-        service, {Platform.LINKEDIN: linkedin} if linkedin else {}, connections, settings.web_base_url
+        service, {Platform.LINKEDIN: linkedin} if linkedin else {}, connections,
+        settings.web_base_url, state_store=state_store
     )
     return SocialModule(service, flow)
