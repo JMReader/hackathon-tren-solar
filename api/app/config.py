@@ -45,6 +45,8 @@ class Settings:
                 if line and not line.startswith("#") and "=" in line:
                     k, _, v = line.partition("=")
                     file_env[k.strip()] = v.strip().strip('"').strip("'")
+        for k, v in file_env.items():
+            os.environ.setdefault(k, v)
         merged = {**file_env, **(env if env is not None else os.environ)}
         env = merged
         data_dir = Path(env.get("TS_DATA_DIR", str(DEFAULT_DATA_DIR)))

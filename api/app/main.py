@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 from fastapi import FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from social.router import create_router as create_social_router
@@ -107,6 +108,11 @@ def create_app(services: Services | None = None,
         create_social_router(svc.social.service, svc.social.flow, social_owner),
         prefix="/api/v1",
     )
+
+    @app.get("/demo", include_in_schema=False)
+    def demo() -> FileResponse:
+        return FileResponse(Path(__file__).resolve().parent.parent / "demo.html")
+
     return app
 
 
