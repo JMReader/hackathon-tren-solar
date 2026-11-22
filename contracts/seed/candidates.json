@@ -11,11 +11,33 @@
       "country": "Argentina",
       "work_mode": "hybrid",
       "segment": "digital_junior",
-      "skills": ["UX", "Figma", "React"],
+      "skills": [
+        "UX",
+        "Figma",
+        "React"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": "seed-ana-ux",
-      "pubs_7d": 3
+      "pubs_7d": 3,
+      "x": true,
+      "achievement_title": "App de turnos para clínica dental",
+      "transcript": "Diseñé el flujo de reserva de una clínica dental de San Salvador: quedó en 3 pasos y el equipo lo entregó en 5 semanas.",
+      "evidence": {
+        "UX": "Diseñé el flujo de reserva de una clínica dental de San Salvador: pasó de 6 pantallas a 3.",
+        "Figma": "Armé el prototipo navegable en Figma con componentes propios y lo testeé con 6 pacientes.",
+        "React": "Maqueté la pantalla de confirmación en React junto al equipo backend."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "App de turnos para una clínica dental de San Salvador."
+        },
+        {
+          "category": "impact",
+          "text": "El flujo quedó en 3 pasos y el MVP se entregó en 5 semanas."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_02_bruno",
@@ -27,11 +49,32 @@
       "location": "San Salvador de Jujuy",
       "work_mode": "onsite",
       "segment": "digital_junior",
-      "skills": ["Python", "FastAPI"],
+      "skills": [
+        "Python",
+        "FastAPI",
+        "PostgreSQL"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": "seed-bruno-api",
-      "pubs_7d": null
+      "pubs_7d": 7,
+      "achievement_title": "API de turnos para cooperativa",
+      "transcript": "Automaticé el conciliador de pagos de una cooperativa en Python y expuse la API de turnos con FastAPI.",
+      "evidence": {
+        "Python": "Automaticé el conciliador de pagos de una cooperativa en Python; procesa 1.200 líneas por corrida.",
+        "FastAPI": "Expuse la API de turnos con FastAPI, 12 endpoints documentados con OpenAPI.",
+        "PostgreSQL": "Diseñé el esquema de turnos en PostgreSQL con 14 tablas y migraciones versionadas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "API de turnos para una cooperativa de servicios de Jujuy."
+        },
+        {
+          "category": "impact",
+          "text": "El conciliador dejó de correr a mano todas las noches."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_03_carla",
@@ -43,11 +86,32 @@
       "location": "San Salvador de Jujuy",
       "work_mode": "hybrid",
       "segment": "digital_junior",
-      "skills": ["UX", "CSS"],
+      "skills": [
+        "UX",
+        "CSS",
+        "Figma"
+      ],
       "achievement_status": "approved",
       "consent": false,
       "slug": "seed-carla-privada",
-      "pubs_7d": null
+      "pubs_7d": 6,
+      "achievement_title": "Rediseño de portal de socios",
+      "transcript": "Rediseñé el portal de socios de una cooperativa; prefiero mantener mi perfil privado por ahora.",
+      "evidence": {
+        "UX": "Reorganicé el portal de socios: el trámite más pedido quedó a 1 clic del home.",
+        "CSS": "Maqueté el portal con CSS Grid mobile-first, sin frameworks.",
+        "Figma": "Documenté las 10 pantallas del portal en Figma para el equipo."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del portal de socios de una cooperativa de Palpalá."
+        },
+        {
+          "category": "impact",
+          "text": "Las consultas por teléfono bajaron un 30% el primer mes."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_04_diana",
@@ -59,11 +123,33 @@
       "location": "Palpalá",
       "work_mode": "onsite",
       "segment": "digital_junior",
-      "skills": ["UX", "Figma"],
+      "skills": [
+        "UX",
+        "Figma",
+        "Prototipado"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": "seed-diana-ui",
-      "pubs_7d": 0
+      "pubs_7d": 0,
+      "x": true,
+      "achievement_title": "Menú digital para rotisería",
+      "transcript": "Reorganicé el menú digital de una rotisería de Palpalá y los pedidos por WhatsApp subieron 30%.",
+      "evidence": {
+        "UX": "Reorganicé el menú digital de una rotisería de Palpalá; los pedidos por WhatsApp subieron 30%.",
+        "Figma": "Prototipé la app de pedidos en Figma con modo oscuro incluido.",
+        "Prototipado": "Iteré el prototipo 3 veces en una semana a partir del feedback del mostrador."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Menú digital para una rotisería de Palpalá."
+        },
+        {
+          "category": "impact",
+          "text": "Los pedidos por WhatsApp subieron 30% en el primer mes."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_05_eli",
@@ -75,11 +161,32 @@
       "location": "Córdoba",
       "work_mode": "hybrid",
       "segment": "digital_junior",
-      "skills": ["UX", "Figma"],
+      "skills": [
+        "UX",
+        "Figma",
+        "Research"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": "seed-elias-cba",
-      "pubs_7d": 1
+      "pubs_7d": 2,
+      "achievement_title": "Onboarding de fintech",
+      "transcript": "Rediseñé el onboarding de una fintech cordobesa; el alta bajó de 9 a 5 campos.",
+      "evidence": {
+        "UX": "Rediseñé el onboarding de una fintech cordobesa; el alta bajó de 9 a 5 campos.",
+        "Figma": "Armé la biblioteca de componentes en Figma para el equipo de 4 diseñadores.",
+        "Research": "Corrí un benchmark de 6 fintechs y sinteticé los hallazgos en un informe de 4 páginas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Onboarding de una fintech de Córdoba."
+        },
+        {
+          "category": "impact",
+          "text": "El alta quedó en 5 campos y el abandono bajó 18%."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_06_florencia",
@@ -91,11 +198,33 @@
       "location": "Remoto",
       "work_mode": "remote",
       "segment": "digital_junior",
-      "skills": ["UX", "CSS"],
+      "skills": [
+        "UX",
+        "CSS",
+        "Diseño UI"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": "seed-florencia-remote",
-      "pubs_7d": null
+      "pubs_7d": 4,
+      "x": true,
+      "achievement_title": "Research para plataforma de turismo",
+      "transcript": "Llevé el research de una plataforma de turismo del NOA: 12 entrevistas y mapa de experiencia, todo remoto.",
+      "evidence": {
+        "UX": "Llevé el research de una plataforma de turismo del NOA: 12 entrevistas y mapa de experiencia.",
+        "CSS": "Maqueté el sitio responsive con CSS puro, sin frameworks; quedó 96/100 en Lighthouse.",
+        "Diseño UI": "Diseñé las tarjetas de destino que subieron el CTR de la home un 18%."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Plataforma de turismo del NOA, trabajo 100% remoto."
+        },
+        {
+          "category": "impact",
+          "text": "Los hallazgos reordenaron el roadmap del primer trimestre."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_07_gus",
@@ -107,11 +236,32 @@
       "location": "San Salvador de Jujuy",
       "work_mode": "hybrid",
       "segment": "digital_junior",
-      "skills": ["UX"],
+      "skills": [
+        "UX",
+        "Accesibilidad",
+        "Research"
+      ],
       "achievement_status": "approved",
       "consent": "revoked",
       "slug": "seed-gus-revocado",
-      "pubs_7d": 2
+      "pubs_7d": 2,
+      "achievement_title": "Relevamiento de accesibilidad",
+      "transcript": "Hice el relevamiento de accesibilidad de la web municipal; después retiré mi consentimiento de búsqueda.",
+      "evidence": {
+        "UX": "Relevé la accesibilidad de la web municipal con NVDA y prioricé 11 correcciones.",
+        "Accesibilidad": "Corregí contraste y foco visible en las 6 pantallas principales del portal.",
+        "Research": "Documenté los hallazgos en un informe de 5 páginas para la secretaría."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Auditoría de accesibilidad de la web municipal."
+        },
+        {
+          "category": "impact",
+          "text": "El informe quedó como insumo para el rediseño del portal."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_08_helena",
@@ -123,11 +273,32 @@
       "location": "Jujuy",
       "work_mode": "onsite",
       "segment": "mineria_industria",
-      "skills": ["Seguridad industrial"],
+      "skills": [
+        "Seguridad industrial",
+        "Capacitación",
+        "Logística de campaña"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": null,
-      "pubs_7d": null
+      "pubs_7d": null,
+      "achievement_title": "Auditoría de seguridad en planta",
+      "transcript": "Audité los protocolos de seguridad de una planta de Perico; cero incidentes en 90 días.",
+      "evidence": {
+        "Seguridad industrial": "Audité los protocolos de seguridad de una planta de Perico; cero incidentes en 90 días.",
+        "Capacitación": "Capacité a 30 operarios en uso de EPP y nueva señalización.",
+        "Logística de campaña": "Organicé la logística diaria de 3 cuadrillas durante la zafra."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Auditoría de seguridad industrial en planta de Perico."
+        },
+        {
+          "category": "impact",
+          "text": "Cero incidentes reportados en los 90 días posteriores."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_09_ivan",
@@ -139,11 +310,33 @@
       "location": "San Salvador de Jujuy",
       "work_mode": "hybrid",
       "segment": "digital_junior",
-      "skills": ["React", "TypeScript"],
+      "skills": [
+        "React",
+        "TypeScript",
+        "Frontend"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": "seed-ivan-fe",
-      "pubs_7d": 5
+      "pubs_7d": 9,
+      "x": true,
+      "achievement_title": "Panel de stock en React",
+      "transcript": "Desarrollé el panel de stock de un almacén de Perico en React con 15 pantallas y TypeScript estricto.",
+      "evidence": {
+        "React": "Desarrollé el panel de stock de un mayorista de Perico en React con 15 pantallas.",
+        "TypeScript": "Tipé toda la capa de datos con TypeScript estricto; cero any en el repo.",
+        "Frontend": "Levanté el front completo en 3 semanas con grilla responsive propia."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Panel de stock para un mayorista de Perico."
+        },
+        {
+          "category": "impact",
+          "text": "El conteo diario de stock bajó de 2 horas a 25 minutos."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_10_julia",
@@ -155,11 +348,32 @@
       "location": "San Salvador de Jujuy",
       "work_mode": "hybrid",
       "segment": "digital_junior",
-      "skills": ["UX", "Figma"],
+      "skills": [
+        "UX",
+        "Figma",
+        "Diseño UI"
+      ],
       "achievement_status": "needs_review",
       "consent": true,
       "slug": null,
-      "pubs_7d": null
+      "pubs_7d": 1,
+      "achievement_title": "Rediseño de portal cooperativa",
+      "transcript": "Empecé el rediseño del portal de la cooperativa de Palpalá; todavía está en revisión.",
+      "evidence": {
+        "UX": "Empecé el rediseño del portal de la cooperativa de Palpalá.",
+        "Figma": "Boceté las primeras 8 pantallas en Figma.",
+        "Diseño UI": "Definí la grilla base y la paleta inicial del portal."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del portal de una cooperativa (en curso)."
+        },
+        {
+          "category": "context",
+          "text": "Trabajo en curso, pendiente de validación con la comisión."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_11_kevin",
@@ -171,11 +385,32 @@
       "location": "Perico",
       "work_mode": "onsite",
       "segment": "digital_junior",
-      "skills": ["UX", "Figma"],
+      "skills": [
+        "UX",
+        "Figma",
+        "Prototipado"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": "seed-kevin-ux",
-      "pubs_7d": 1
+      "pubs_7d": 1,
+      "achievement_title": "App de turnos para taller",
+      "transcript": "Diseñé la app de turnos para el taller mecánico de mi familia en Perico; documenté todo el flujo en Figma.",
+      "evidence": {
+        "UX": "Diseñé la app de turnos para el taller mecánico de mi familia en Perico: la reserva quedó en menos de 1 minuto.",
+        "Figma": "Documenté el flujo completo en Figma con 14 pantallas conectadas.",
+        "Prototipado": "Validé el prototipo con 5 clientes del taller antes de escribir código."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "App de turnos para un taller mecánico de Perico."
+        },
+        {
+          "category": "impact",
+          "text": "Las llamadas para coordinar turnos bajaron a la mitad."
+        }
+      ]
     },
     {
       "session_id": "seed_ses_12_laura",
@@ -187,18 +422,3994 @@
       "location": "San Pedro de Jujuy",
       "work_mode": "hybrid",
       "segment": "digital_junior",
-      "skills": ["UX", "Figma", "CSS"],
+      "skills": [
+        "UX",
+        "Figma",
+        "CSS"
+      ],
       "achievement_status": "approved",
       "consent": true,
       "slug": "seed-laura-ux",
-      "pubs_7d": null
+      "pubs_7d": 2,
+      "x": true,
+      "achievement_title": "Web de artesanía de San Pedro",
+      "transcript": "Reestructuré la web de una artesanía de San Pedro; el catálogo pasó de 3 clics a 1.",
+      "evidence": {
+        "UX": "Reestructuré la web de una artesanía de San Pedro; el catálogo pasó de 3 clics a 1.",
+        "Figma": "Armé el prototipo en Figma con una paleta inspirada en los cerros.",
+        "CSS": "Implementé el front con CSS Grid y variables, mobile-first."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Web de una artesanía de San Pedro de Jujuy."
+        },
+        {
+          "category": "impact",
+          "text": "Las consultas por catálogo crecieron 40% en dos meses."
+        }
+      ]
+    },
+    {
+      "session_id": "seed_ses_e013",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "María Eugenia Quispe",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "San Salvador de Jujuy",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Figma",
+        "Diseño UI"
+      ],
+      "evidence": {
+        "UX": "Rediseñé el flujo de turnos de una clínica dental de San Salvador: pasó de 6 pantallas a 3.",
+        "Figma": "Prototipé 14 pantallas conectadas en Figma para la app de turnos.",
+        "Diseño UI": "Definí la grilla de 8pt y la tipografía del dashboard administrativo."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "App de turnos para clínica local."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "App de turnos para clínica local",
+      "transcript": "App de turnos para clínica local: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-maria-ux",
+      "pubs_7d": 0,
+      "linkedin": true,
+      "x": true,
+      "template_id": "recorrido",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e014",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Martín Vilca",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Palpalá",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Diseño UI",
+        "Prototipado",
+        "Research"
+      ],
+      "evidence": {
+        "UX": "Reorganicé el checkout de una tienda de textiles de Tilcara y el abandono bajó 22%.",
+        "Diseño UI": "Definí la grilla de 8pt y la tipografía del dashboard administrativo.",
+        "Prototipado": "Iteré el prototipo 4 veces en una semana a partir del feedback del mostrador.",
+        "Research": "Documenté los insights del discovery en un repositorio compartido con el equipo."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del menú digital de una rotisería."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Rediseño del menú digital de una rotisería",
+      "transcript": "Rediseño del menú digital de una rotisería: bajó la carga del mostrador que atendía todo por whatsapp. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-martin-ux",
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e015",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Luciana Cruz",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Perico",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Prototipado",
+        "Research",
+        "Design System",
+        "Accesibilidad"
+      ],
+      "evidence": {
+        "UX": "Llevé adelante el research de una app de carpooling San Salvador–Palpalá: 11 entrevistas.",
+        "Prototipado": "Iteré el prototipo 4 veces en una semana a partir del feedback del mostrador.",
+        "Research": "Documenté los insights del discovery en un repositorio compartido con el equipo.",
+        "Design System": "Documenté el uso de cada componente con ejemplos de hacer/no hacer.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Portal de turismo de la Quebrada."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Portal de turismo de la Quebrada",
+      "transcript": "Portal de turismo de la Quebrada: quedó funcionando en producción para ~200 usuarios activos. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-luciana-ux",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": true,
+      "template_id": "caso",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e016",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Sebastián Condori",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "El Carmen",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "UX",
+        "Research",
+        "Design System",
+        "Accesibilidad",
+        "UX Writing",
+        "Testeo con usuarios"
+      ],
+      "evidence": {
+        "UX": "Diseñé el onboarding de una billetera para kioscos: el alta quedó en 4 pasos.",
+        "Research": "Documenté los insights del discovery en un repositorio compartido con el equipo.",
+        "Design System": "Documenté el uso de cada componente con ejemplos de hacer/no hacer.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard.",
+        "UX Writing": "Reduje el texto del onboarding a frases de menos de 12 palabras.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Checkout para tienda de textiles."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Checkout para tienda de textiles",
+      "transcript": "Checkout para tienda de textiles: el cliente renovó el contrato para la segunda etapa. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-sebastian-ux",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e017",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Valeria Lamas",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "San Pedro de Jujuy",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Design System",
+        "Accesibilidad"
+      ],
+      "evidence": {
+        "UX": "Mapeé el journey de pacientes del hospital de Perico y detecté 7 fricciones en el ingreso.",
+        "Design System": "Documenté el uso de cada componente con ejemplos de hacer/no hacer.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "App de carpooling San Salvador–Palpalá."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "App de carpooling San Salvador–Palpalá",
+      "transcript": "App de carpooling San Salvador–Palpalá: se presentó en el meetup de tecnología de san salvador. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-valeria-ux",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e018",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Matías Soria",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Libertador General San Martín",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "UX",
+        "Accesibilidad",
+        "UX Writing",
+        "Testeo con usuarios"
+      ],
+      "evidence": {
+        "UX": "Rediseñé la web de trámites municipales: la tarea más buscada quedó a 1 clic.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard.",
+        "UX Writing": "Reduje el texto del onboarding a frases de menos de 12 palabras.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Onboarding de billetera para kioscos."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Onboarding de billetera para kioscos",
+      "transcript": "Onboarding de billetera para kioscos: redujo el trabajo manual del equipo a la mitad. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": false,
+      "slug": null,
+      "pubs_7d": 14,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e019",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Gabriela Burgos",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Monterrico",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "UX Writing",
+        "Testeo con usuarios",
+        "Figma",
+        "Diseño UI"
+      ],
+      "evidence": {
+        "UX": "Estructuré la información de un menú digital para una rotisería; los pedidos subieron 30%.",
+        "UX Writing": "Reduje el texto del onboarding a frases de menos de 12 palabras.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas.",
+        "Figma": "Armé el prototipo en Figma con una paleta inspirada en los cerros de Purmamarca.",
+        "Diseño UI": "Retoqué la UI de la landing hasta dejarla en AA de contraste."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Web de trámites municipales."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "Web de trámites municipales",
+      "transcript": "Web de trámites municipales: hoy lo usa la administración para su operación diaria. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-gabriela-ux",
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e020",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Federico Castro",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Tilcara",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Testeo con usuarios",
+        "Figma",
+        "Diseño UI",
+        "Prototipado",
+        "Research"
+      ],
+      "evidence": {
+        "UX": "Validé el prototipo de una app de turismo de la Quebrada con 9 usuarios.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas.",
+        "Figma": "Armé el prototipo en Figma con una paleta inspirada en los cerros de Purmamarca.",
+        "Diseño UI": "Retoqué la UI de la landing hasta dejarla en AA de contraste.",
+        "Prototipado": "El prototipo del tour guiado quedó listo en 2 días para mostrarlo a inversores.",
+        "Research": "Hice 12 entrevistas a comerciantes de la feria de San Salvador para entender su operación."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Sistema de reservas para taller mecánico."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Sistema de reservas para taller mecánico",
+      "transcript": "Sistema de reservas para taller mecánico: el resultado se usa como caso de referencia del equipo. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-federico-ux",
+      "pubs_7d": 8,
+      "linkedin": true,
+      "x": true,
+      "template_id": "caso",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e021",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Soledad Guzmán",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Humahuaca",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Figma",
+        "Diseño UI"
+      ],
+      "evidence": {
+        "UX": "Convertí un formulario de 18 campos en un wizard de 4 pasos para una mutual de El Carmen.",
+        "Figma": "Armé el prototipo en Figma con una paleta inspirada en los cerros de Purmamarca.",
+        "Diseño UI": "Retoqué la UI de la landing hasta dejarla en AA de contraste."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Catálogo online de feria artesanal."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Catálogo online de feria artesanal",
+      "transcript": "Catálogo online de feria artesanal: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-soledad-ux",
+      "pubs_7d": 0,
+      "linkedin": false,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e022",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Alejandro Lezcano",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Fraile Pintado",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "UX",
+        "Diseño UI",
+        "Prototipado",
+        "Research"
+      ],
+      "evidence": {
+        "UX": "Diseñé el flujo de carga de fotos para una feria artesanal online.",
+        "Diseño UI": "Retoqué la UI de la landing hasta dejarla en AA de contraste.",
+        "Prototipado": "El prototipo del tour guiado quedó listo en 2 días para mostrarlo a inversores.",
+        "Research": "Hice 12 entrevistas a comerciantes de la feria de San Salvador para entender su operación."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Tablero de indicadores para fundación."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Tablero de indicadores para fundación",
+      "transcript": "Tablero de indicadores para fundación: bajó la carga del mostrador que atendía todo por whatsapp. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-alejandro-ux",
+      "pubs_7d": 11,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e023",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Mariana Morales",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Abra Pampa",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Prototipado",
+        "Research",
+        "Design System",
+        "Accesibilidad"
+      ],
+      "evidence": {
+        "UX": "Audité la usabilidad del portal de una cooperativa y prioricé 12 mejoras.",
+        "Prototipado": "El prototipo del tour guiado quedó listo en 2 días para mostrarlo a inversores.",
+        "Research": "Hice 12 entrevistas a comerciantes de la feria de San Salvador para entender su operación.",
+        "Design System": "Documenté el uso de cada componente con ejemplos de hacer/no hacer.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño de portal de socios."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Rediseño de portal de socios",
+      "transcript": "Rediseño de portal de socios: quedó funcionando en producción para ~200 usuarios activos. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-mariana-ux",
+      "pubs_7d": 5,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e024",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Cristian Nievas",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Yuto",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "UX",
+        "Research",
+        "Design System",
+        "Accesibilidad",
+        "UX Writing",
+        "Testeo con usuarios"
+      ],
+      "evidence": {
+        "UX": "Reduje el tiempo de reserva de la app de turnos de un taller a menos de 1 minuto.",
+        "Research": "Hice 12 entrevistas a comerciantes de la feria de San Salvador para entender su operación.",
+        "Design System": "Documenté el uso de cada componente con ejemplos de hacer/no hacer.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard.",
+        "UX Writing": "Reescribí los mensajes de error del checkout: las consultas a soporte bajaron 35%.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "App de pedidos para verdulería."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "App de pedidos para verdulería",
+      "transcript": "App de pedidos para verdulería: el cliente renovó el contrato para la segunda etapa. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-cristian-ux",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": true,
+      "template_id": "esencial",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e025",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Carolina Ocampo",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Calilegua",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Design System",
+        "Accesibilidad"
+      ],
+      "evidence": {
+        "UX": "Diseñé el tablero de indicadores para una fundación: 3 métricas clave sin scroll.",
+        "Design System": "Documenté el uso de cada componente con ejemplos de hacer/no hacer.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "App de turnos para clínica local."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "App de turnos para clínica local",
+      "transcript": "App de turnos para clínica local: se presentó en el meetup de tecnología de san salvador. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-carolina-ux",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e026",
+      "matrix": "ux Jujuy ampliada",
+      "display_name": "Diego Quiroga",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "San Antonio",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Accesibilidad",
+        "UX Writing",
+        "Testeo con usuarios"
+      ],
+      "evidence": {
+        "UX": "Reorganicé el menú digital de una rotisería de Palpalá; los pedidos por WhatsApp subieron 30%.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard.",
+        "UX Writing": "Reescribí los mensajes de error del checkout: las consultas a soporte bajaron 35%.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del menú digital de una rotisería."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Rediseño del menú digital de una rotisería",
+      "transcript": "Rediseño del menú digital de una rotisería: redujo el trabajo manual del equipo a la mitad. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-diego-ux",
+      "pubs_7d": 10,
+      "linkedin": true,
+      "x": true,
+      "template_id": "credencial",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e027",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Verónica Ríos",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "El Aguilar",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "React",
+        "TypeScript",
+        "Next.js",
+        "JavaScript"
+      ],
+      "evidence": {
+        "Frontend": "Desarrollé el módulo de reserva con selección de fecha y hora.",
+        "React": "Hice el módulo de reportes en React con gráficos consumiendo la API nueva.",
+        "TypeScript": "Armé helpers genéricos tipados para el form builder del backoffice.",
+        "Next.js": "Implementé el dashboard en Next.js App Router con server actions.",
+        "JavaScript": "Resolví 30 bugs del front heredado en JavaScript en un mes."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Galería online de feria."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "Galería online de feria",
+      "transcript": "Galería online de feria: hoy lo usa la administración para su operación diaria. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-veronica-frontend",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": false,
+      "template_id": "galeria",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e028",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Ezequiel Salinas",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Puesto Viejo",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Frontend",
+        "TypeScript",
+        "Next.js",
+        "JavaScript",
+        "CSS",
+        "Tailwind"
+      ],
+      "evidence": {
+        "Frontend": "Implementé la galería de fotos de la feria con lazy loading.",
+        "TypeScript": "Armé helpers genéricos tipados para el form builder del backoffice.",
+        "Next.js": "Implementé el dashboard en Next.js App Router con server actions.",
+        "JavaScript": "Resolví 30 bugs del front heredado en JavaScript en un mes.",
+        "CSS": "Implementé el modo oscuro completo con custom properties.",
+        "Tailwind": "Migré el dashboard a Tailwind y el CSS custom quedó en 200 líneas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Buscador con filtros para catálogo."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Buscador con filtros para catálogo",
+      "transcript": "Buscador con filtros para catálogo: el resultado se usa como caso de referencia del equipo. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-ezequiel-frontend",
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": true,
+      "template_id": "recorrido",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e029",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Natalia Tapia",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "San Salvador de Jujuy",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "Next.js",
+        "JavaScript"
+      ],
+      "evidence": {
+        "Frontend": "Maqueté las 15 pantallas del panel de stock en 3 semanas.",
+        "Next.js": "Implementé el dashboard en Next.js App Router con server actions.",
+        "JavaScript": "Resolví 30 bugs del front heredado en JavaScript en un mes."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Portal de turnos para gimnasio."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Portal de turnos para gimnasio",
+      "transcript": "Portal de turnos para gimnasio: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-natalia-frontend",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e030",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Facundo Vargas",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Palpalá",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "Frontend",
+        "JavaScript",
+        "CSS",
+        "Tailwind"
+      ],
+      "evidence": {
+        "Frontend": "Implementé el modo offline de la app de pedidos con service workers.",
+        "JavaScript": "Resolví 30 bugs del front heredado en JavaScript en un mes.",
+        "CSS": "Implementé el modo oscuro completo con custom properties.",
+        "Tailwind": "Migré el dashboard a Tailwind y el CSS custom quedó en 200 líneas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Web app de pedidos offline."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Web app de pedidos offline",
+      "transcript": "Web app de pedidos offline: bajó la carga del mostrador que atendía todo por whatsapp. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-facundo-frontend",
+      "pubs_7d": 6,
+      "linkedin": true,
+      "x": true,
+      "template_id": "caso",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e031",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Silvina Zamora",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Perico",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "CSS",
+        "Tailwind",
+        "HTML",
+        "React"
+      ],
+      "evidence": {
+        "Frontend": "Levanté el sitio institucional de una bodega de Cafayate en una semana.",
+        "CSS": "Implementé el modo oscuro completo con custom properties.",
+        "Tailwind": "Migré el dashboard a Tailwind y el CSS custom quedó en 200 líneas.",
+        "HTML": "Estructuré la web con HTML semántico: nav, main y headings ordenados.",
+        "React": "Armé un buscador con filtros combinables en React para el catálogo de una feria."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Sitio de turismo con 30 destinos."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Sitio de turismo con 30 destinos",
+      "transcript": "Sitio de turismo con 30 destinos: quedó funcionando en producción para ~200 usuarios activos. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "needs_review",
+      "consent": true,
+      "slug": null,
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e032",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Gonzalo García",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "El Carmen",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "Tailwind",
+        "HTML",
+        "React",
+        "TypeScript",
+        "Next.js"
+      ],
+      "evidence": {
+        "Frontend": "Migré la landing de jQuery suelto a componentes reutilizables.",
+        "Tailwind": "Migré el dashboard a Tailwind y el CSS custom quedó en 200 líneas.",
+        "HTML": "Estructuré la web con HTML semántico: nav, main y headings ordenados.",
+        "React": "Armé un buscador con filtros combinables en React para el catálogo de una feria.",
+        "TypeScript": "Activé strict en el proyecto y resolví los 120 warnings que quedaron.",
+        "Next.js": "Levanté el blog institucional en Next.js con MDX y RSS."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Front de app de carpooling."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Front de app de carpooling",
+      "transcript": "Front de app de carpooling: el cliente renovó el contrato para la segunda etapa. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-gonzalo-frontend",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": false,
+      "template_id": "galeria",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e033",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Romina Herrera",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "San Pedro de Jujuy",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "HTML",
+        "React"
+      ],
+      "evidence": {
+        "Frontend": "Optimicé el bundle: el tiempo de carga bajó de 4,2s a 1,3s.",
+        "HTML": "Estructuré la web con HTML semántico: nav, main y headings ordenados.",
+        "React": "Armé un buscador con filtros combinables en React para el catálogo de una feria."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Panel de stock para mayorista."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "Panel de stock para mayorista",
+      "transcript": "Panel de stock para mayorista: se presentó en el meetup de tecnología de san salvador. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-romina-frontend",
+      "pubs_7d": 0,
+      "linkedin": true,
+      "x": true,
+      "template_id": "recorrido",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e034",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Hernán Ibáñez",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Libertador General San Martín",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Frontend",
+        "React",
+        "TypeScript",
+        "Next.js"
+      ],
+      "evidence": {
+        "Frontend": "Armé el front del tablero de indicadores con grilla responsive propia.",
+        "React": "Armé un buscador con filtros combinables en React para el catálogo de una feria.",
+        "TypeScript": "Activé strict en el proyecto y resolví los 120 warnings que quedaron.",
+        "Next.js": "Levanté el blog institucional en Next.js con MDX y RSS."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Sitio institucional de bodega."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Sitio institucional de bodega",
+      "transcript": "Sitio institucional de bodega: redujo el trabajo manual del equipo a la mitad. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-hernan-frontend",
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e035",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Antonella Juárez",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Monterrico",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "TypeScript",
+        "Next.js",
+        "JavaScript",
+        "CSS"
+      ],
+      "evidence": {
+        "Frontend": "Desarrollé el módulo de reserva con selección de fecha y hora.",
+        "TypeScript": "Activé strict en el proyecto y resolví los 120 warnings que quedaron.",
+        "Next.js": "Levanté el blog institucional en Next.js con MDX y RSS.",
+        "JavaScript": "Escribí la lógica del carrito en JavaScript puro sin dependencias.",
+        "CSS": "Bajé el CSS de 240KB a 60KB sacando frameworks que no usábamos."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Dashboard administrativo responsive."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "Dashboard administrativo responsive",
+      "transcript": "Dashboard administrativo responsive: hoy lo usa la administración para su operación diaria. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-antonella-frontend",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": true,
+      "template_id": "caso",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e036",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Ignacio Luna",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Tilcara",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "Frontend",
+        "Next.js",
+        "JavaScript",
+        "CSS",
+        "Tailwind",
+        "HTML"
+      ],
+      "evidence": {
+        "Frontend": "Implementé la galería de fotos de la feria con lazy loading.",
+        "Next.js": "Levanté el blog institucional en Next.js con MDX y RSS.",
+        "JavaScript": "Escribí la lógica del carrito en JavaScript puro sin dependencias.",
+        "CSS": "Bajé el CSS de 240KB a 60KB sacando frameworks que no usábamos.",
+        "Tailwind": "Estandaricé el espaciado del proyecto con la escala de Tailwind.",
+        "HTML": "Armé las plantillas de email en HTML tablas para que abran bien en Outlook."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Landing de lanzamiento de marca."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Landing de lanzamiento de marca",
+      "transcript": "Landing de lanzamiento de marca: el resultado se usa como caso de referencia del equipo. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-ignacio-frontend",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e037",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Milagros Medina",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Humahuaca",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "JavaScript",
+        "CSS"
+      ],
+      "evidence": {
+        "Frontend": "Maqueté las 15 pantallas del panel de stock en 3 semanas.",
+        "JavaScript": "Escribí la lógica del carrito en JavaScript puro sin dependencias.",
+        "CSS": "Bajé el CSS de 240KB a 60KB sacando frameworks que no usábamos."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Galería online de feria."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Galería online de feria",
+      "transcript": "Galería online de feria: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-milagros-frontend",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e038",
+      "matrix": "frontend Jujuy ampliada",
+      "display_name": "Joaquín Navarro",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Fraile Pintado",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "CSS",
+        "Tailwind",
+        "HTML"
+      ],
+      "evidence": {
+        "Frontend": "Implementé el modo offline de la app de pedidos con service workers.",
+        "CSS": "Bajé el CSS de 240KB a 60KB sacando frameworks que no usábamos.",
+        "Tailwind": "Estandaricé el espaciado del proyecto con la escala de Tailwind.",
+        "HTML": "Armé las plantillas de email en HTML tablas para que abran bien en Outlook."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Buscador con filtros para catálogo."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Buscador con filtros para catálogo",
+      "transcript": "Buscador con filtros para catálogo: bajó la carga del mostrador que atendía todo por whatsapp. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-joaquin-frontend",
+      "pubs_7d": 14,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e039",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Camila Ortiz",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Abra Pampa",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "Django",
+        "Node.js",
+        "PostgreSQL",
+        "APIs"
+      ],
+      "evidence": {
+        "Backend": "Migré el sistema de socios de una cooperativa a una API moderna.",
+        "Django": "Implementé el blog corporativo con Django y Wagtail.",
+        "Node.js": "Desarrollé el webhook que sincroniza el CRM en Node.js.",
+        "PostgreSQL": "Documenté el modelo de datos en Postgres con migraciones versionadas.",
+        "APIs": "Integré la API de WhatsApp Business para las notificaciones de turnos."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "API de stock multi-sucursal."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "API de stock multi-sucursal",
+      "transcript": "API de stock multi-sucursal: quedó funcionando en producción para ~200 usuarios activos. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-camila-backend",
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": true,
+      "template_id": "esencial",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e040",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Leandro Pereyra",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Yuto",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Backend",
+        "Node.js",
+        "PostgreSQL",
+        "APIs",
+        "SQL",
+        "Docker"
+      ],
+      "evidence": {
+        "Backend": "Implementé la cola de procesamiento de facturas con reintentos.",
+        "Node.js": "Desarrollé el webhook que sincroniza el CRM en Node.js.",
+        "PostgreSQL": "Documenté el modelo de datos en Postgres con migraciones versionadas.",
+        "APIs": "Integré la API de WhatsApp Business para las notificaciones de turnos.",
+        "SQL": "Escribí las queries del tablero de KPIs con window functions.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Bot de WhatsApp para consultas."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Bot de WhatsApp para consultas",
+      "transcript": "Bot de WhatsApp para consultas: el cliente renovó el contrato para la segunda etapa. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-leandro-backend",
+      "pubs_7d": 8,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e041",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Agustina Ramos",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Calilegua",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "PostgreSQL",
+        "APIs"
+      ],
+      "evidence": {
+        "Backend": "Armé el servicio de notificaciones que manda 3.000 mails por semana.",
+        "PostgreSQL": "Documenté el modelo de datos en Postgres con migraciones versionadas.",
+        "APIs": "Integré la API de WhatsApp Business para las notificaciones de turnos."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Migración de sistema de facturación."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "Migración de sistema de facturación",
+      "transcript": "Migración de sistema de facturación: se presentó en el meetup de tecnología de san salvador. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-agustina-backend",
+      "pubs_7d": 0,
+      "linkedin": true,
+      "x": true,
+      "template_id": "credencial",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e042",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Maximiliano Sosa",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "San Antonio",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "Backend",
+        "APIs",
+        "SQL",
+        "Docker"
+      ],
+      "evidence": {
+        "Backend": "Levanté el backend del marketplace de artesanos de la Quebrada.",
+        "APIs": "Integré la API de WhatsApp Business para las notificaciones de turnos.",
+        "SQL": "Escribí las queries del tablero de KPIs con window functions.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Cola de procesamiento de facturas."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Cola de procesamiento de facturas",
+      "transcript": "Cola de procesamiento de facturas: redujo el trabajo manual del equipo a la mitad. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": "revoked",
+      "slug": "seed-maximiliano-backend",
+      "pubs_7d": 11,
+      "linkedin": true,
+      "x": false,
+      "template_id": "galeria",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e043",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Micaela Torres",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "El Aguilar",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "SQL",
+        "Docker",
+        "Python",
+        "FastAPI"
+      ],
+      "evidence": {
+        "Backend": "Reduje la consulta más lenta de 8s a 300ms con índices.",
+        "SQL": "Escribí las queries del tablero de KPIs con window functions.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local.",
+        "Python": "Escribí el scraper que consolida precios de 5 proveedores en Python.",
+        "FastAPI": "Documenté toda la API con los esquemas de FastAPI; el front se integró sin calls."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "API de turnos para cooperativa."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "API de turnos para cooperativa",
+      "transcript": "API de turnos para cooperativa: hoy lo usa la administración para su operación diaria. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-micaela-backend",
+      "pubs_7d": 5,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e044",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Nahuel Vaca",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Puesto Viejo",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "Docker",
+        "Python",
+        "FastAPI",
+        "Django",
+        "Node.js"
+      ],
+      "evidence": {
+        "Backend": "Implementé autenticación con JWT y roles para el backoffice.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local.",
+        "Python": "Escribí el scraper que consolida precios de 5 proveedores en Python.",
+        "FastAPI": "Documenté toda la API con los esquemas de FastAPI; el front se integró sin calls.",
+        "Django": "Implementé el blog corporativo con Django y Wagtail.",
+        "Node.js": "Implementé el servicio de facturación en Node.js con workers."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Conciliador automático de pagos."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Conciliador automático de pagos",
+      "transcript": "Conciliador automático de pagos: el resultado se usa como caso de referencia del equipo. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-nahuel-backend",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": true,
+      "template_id": "esencial",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e045",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Rocío Yapura",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "San Salvador de Jujuy",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "Python",
+        "FastAPI"
+      ],
+      "evidence": {
+        "Backend": "Diseñé la API REST del sistema de turnos con 12 endpoints documentados.",
+        "Python": "Escribí el scraper que consolida precios de 5 proveedores en Python.",
+        "FastAPI": "Documenté toda la API con los esquemas de FastAPI; el front se integró sin calls."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Sistema de socios migrado a API."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Sistema de socios migrado a API",
+      "transcript": "Sistema de socios migrado a API: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-rocio-backend",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e046",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Oscar Zenteno",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Palpalá",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Backend",
+        "FastAPI",
+        "Django",
+        "Node.js"
+      ],
+      "evidence": {
+        "Backend": "Automaticé el conciliador de pagos que corría a mano todas las noches.",
+        "FastAPI": "Documenté toda la API con los esquemas de FastAPI; el front se integró sin calls.",
+        "Django": "Implementé el blog corporativo con Django y Wagtail.",
+        "Node.js": "Implementé el servicio de facturación en Node.js con workers."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Servicio de notificaciones por mail."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Servicio de notificaciones por mail",
+      "transcript": "Servicio de notificaciones por mail: bajó la carga del mostrador que atendía todo por whatsapp. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-oscar-backend",
+      "pubs_7d": 10,
+      "linkedin": false,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e047",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Yamila Alfaro",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Perico",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "Django",
+        "Node.js",
+        "PostgreSQL",
+        "APIs"
+      ],
+      "evidence": {
+        "Backend": "Migré el sistema de socios de una cooperativa a una API moderna.",
+        "Django": "Implementé el blog corporativo con Django y Wagtail.",
+        "Node.js": "Implementé el servicio de facturación en Node.js con workers.",
+        "PostgreSQL": "Migré los datos del Excel histórico a PostgreSQL sin perder nada.",
+        "APIs": "Integré 4 APIs de terceros (mapas, pagos, mails, SMS) en un solo servicio."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Backend de marketplace de artesanos."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Backend de marketplace de artesanos",
+      "transcript": "Backend de marketplace de artesanos: quedó funcionando en producción para ~200 usuarios activos. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-yamila-backend",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e048",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Pablo Benavídez",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "El Carmen",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "Backend",
+        "Node.js",
+        "PostgreSQL",
+        "APIs",
+        "SQL",
+        "Docker"
+      ],
+      "evidence": {
+        "Backend": "Implementé la cola de procesamiento de facturas con reintentos.",
+        "Node.js": "Implementé el servicio de facturación en Node.js con workers.",
+        "PostgreSQL": "Migré los datos del Excel histórico a PostgreSQL sin perder nada.",
+        "APIs": "Integré 4 APIs de terceros (mapas, pagos, mails, SMS) en un solo servicio.",
+        "SQL": "Audité las queries más lentas del sistema y las dejé bajo 500ms.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Integración de pagos MercadoPago."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Integración de pagos MercadoPago",
+      "transcript": "Integración de pagos MercadoPago: el cliente renovó el contrato para la segunda etapa. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-pablo-backend",
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e049",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Tamara Corimayo",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "San Pedro de Jujuy",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "PostgreSQL",
+        "APIs"
+      ],
+      "evidence": {
+        "Backend": "Armé el servicio de notificaciones que manda 3.000 mails por semana.",
+        "PostgreSQL": "Migré los datos del Excel histórico a PostgreSQL sin perder nada.",
+        "APIs": "Integré 4 APIs de terceros (mapas, pagos, mails, SMS) en un solo servicio."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "API de stock multi-sucursal."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "API de stock multi-sucursal",
+      "transcript": "API de stock multi-sucursal: se presentó en el meetup de tecnología de san salvador. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-tamara-backend",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e050",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Ramiro Delgado",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Libertador General San Martín",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "APIs",
+        "SQL",
+        "Docker"
+      ],
+      "evidence": {
+        "Backend": "Levanté el backend del marketplace de artesanos de la Quebrada.",
+        "APIs": "Integré 4 APIs de terceros (mapas, pagos, mails, SMS) en un solo servicio.",
+        "SQL": "Audité las queries más lentas del sistema y las dejé bajo 500ms.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Bot de WhatsApp para consultas."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Bot de WhatsApp para consultas",
+      "transcript": "Bot de WhatsApp para consultas: redujo el trabajo manual del equipo a la mitad. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-ramiro-backend",
+      "pubs_7d": 6,
+      "linkedin": true,
+      "x": true,
+      "template_id": "caso",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e051",
+      "matrix": "backend Jujuy ampliada",
+      "display_name": "Luz Espinoza",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Monterrico",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "SQL",
+        "Docker",
+        "Python",
+        "FastAPI"
+      ],
+      "evidence": {
+        "Backend": "Reduje la consulta más lenta de 8s a 300ms con índices.",
+        "SQL": "Audité las queries más lentas del sistema y las dejé bajo 500ms.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local.",
+        "Python": "Escribí el scraper que consolida precios de 5 proveedores en Python.",
+        "FastAPI": "Expuse la API de turnos con FastAPI, 12 endpoints documentados en OpenAPI."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Migración de sistema de facturación."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "Migración de sistema de facturación",
+      "transcript": "Migración de sistema de facturación: hoy lo usa la administración para su operación diaria. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-luz-backend",
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e052",
+      "matrix": "data Jujuy ampliada",
+      "display_name": "Santiago Figueroa",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Tilcara",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Data",
+        "Excel",
+        "Looker",
+        "Analytics",
+        "SQL",
+        "Python"
+      ],
+      "evidence": {
+        "Data": "Construí el dataset de turismo de la provincia para el análisis de temporada.",
+        "Excel": "Armé la planilla de control de caja que usa la cooperativa todos los días.",
+        "Looker": "Conecté las fuentes de Analytics y Ads al dashboard en Looker.",
+        "Analytics": "Medí las campañas con UTM consistentes y armé el tablero de atribución.",
+        "SQL": "Armé las vistas materializadas que alimentan el dashboard.",
+        "Python": "Armé el bot de Telegram que avisa cuando baja el stock, en Python."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Pipeline de datos del ERP."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Pipeline de datos del ERP",
+      "transcript": "Pipeline de datos del ERP: el resultado se usa como caso de referencia del equipo. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-santiago-data",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e053",
+      "matrix": "data Jujuy ampliada",
+      "display_name": "Aylén Gallardo",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Humahuaca",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Data",
+        "Looker",
+        "Analytics"
+      ],
+      "evidence": {
+        "Data": "Detecté el producto más devuelto cruzando ventas con reclamos.",
+        "Looker": "Conecté las fuentes de Analytics y Ads al dashboard en Looker.",
+        "Analytics": "Medí las campañas con UTM consistentes y armé el tablero de atribución."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Tablero de ventas semanal."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Tablero de ventas semanal",
+      "transcript": "Tablero de ventas semanal: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-aylen-data",
+      "pubs_7d": 0,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e054",
+      "matrix": "data Jujuy ampliada",
+      "display_name": "Tomás Huanca",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Fraile Pintado",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "Data",
+        "Analytics",
+        "SQL",
+        "Python"
+      ],
+      "evidence": {
+        "Data": "Armé el informe de cohortes que ordenó las campañas por retención.",
+        "Analytics": "Medí las campañas con UTM consistentes y armé el tablero de atribución.",
+        "SQL": "Armé las vistas materializadas que alimentan el dashboard.",
+        "Python": "Armé el bot de Telegram que avisa cuando baja el stock, en Python."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Reporte de churn automatizado."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Reporte de churn automatizado",
+      "transcript": "Reporte de churn automatizado: bajó la carga del mostrador que atendía todo por whatsapp. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": false,
+      "slug": null,
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e055",
+      "matrix": "data Jujuy ampliada",
+      "display_name": "Maira Ibarra",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Abra Pampa",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Data",
+        "SQL",
+        "Python",
+        "Power BI",
+        "Pandas"
+      ],
+      "evidence": {
+        "Data": "Armé el tablero de ventas que la gerencia mira todos los lunes.",
+        "SQL": "Armé las vistas materializadas que alimentan el dashboard.",
+        "Python": "Armé el bot de Telegram que avisa cuando baja el stock, en Python.",
+        "Power BI": "Armé el tablero de ventas en Power BI con drill-down por sucursal.",
+        "Pandas": "Procesé los logs del sistema con pandas para el análisis de errores."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Limpieza de base de clientes."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Limpieza de base de clientes",
+      "transcript": "Limpieza de base de clientes: quedó funcionando en producción para ~200 usuarios activos. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-maira-data",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e056",
+      "matrix": "data Jujuy ampliada",
+      "display_name": "Ulises Jofré",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Yuto",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Data",
+        "Python",
+        "Power BI",
+        "Pandas",
+        "Excel",
+        "Looker"
+      ],
+      "evidence": {
+        "Data": "Automaticé el reporte de churn semanal con queries programadas.",
+        "Python": "Armé el bot de Telegram que avisa cuando baja el stock, en Python.",
+        "Power BI": "Armé el tablero de ventas en Power BI con drill-down por sucursal.",
+        "Pandas": "Procesé los logs del sistema con pandas para el análisis de errores.",
+        "Excel": "Ordené el inventario del depósito en Excel con códigos de barras.",
+        "Looker": "Migré los reportes de marketing a Looker Studio con datos en vivo."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Dataset de turismo provincial."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Dataset de turismo provincial",
+      "transcript": "Dataset de turismo provincial: el cliente renovó el contrato para la segunda etapa. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-ulises-data",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": true,
+      "template_id": "credencial",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e057",
+      "matrix": "data Jujuy ampliada",
+      "display_name": "Nadia Ledesma",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Calilegua",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Data",
+        "Power BI",
+        "Pandas"
+      ],
+      "evidence": {
+        "Data": "Limpié la base de 60.000 clientes y unifiqué criterios de categorías.",
+        "Power BI": "Armé el tablero de ventas en Power BI con drill-down por sucursal.",
+        "Pandas": "Procesé los logs del sistema con pandas para el análisis de errores."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Análisis de devoluciones."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "Análisis de devoluciones",
+      "transcript": "Análisis de devoluciones: se presentó en el meetup de tecnología de san salvador. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-nadia-data",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": false,
+      "template_id": "galeria",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e058",
+      "matrix": "data Jujuy ampliada",
+      "display_name": "Vicente Miranda",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "San Antonio",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Data",
+        "Pandas",
+        "Excel",
+        "Looker"
+      ],
+      "evidence": {
+        "Data": "Construí el dataset de turismo de la provincia para el análisis de temporada.",
+        "Pandas": "Procesé los logs del sistema con pandas para el análisis de errores.",
+        "Excel": "Ordené el inventario del depósito en Excel con códigos de barras.",
+        "Looker": "Migré los reportes de marketing a Looker Studio con datos en vivo."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Informe de cohortes de retención."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Informe de cohortes de retención",
+      "transcript": "Informe de cohortes de retención: redujo el trabajo manual del equipo a la mitad. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-vicente-data",
+      "pubs_7d": 14,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e059",
+      "matrix": "marketing Jujuy ampliada",
+      "display_name": "Estefanía Olmos",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "El Aguilar",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Marketing digital",
+        "Email marketing",
+        "Analytics",
+        "Copywriting",
+        "SEO"
+      ],
+      "evidence": {
+        "Marketing digital": "Coordiné el rebranding digital de una cooperativa con 12 piezas.",
+        "Email marketing": "Recuperé el 12% de carritos abandonados con la secuencia de 3 mails.",
+        "Analytics": "Implementé el tracking de eventos con GA4 y definí las conversiones clave.",
+        "Copywriting": "Escribí los textos del checkout reduciendo las dudas frecuentes.",
+        "SEO": "Tripliqué el tráfico orgánico del blog en 6 meses con contenido por clusters."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Campaña de lanzamiento de gimnasio."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "Campaña de lanzamiento de gimnasio",
+      "transcript": "Campaña de lanzamiento de gimnasio: hoy lo usa la administración para su operación diaria. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-estefania-marketing",
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": true,
+      "template_id": "esencial",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e060",
+      "matrix": "marketing Jujuy ampliada",
+      "display_name": "Walter Paredes",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "Puesto Viejo",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "Marketing digital",
+        "Analytics",
+        "Copywriting",
+        "SEO",
+        "Contenidos",
+        "Meta Ads"
+      ],
+      "evidence": {
+        "Marketing digital": "Diseñé la estrategia de captación que duplicó los leads de la academia.",
+        "Analytics": "Implementé el tracking de eventos con GA4 y definí las conversiones clave.",
+        "Copywriting": "Escribí los textos del checkout reduciendo las dudas frecuentes.",
+        "SEO": "Tripliqué el tráfico orgánico del blog en 6 meses con contenido por clusters.",
+        "Contenidos": "Planifiqué y grabé la serie de reels que sumó 4.000 seguidores.",
+        "Meta Ads": "Gestioné campañas de Meta Ads con un ROAS promedio de 4,2."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Programa de email de bienvenida."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Programa de email de bienvenida",
+      "transcript": "Programa de email de bienvenida: el resultado se usa como caso de referencia del equipo. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-walter-marketing",
+      "pubs_7d": 8,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e061",
+      "matrix": "marketing Jujuy ampliada",
+      "display_name": "Brenda Reynoso",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "San Salvador de Jujuy",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Marketing digital",
+        "Copywriting",
+        "SEO"
+      ],
+      "evidence": {
+        "Marketing digital": "Llevé la cuenta de Instagram de una heladería de 800 a 9.000 seguidores en 8 meses.",
+        "Copywriting": "Escribí los textos del checkout reduciendo las dudas frecuentes.",
+        "SEO": "Tripliqué el tráfico orgánico del blog en 6 meses con contenido por clusters."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Contenidos para blog de tecnología."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Contenidos para blog de tecnología",
+      "transcript": "Contenidos para blog de tecnología: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-brenda-marketing",
+      "pubs_7d": 0,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e062",
+      "matrix": "marketing Jujuy ampliada",
+      "display_name": "Yamil Sandoval",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "Palpalá",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Marketing digital",
+        "SEO",
+        "Contenidos",
+        "Meta Ads"
+      ],
+      "evidence": {
+        "Marketing digital": "Organicé el lanzamiento digital de una marca de indumentaria de Tilcara.",
+        "SEO": "Tripliqué el tráfico orgánico del blog en 6 meses con contenido por clusters.",
+        "Contenidos": "Planifiqué y grabé la serie de reels que sumó 4.000 seguidores.",
+        "Meta Ads": "Gestioné campañas de Meta Ads con un ROAS promedio de 4,2."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Calendario trimestral de contenidos."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Calendario trimestral de contenidos",
+      "transcript": "Calendario trimestral de contenidos: bajó la carga del mostrador que atendía todo por whatsapp. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-yamil-marketing",
+      "pubs_7d": 11,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e063",
+      "matrix": "marketing Jujuy ampliada",
+      "display_name": "Celeste Tejerina",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "Perico",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Marketing digital",
+        "Contenidos",
+        "Meta Ads",
+        "Google Ads",
+        "Email marketing"
+      ],
+      "evidence": {
+        "Marketing digital": "Planifiqué el calendario de contenidos trimestral para 3 clientes.",
+        "Contenidos": "Planifiqué y grabé la serie de reels que sumó 4.000 seguidores.",
+        "Meta Ads": "Gestioné campañas de Meta Ads con un ROAS promedio de 4,2.",
+        "Google Ads": "Lancé la campaña de una clínica con extensiones de ubicación y llamadas.",
+        "Email marketing": "Armé el flujo de bienvenida que abre al 48% en una base de 6.000 contactos."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Crecimiento de Instagram de heladería."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Crecimiento de Instagram de heladería",
+      "transcript": "Crecimiento de Instagram de heladería: quedó funcionando en producción para ~200 usuarios activos. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-celeste-marketing",
+      "pubs_7d": 5,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e064",
+      "matrix": "community Jujuy ampliada",
+      "display_name": "Ángel Ugarte",
+      "role": "Community manager",
+      "industry": "agencia digital",
+      "location": "El Carmen",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Community management",
+        "Eventos",
+        "Redes sociales",
+        "Engagement",
+        "Discord",
+        "Moderación"
+      ],
+      "evidence": {
+        "Community management": "Gestioné las redes de una cooperativa duplicando la interacción.",
+        "Eventos": "Organicé la feria de emprendedores de San Salvador con 40 stands.",
+        "Redes sociales": "Crecí la cuenta de TikTok de la marca a 12.000 seguidores en 4 meses.",
+        "Engagement": "Subí el engagement promedio de 1,8% a 4,6% con contenido de bastidores.",
+        "Discord": "Organicé 3 eventos en Discord con 200 asistentes cada uno.",
+        "Moderación": "Formé al equipo de moderadores del foro con guías de escalado."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Meetup mensual de emprendedores."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Meetup mensual de emprendedores",
+      "transcript": "Meetup mensual de emprendedores: el cliente renovó el contrato para la segunda etapa. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-angel-community",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": true,
+      "template_id": "esencial",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e065",
+      "matrix": "community Jujuy ampliada",
+      "display_name": "Daiana Vera",
+      "role": "Community manager",
+      "industry": "agencia digital",
+      "location": "San Pedro de Jujuy",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Community management",
+        "Redes sociales",
+        "Engagement"
+      ],
+      "evidence": {
+        "Community management": "Modero la comunidad de 3.000 miembros respondiendo en menos de 2 horas.",
+        "Redes sociales": "Crecí la cuenta de TikTok de la marca a 12.000 seguidores en 4 meses.",
+        "Engagement": "Subí el engagement promedio de 1,8% a 4,6% con contenido de bastidores."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Redes de cooperativa artesanal."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "Redes de cooperativa artesanal",
+      "transcript": "Redes de cooperativa artesanal: se presentó en el meetup de tecnología de san salvador. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-daiana-community",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e066",
+      "matrix": "community Jujuy ampliada",
+      "display_name": "Benjamín Yufra",
+      "role": "Community manager",
+      "industry": "agencia digital",
+      "location": "Libertador General San Martín",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_senior",
+      "skills": [
+        "Community management",
+        "Engagement",
+        "Discord",
+        "Moderación"
+      ],
+      "evidence": {
+        "Community management": "Organicé la comunidad de la app y bajé los reportes de spam un 80%.",
+        "Engagement": "Subí el engagement promedio de 1,8% a 4,6% con contenido de bastidores.",
+        "Discord": "Organicé 3 eventos en Discord con 200 asistentes cada uno.",
+        "Moderación": "Formé al equipo de moderadores del foro con guías de escalado."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Feria de emprendedores local."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Feria de emprendedores local",
+      "transcript": "Feria de emprendedores local: redujo el trabajo manual del equipo a la mitad. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-benjamin-community",
+      "pubs_7d": 10,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e067",
+      "matrix": "producto Jujuy ampliada",
+      "display_name": "Evelyn Aguirre",
+      "role": "Product manager",
+      "industry": "tecnología",
+      "location": "Monterrico",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Product management",
+        "Discovery",
+        "Roadmap",
+        "Scrum",
+        "Analytics"
+      ],
+      "evidence": {
+        "Product management": "Coordiné los releases quincenales entre diseño, dev y negocio.",
+        "Discovery": "Sinteticé el discovery en un one-pager que alineó a todo el equipo.",
+        "Roadmap": "Comuniqué el roadmap a dirección con criterios de priorización explícitos.",
+        "Scrum": "Facilité las ceremonias del equipo de 6 personas durante un año.",
+        "Analytics": "Medí las campañas con UTM consistentes y armé el tablero de atribución."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "MVP de app de turnos."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "MVP de app de turnos",
+      "transcript": "MVP de app de turnos: hoy lo usa la administración para su operación diaria. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-evelyn-producto",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e068",
+      "matrix": "producto Jujuy ampliada",
+      "display_name": "Claudio Bazán",
+      "role": "Product manager",
+      "industry": "tecnología",
+      "location": "Tilcara",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Product management",
+        "Roadmap",
+        "Scrum",
+        "Analytics",
+        "User stories",
+        "Priorización"
+      ],
+      "evidence": {
+        "Product management": "Prioricé el roadmap del MVP de turnos y lo lanzamos en 6 semanas.",
+        "Roadmap": "Comuniqué el roadmap a dirección con criterios de priorización explícitos.",
+        "Scrum": "Facilité las ceremonias del equipo de 6 personas durante un año.",
+        "Analytics": "Medí las campañas con UTM consistentes y armé el tablero de atribución.",
+        "User stories": "Documenté los flujos con escenarios dado-cuando-entonces.",
+        "Priorización": "Ordené el backlog con RICE y el equipo dejó de discutir prioridades."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del checkout de tienda."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Rediseño del checkout de tienda",
+      "transcript": "Rediseño del checkout de tienda: el resultado se usa como caso de referencia del equipo. Proyecto para un cliente de la provincia.",
+      "achievement_status": "needs_review",
+      "consent": true,
+      "slug": null,
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e069",
+      "matrix": "producto Jujuy ampliada",
+      "display_name": "Guadalupe Carrizo",
+      "role": "Product manager",
+      "industry": "tecnología",
+      "location": "Humahuaca",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Product management",
+        "Scrum",
+        "Analytics"
+      ],
+      "evidence": {
+        "Product management": "Definí el alcance del rediseño del checkout junto al equipo.",
+        "Scrum": "Facilité las ceremonias del equipo de 6 personas durante un año.",
+        "Analytics": "Medí las campañas con UTM consistentes y armé el tablero de atribución."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Portal de socios de cooperativa."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Portal de socios de cooperativa",
+      "transcript": "Portal de socios de cooperativa: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-guadalupe-producto",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e070",
+      "matrix": "producto Jujuy ampliada",
+      "display_name": "Damián Escudero",
+      "role": "Product manager",
+      "industry": "tecnología",
+      "location": "Fraile Pintado",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Product management",
+        "Analytics",
+        "User stories",
+        "Priorización"
+      ],
+      "evidence": {
+        "Product management": "Organicé el backlog del producto en ahora/próximo/después.",
+        "Analytics": "Medí las campañas con UTM consistentes y armé el tablero de atribución.",
+        "User stories": "Documenté los flujos con escenarios dado-cuando-entonces.",
+        "Priorización": "Ordené el backlog con RICE y el equipo dejó de discutir prioridades."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Marketplace de artesanos."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Marketplace de artesanos",
+      "transcript": "Marketplace de artesanos: bajó la carga del mostrador que atendía todo por whatsapp. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-damian-producto",
+      "pubs_7d": 6,
+      "linkedin": true,
+      "x": true,
+      "template_id": "caso",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e071",
+      "matrix": "otro Jujuy ampliada",
+      "display_name": "Jazmín Funes",
+      "role": "Supervisor de seguridad",
+      "industry": "minería",
+      "location": "Ledesma",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "mineria_industria",
+      "skills": [
+        "Seguridad industrial",
+        "Capacitación",
+        "Logística de campaña"
+      ],
+      "evidence": {
+        "Seguridad industrial": "Audité los protocolos de seguridad de una planta de Ledesma; cero incidentes en 90 días.",
+        "Capacitación": "Capacité a 30 operarios en uso de EPP y nueva señalización.",
+        "Logística de campaña": "Organicé la logística diaria de 3 cuadrillas durante la zafra."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Auditoría de seguridad en planta."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Auditoría de seguridad en planta",
+      "transcript": "Audité los protocolos de seguridad de la planta y capacité a las cuadrillas en EPP.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-jazmin-campo",
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e072",
+      "matrix": "otro Jujuy ampliada",
+      "display_name": "Emiliano Giménez",
+      "role": "Guía de turismo",
+      "industry": "turismo",
+      "location": "Tilcara",
+      "province": "Jujuy",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "turismo",
+      "skills": [
+        "Turismo",
+        "Atención al público",
+        "Inglés",
+        "Senderismo"
+      ],
+      "evidence": {
+        "Turismo": "Guié 25 grupos por la Quebrada de Humahuaca con reseñas de 4,9 estrellas.",
+        "Atención al público": "Coordino la recepción de grupos de hasta 15 personas por salida.",
+        "Inglés": "Guío grupos de habla inglesa por Tilcara y Humahuaca.",
+        "Senderismo": "Armé el circuito de 3 días por los pueblos de la Puna con 2 alternativas de dificultad."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Circuito de 3 días por la Puna."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Circuito de 3 días por la Puna",
+      "transcript": "Guié 25 grupos por la Quebrada y armé un circuito de 3 días por la Puna.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-emiliano-campo",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": false,
+      "template_id": "galeria",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e073",
+      "matrix": "ux Salta ampliada",
+      "display_name": "Leonela Heredia",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Remoto",
+      "province": "Salta",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Design System",
+        "Accesibilidad"
+      ],
+      "evidence": {
+        "UX": "Estructuré la información de un menú digital para una rotisería; los pedidos subieron 30%.",
+        "Design System": "Documenté el uso de cada componente con ejemplos de hacer/no hacer.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "App de turnos para clínica local."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "App de turnos para clínica local",
+      "transcript": "App de turnos para clínica local: se presentó en el meetup de tecnología de san salvador. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-leonela-ux",
+      "pubs_7d": 0,
+      "linkedin": true,
+      "x": true,
+      "template_id": "recorrido",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e074",
+      "matrix": "ux Salta ampliada",
+      "display_name": "Fabián Iriarte",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "San Ramón de la Nueva Orán",
+      "province": "Salta",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Accesibilidad",
+        "UX Writing",
+        "Testeo con usuarios"
+      ],
+      "evidence": {
+        "UX": "Validé el prototipo de una app de turismo de la Quebrada con 9 usuarios.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard.",
+        "UX Writing": "Reescribí los mensajes de error del checkout: las consultas a soporte bajaron 35%.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del menú digital de una rotisería."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Rediseño del menú digital de una rotisería",
+      "transcript": "Rediseño del menú digital de una rotisería: redujo el trabajo manual del equipo a la mitad. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-fabian-ux",
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e075",
+      "matrix": "frontend Salta ampliada",
+      "display_name": "Martina Jerez",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Tartagal",
+      "province": "Salta",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "HTML",
+        "React",
+        "TypeScript",
+        "Next.js"
+      ],
+      "evidence": {
+        "Frontend": "Desarrollé el módulo de reserva con selección de fecha y hora.",
+        "HTML": "Estructuré la web con HTML semántico: nav, main y headings ordenados.",
+        "React": "Refactoricé el carrito a React Query y desaparecieron los bugs de sincronización.",
+        "TypeScript": "Activé strict en el proyecto y resolví los 120 warnings que quedaron.",
+        "Next.js": "Armé el sitio de turismo en Next.js con 30 páginas estáticas por destino."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Dashboard administrativo responsive."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "Dashboard administrativo responsive",
+      "transcript": "Dashboard administrativo responsive: hoy lo usa la administración para su operación diaria. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-martina-frontend",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e076",
+      "matrix": "frontend Salta ampliada",
+      "display_name": "Gabriel Moreno",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Remoto",
+      "province": "Salta",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_ssr",
+      "skills": [
+        "Frontend",
+        "React",
+        "TypeScript",
+        "Next.js",
+        "JavaScript",
+        "CSS"
+      ],
+      "evidence": {
+        "Frontend": "Implementé la galería de fotos de la feria con lazy loading.",
+        "React": "Refactoricé el carrito a React Query y desaparecieron los bugs de sincronización.",
+        "TypeScript": "Activé strict en el proyecto y resolví los 120 warnings que quedaron.",
+        "Next.js": "Armé el sitio de turismo en Next.js con 30 páginas estáticas por destino.",
+        "JavaScript": "Implementé el mapa interactivo de la feria con JavaScript y Leaflet.",
+        "CSS": "Bajé el CSS de 240KB a 60KB sacando frameworks que no usábamos."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Landing de lanzamiento de marca."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Landing de lanzamiento de marca",
+      "transcript": "Landing de lanzamiento de marca: el resultado se usa como caso de referencia del equipo. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": null,
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e077",
+      "matrix": "backend Salta ampliada",
+      "display_name": "Noelia Olivera",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Cafayate",
+      "province": "Salta",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "Python",
+        "FastAPI"
+      ],
+      "evidence": {
+        "Backend": "Diseñé la API REST del sistema de turnos con 12 endpoints documentados.",
+        "Python": "Escribí el scraper que consolida precios de 5 proveedores en Python.",
+        "FastAPI": "Expuse la API de turnos con FastAPI, 12 endpoints documentados en OpenAPI."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Backend de marketplace de artesanos."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Backend de marketplace de artesanos",
+      "transcript": "Backend de marketplace de artesanos: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-noelia-backend",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e078",
+      "matrix": "data Salta ampliada",
+      "display_name": "Hugo Palacios",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Rosario de Lerma",
+      "province": "Salta",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_senior",
+      "skills": [
+        "Data",
+        "Power BI",
+        "Pandas",
+        "Excel"
+      ],
+      "evidence": {
+        "Data": "Armé el informe de cohortes que ordenó las campañas por retención.",
+        "Power BI": "Migré los 12 reportes de Excel a Power BI con actualización automática.",
+        "Pandas": "Armé el consolidado de 15 planillas en un solo dataset con pandas.",
+        "Excel": "Armé la planilla de control de caja que usa la cooperativa todos los días."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Informe de cohortes de retención."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Informe de cohortes de retención",
+      "transcript": "Informe de cohortes de retención: bajó la carga del mostrador que atendía todo por whatsapp. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-hugo-data",
+      "pubs_7d": 14,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e079",
+      "matrix": "marketing Salta ampliada",
+      "display_name": "Oriana Segovia",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "Salta",
+      "province": "Salta",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Marketing digital",
+        "Google Ads",
+        "Email marketing",
+        "Analytics",
+        "Copywriting"
+      ],
+      "evidence": {
+        "Marketing digital": "Llevé la cuenta de Instagram de una heladería de 800 a 9.000 seguidores en 8 meses.",
+        "Google Ads": "Estructuré las campañas por intención y el CTR subió a 7%.",
+        "Email marketing": "Recuperé el 12% de carritos abandonados con la secuencia de 3 mails.",
+        "Analytics": "Armé el informe de funnel que mostró dónde se caía el 60% de los usuarios.",
+        "Copywriting": "Escribí los textos del checkout reduciendo las dudas frecuentes."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Campaña de lanzamiento de gimnasio."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Campaña de lanzamiento de gimnasio",
+      "transcript": "Campaña de lanzamiento de gimnasio: quedó funcionando en producción para ~200 usuarios activos. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-oriana-marketing",
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": true,
+      "template_id": "esencial",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e080",
+      "matrix": "producto Salta ampliada",
+      "display_name": "Javier Toledo",
+      "role": "Product manager",
+      "industry": "tecnología",
+      "location": "San Ramón de la Nueva Orán",
+      "province": "Salta",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Product management",
+        "Roadmap",
+        "Scrum",
+        "Analytics",
+        "User stories",
+        "Priorización"
+      ],
+      "evidence": {
+        "Product management": "Organicé el backlog del producto en ahora/próximo/después.",
+        "Roadmap": "Comuniqué el roadmap a dirección con criterios de priorización explícitos.",
+        "Scrum": "Facilité las ceremonias del equipo de 6 personas durante un año.",
+        "Analytics": "Medí las campañas con UTM consistentes y armé el tablero de atribución.",
+        "User stories": "Documenté los flujos con escenarios dado-cuando-entonces.",
+        "Priorización": "Ordené el backlog con RICE y el equipo dejó de discutir prioridades."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del checkout de tienda."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Rediseño del checkout de tienda",
+      "transcript": "Rediseño del checkout de tienda: el cliente renovó el contrato para la segunda etapa. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": false,
+      "slug": null,
+      "pubs_7d": 8,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e081",
+      "matrix": "frontend Buenos Aires ampliada",
+      "display_name": "Priscila Valdez",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "CABA",
+      "province": "Buenos Aires",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "Tailwind",
+        "HTML"
+      ],
+      "evidence": {
+        "Frontend": "Optimicé el bundle: el tiempo de carga bajó de 4,2s a 1,3s.",
+        "Tailwind": "Armé el design system del equipo como preset de Tailwind.",
+        "HTML": "Armé las plantillas de email en HTML tablas para que abran bien en Outlook."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Sitio de turismo con 30 destinos."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "Sitio de turismo con 30 destinos",
+      "transcript": "Sitio de turismo con 30 destinos: se presentó en el meetup de tecnología de san salvador. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-priscila-frontend",
+      "pubs_7d": 0,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e082",
+      "matrix": "frontend Buenos Aires ampliada",
+      "display_name": "Lautaro Zalazar",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Remoto",
+      "province": "Buenos Aires",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_ssr",
+      "skills": [
+        "Frontend",
+        "HTML",
+        "React",
+        "TypeScript"
+      ],
+      "evidence": {
+        "Frontend": "Armé el front del tablero de indicadores con grilla responsive propia.",
+        "HTML": "Armé las plantillas de email en HTML tablas para que abran bien en Outlook.",
+        "React": "Migré el dashboard de una cooperativa a React 18 con suspense en el listado.",
+        "TypeScript": "Tipé toda la capa de datos con TypeScript estricto; cero any en el repo."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Front de app de carpooling."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Front de app de carpooling",
+      "transcript": "Front de app de carpooling: redujo el trabajo manual del equipo a la mitad. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-lautaro-frontend",
+      "pubs_7d": 11,
+      "linkedin": true,
+      "x": true,
+      "template_id": "galeria",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e083",
+      "matrix": "backend Buenos Aires ampliada",
+      "display_name": "Quimey Abán",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Mar del Plata",
+      "province": "Buenos Aires",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "SQL",
+        "Docker",
+        "Python",
+        "FastAPI"
+      ],
+      "evidence": {
+        "Backend": "Reduje la consulta más lenta de 8s a 300ms con índices.",
+        "SQL": "Escribí las queries del tablero de KPIs con window functions.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local.",
+        "Python": "Escribí el scraper que consolida precios de 5 proveedores en Python.",
+        "FastAPI": "Implementé webhooks de MercadoPago en FastAPI con verificación de firma."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "API de turnos para cooperativa."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "API de turnos para cooperativa",
+      "transcript": "API de turnos para cooperativa: hoy lo usa la administración para su operación diaria. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-quimey-backend",
+      "pubs_7d": 5,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e084",
+      "matrix": "backend Buenos Aires ampliada",
+      "display_name": "Marcos Arce",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Bahía Blanca",
+      "province": "Buenos Aires",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_senior",
+      "skills": [
+        "Backend",
+        "Docker",
+        "Python",
+        "FastAPI",
+        "Django",
+        "Node.js"
+      ],
+      "evidence": {
+        "Backend": "Implementé autenticación con JWT y roles para el backoffice.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local.",
+        "Python": "Escribí el scraper que consolida precios de 5 proveedores en Python.",
+        "FastAPI": "Implementé webhooks de MercadoPago en FastAPI con verificación de firma.",
+        "Django": "Implementé el blog corporativo con Django y Wagtail.",
+        "Node.js": "Implementé el servicio de facturación en Node.js con workers."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Conciliador automático de pagos."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Conciliador automático de pagos",
+      "transcript": "Conciliador automático de pagos: el resultado se usa como caso de referencia del equipo. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-marcos-backend",
+      "pubs_7d": null,
+      "linkedin": false,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e085",
+      "matrix": "ux Buenos Aires ampliada",
+      "display_name": "Rosalía Bustos",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Remoto",
+      "province": "Buenos Aires",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Figma",
+        "Diseño UI"
+      ],
+      "evidence": {
+        "UX": "Rediseñé el flujo de turnos de una clínica dental de San Salvador: pasó de 6 pantallas a 3.",
+        "Figma": "Monté el archivo maestro del proyecto en Figma con auto layout en todas las pantallas.",
+        "Diseño UI": "Definí la grilla de 8pt y la tipografía del dashboard administrativo."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "App de turnos para clínica local."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "App de turnos para clínica local",
+      "transcript": "App de turnos para clínica local: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-rosalia-ux",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": true,
+      "template_id": "caso",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e086",
+      "matrix": "producto Buenos Aires ampliada",
+      "display_name": "Néstor Campos",
+      "role": "Product manager",
+      "industry": "tecnología",
+      "location": "La Plata",
+      "province": "Buenos Aires",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Product management",
+        "Roadmap",
+        "Scrum",
+        "Analytics"
+      ],
+      "evidence": {
+        "Product management": "Llevé el producto de 0 a 400 usuarios activos mensuales.",
+        "Roadmap": "Comuniqué el roadmap a dirección con criterios de priorización explícitos.",
+        "Scrum": "Facilité las ceremonias del equipo de 6 personas durante un año.",
+        "Analytics": "Implementé el tracking de eventos con GA4 y definí las conversiones clave."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del checkout de tienda."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Rediseño del checkout de tienda",
+      "transcript": "Rediseño del checkout de tienda: bajó la carga del mostrador que atendía todo por whatsapp. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-nestor-producto",
+      "pubs_7d": 10,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e087",
+      "matrix": "backend Córdoba ampliada",
+      "display_name": "Selena Estrada",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Remoto",
+      "province": "Córdoba",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "Django",
+        "Node.js",
+        "PostgreSQL",
+        "APIs"
+      ],
+      "evidence": {
+        "Backend": "Migré el sistema de socios de una cooperativa a una API moderna.",
+        "Django": "Implementé el blog corporativo con Django y Wagtail.",
+        "Node.js": "Implementé el servicio de facturación en Node.js con workers.",
+        "PostgreSQL": "Migré los datos del Excel histórico a PostgreSQL sin perder nada.",
+        "APIs": "Integré 4 APIs de terceros (mapas, pagos, mails, SMS) en un solo servicio."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Backend de marketplace de artesanos."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Backend de marketplace de artesanos",
+      "transcript": "Backend de marketplace de artesanos: quedó funcionando en producción para ~200 usuarios activos. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-selena-backend",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": false,
+      "template_id": "galeria",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e088",
+      "matrix": "data Córdoba ampliada",
+      "display_name": "Octavio Farfán",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "San Francisco",
+      "province": "Córdoba",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Data",
+        "Looker",
+        "Analytics",
+        "SQL",
+        "Python",
+        "Power BI"
+      ],
+      "evidence": {
+        "Data": "Construí el dataset de turismo de la provincia para el análisis de temporada.",
+        "Looker": "Armé el tablero de campañas en Looker para el equipo comercial.",
+        "Analytics": "Armé el informe de funnel que mostró dónde se caía el 60% de los usuarios.",
+        "SQL": "Armé las vistas materializadas que alimentan el dashboard.",
+        "Python": "Hice los tests de integración del servicio en pytest con datos reales.",
+        "Power BI": "Armé el tablero de ventas en Power BI con drill-down por sucursal."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Informe de cohortes de retención."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Informe de cohortes de retención",
+      "transcript": "Informe de cohortes de retención: el cliente renovó el contrato para la segunda etapa. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-octavio-data",
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": true,
+      "template_id": "recorrido",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e089",
+      "matrix": "marketing Córdoba ampliada",
+      "display_name": "Trinidad Gaitán",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "Córdoba",
+      "province": "Córdoba",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Marketing digital",
+        "Copywriting",
+        "SEO"
+      ],
+      "evidence": {
+        "Marketing digital": "Coordiné el rebranding digital de una cooperativa con 12 piezas.",
+        "Copywriting": "Armé el guion de los 5 videos de producto de la campaña.",
+        "SEO": "Tripliqué el tráfico orgánico del blog en 6 meses con contenido por clusters."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Campaña de lanzamiento de gimnasio."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "Campaña de lanzamiento de gimnasio",
+      "transcript": "Campaña de lanzamiento de gimnasio: se presentó en el meetup de tecnología de san salvador. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-trinidad-marketing",
+      "pubs_7d": 2,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e090",
+      "matrix": "ux Córdoba ampliada",
+      "display_name": "Pedro Iturbe",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Remoto",
+      "province": "Córdoba",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_senior",
+      "skills": [
+        "UX",
+        "Accesibilidad",
+        "UX Writing",
+        "Testeo con usuarios"
+      ],
+      "evidence": {
+        "UX": "Rediseñé la web de trámites municipales: la tarea más buscada quedó a 1 clic.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard.",
+        "UX Writing": "Reduje el texto del onboarding a frases de menos de 12 palabras.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Onboarding de billetera para kioscos."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Onboarding de billetera para kioscos",
+      "transcript": "Onboarding de billetera para kioscos: redujo el trabajo manual del equipo a la mitad. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-pedro-ux",
+      "pubs_7d": 6,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e091",
+      "matrix": "ux Mendoza ampliada",
+      "display_name": "Abigail Lazarte",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Godoy Cruz",
+      "province": "Mendoza",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "UX Writing",
+        "Testeo con usuarios",
+        "Figma",
+        "Diseño UI"
+      ],
+      "evidence": {
+        "UX": "Estructuré la información de un menú digital para una rotisería; los pedidos subieron 30%.",
+        "UX Writing": "Reduje el texto del onboarding a frases de menos de 12 palabras.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas.",
+        "Figma": "Prototipé 14 pantallas conectadas en Figma para la app de turnos.",
+        "Diseño UI": "Retoqué la UI de la landing hasta dejarla en AA de contraste."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Web de trámites municipales."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "Web de trámites municipales",
+      "transcript": "Web de trámites municipales: hoy lo usa la administración para su operación diaria. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-abigail-ux",
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": true,
+      "template_id": "credencial",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e092",
+      "matrix": "frontend Mendoza ampliada",
+      "display_name": "Rodrigo Montaño",
+      "role": "Frontend",
+      "industry": "tecnología",
+      "location": "Maipú",
+      "province": "Mendoza",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Frontend",
+        "Next.js",
+        "JavaScript",
+        "CSS",
+        "Tailwind",
+        "HTML"
+      ],
+      "evidence": {
+        "Frontend": "Implementé la galería de fotos de la feria con lazy loading.",
+        "Next.js": "Migré la web de la cooperativa a Next.js con SSR en el catálogo.",
+        "JavaScript": "Automaticé la carga masiva de productos con un script en JavaScript.",
+        "CSS": "Armé el sistema de espaciado con utilidades propias en CSS.",
+        "Tailwind": "Estandaricé el espaciado del proyecto con la escala de Tailwind.",
+        "HTML": "Estructuré la web con HTML semántico: nav, main y headings ordenados."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Front de app de carpooling."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Front de app de carpooling",
+      "transcript": "Front de app de carpooling: el resultado se usa como caso de referencia del equipo. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": null,
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": false,
+      "template_id": "galeria",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e093",
+      "matrix": "data Mendoza ampliada",
+      "display_name": "Delfina Ojeda",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Mendoza",
+      "province": "Mendoza",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_junior",
+      "skills": [
+        "Data",
+        "Pandas",
+        "Excel"
+      ],
+      "evidence": {
+        "Data": "Limpié la base de 60.000 clientes y unifiqué criterios de categorías.",
+        "Pandas": "Automaticé el cruce de ventas vs. stock con pandas; antes era manual.",
+        "Excel": "Diseñé el presupuesto anual en Excel con escenarios optimista/base/pesimista."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Tablero de ventas semanal."
+        },
+        {
+          "category": "impact",
+          "text": "El equipo lo entregó en 5 semanas y hoy se usa todos los días."
+        }
+      ],
+      "achievement_title": "Tablero de ventas semanal",
+      "transcript": "Tablero de ventas semanal: el equipo lo entregó en 5 semanas y hoy se usa todos los días. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-delfina-data",
+      "pubs_7d": 0,
+      "linkedin": true,
+      "x": false,
+      "template_id": "recorrido",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e094",
+      "matrix": "marketing Mendoza ampliada",
+      "display_name": "Sergio Pimentel",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "San Rafael",
+      "province": "Mendoza",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_ssr",
+      "skills": [
+        "Marketing digital",
+        "Email marketing",
+        "Analytics",
+        "Copywriting"
+      ],
+      "evidence": {
+        "Marketing digital": "Automaticé los reportes de campaña y liberé 4 horas por semana.",
+        "Email marketing": "Segmenté la base por comportamiento y dupliqué el CTR de los envíos.",
+        "Analytics": "Detecté que el 70% del tráfico era mobile y prioricé esa experiencia.",
+        "Copywriting": "Reescribí la landing y la conversión subió de 1,2% a 2,8%."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Lanzamiento digital de marca de indumentaria."
+        },
+        {
+          "category": "impact",
+          "text": "Bajó la carga del mostrador que atendía todo por WhatsApp."
+        }
+      ],
+      "achievement_title": "Lanzamiento digital de marca de indumentaria",
+      "transcript": "Lanzamiento digital de marca de indumentaria: bajó la carga del mostrador que atendía todo por whatsapp. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-sergio-marketing",
+      "pubs_7d": 9,
+      "linkedin": true,
+      "x": true,
+      "template_id": "esencial",
+      "palette_id": "violeta-cerro"
+    },
+    {
+      "session_id": "seed_ses_e095",
+      "matrix": "backend Tucumán ampliada",
+      "display_name": "Emilia Serrano",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Yerba Buena",
+      "province": "Tucumán",
+      "country": "Argentina",
+      "work_mode": "hybrid",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "Django",
+        "Node.js",
+        "PostgreSQL",
+        "APIs"
+      ],
+      "evidence": {
+        "Backend": "Migré el sistema de socios de una cooperativa a una API moderna.",
+        "Django": "Implementé el blog corporativo con Django y Wagtail.",
+        "Node.js": "Levanté el gateway de APIs en Node.js con rate limiting.",
+        "PostgreSQL": "Diseñé el esquema de la app de turnos en PostgreSQL con 14 tablas.",
+        "APIs": "Diseñé la API pública del catálogo con paginación y filtros."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Sistema de socios migrado a API."
+        },
+        {
+          "category": "impact",
+          "text": "Quedó funcionando en producción para ~200 usuarios activos."
+        }
+      ],
+      "achievement_title": "Sistema de socios migrado a API",
+      "transcript": "Sistema de socios migrado a API: quedó funcionando en producción para ~200 usuarios activos. Encargado por una cooperativa local.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-emilia-backend",
+      "pubs_7d": 4,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "gris-piedra"
+    },
+    {
+      "session_id": "seed_ses_e096",
+      "matrix": "community Tucumán ampliada",
+      "display_name": "Tobías Trigo",
+      "role": "Community manager",
+      "industry": "agencia digital",
+      "location": "Concepción",
+      "province": "Tucumán",
+      "country": "Argentina",
+      "work_mode": "onsite",
+      "segment": "digital_senior",
+      "skills": [
+        "Community management",
+        "Engagement",
+        "Discord",
+        "Moderación",
+        "Contenidos",
+        "Eventos"
+      ],
+      "evidence": {
+        "Community management": "Gestioné las redes de una cooperativa duplicando la interacción.",
+        "Engagement": "Subí el engagement promedio de 1,8% a 4,6% con contenido de bastidores.",
+        "Discord": "Organicé 3 eventos en Discord con 200 asistentes cada uno.",
+        "Moderación": "Formé al equipo de moderadores del foro con guías de escalado.",
+        "Contenidos": "Planifiqué y grabé la serie de reels que sumó 4.000 seguidores.",
+        "Eventos": "Organicé la feria de emprendedores de San Salvador con 40 stands."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Torneo online de la comunidad."
+        },
+        {
+          "category": "impact",
+          "text": "El cliente renovó el contrato para la segunda etapa."
+        }
+      ],
+      "achievement_title": "Torneo online de la comunidad",
+      "transcript": "Torneo online de la comunidad: el cliente renovó el contrato para la segunda etapa. Hecho en conjunto con el dueño del negocio.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-tobias-community",
+      "pubs_7d": null,
+      "linkedin": true,
+      "x": false,
+      "template_id": "credencial",
+      "palette_id": "indigo-noche"
+    },
+    {
+      "session_id": "seed_ses_e097",
+      "matrix": "marketing Tucumán ampliada",
+      "display_name": "Josefina Urquiza",
+      "role": "Marketing digital",
+      "industry": "agencia digital",
+      "location": "San Miguel de Tucumán",
+      "province": "Tucumán",
+      "country": "Argentina",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Marketing digital",
+        "SEO",
+        "Contenidos"
+      ],
+      "evidence": {
+        "Marketing digital": "Llevé la cuenta de Instagram de una heladería de 800 a 9.000 seguidores en 8 meses.",
+        "SEO": "Audité el sitio y corregí los 60 errores de indexación que frenaban el tráfico.",
+        "Contenidos": "Armé la guía de estilo de contenidos para mantener el tono de la marca."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Estrategia de leads para academia."
+        },
+        {
+          "category": "impact",
+          "text": "Se presentó en el meetup de tecnología de San Salvador."
+        }
+      ],
+      "achievement_title": "Estrategia de leads para academia",
+      "transcript": "Estrategia de leads para academia: se presentó en el meetup de tecnología de san salvador. Trabajé con un equipo de 3 personas durante 2 meses.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-josefina-marketing",
+      "pubs_7d": 2,
+      "linkedin": false,
+      "x": false,
+      "template_id": "galeria",
+      "palette_id": "verde-yunga"
+    },
+    {
+      "session_id": "seed_ses_e098",
+      "matrix": "ux GLOBAL ampliada",
+      "display_name": "Uriel Velázquez",
+      "role": "Diseño UX/UI",
+      "industry": "tecnología",
+      "location": "Montevideo",
+      "province": "Montevideo",
+      "country": "Uruguay",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "UX",
+        "Accesibilidad",
+        "UX Writing",
+        "Testeo con usuarios"
+      ],
+      "evidence": {
+        "UX": "Reorganicé el menú digital de una rotisería de Palpalá; los pedidos por WhatsApp subieron 30%.",
+        "Accesibilidad": "Sumé etiquetas ARIA a los controles custom del dashboard.",
+        "UX Writing": "Reescribí los mensajes de error del checkout: las consultas a soporte bajaron 35%.",
+        "Testeo con usuarios": "Corrí 6 tests de usabilidad del flujo de registro y detecté 4 trabas."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Rediseño del menú digital de una rotisería."
+        },
+        {
+          "category": "impact",
+          "text": "Redujo el trabajo manual del equipo a la mitad."
+        }
+      ],
+      "achievement_title": "Rediseño del menú digital de una rotisería",
+      "transcript": "Rediseño del menú digital de una rotisería: redujo el trabajo manual del equipo a la mitad. Proyecto para un cliente de la provincia.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-uriel-ux",
+      "pubs_7d": 14,
+      "linkedin": true,
+      "x": true,
+      "template_id": "recorrido",
+      "palette_id": "azul-salina"
+    },
+    {
+      "session_id": "seed_ses_e099",
+      "matrix": "backend GLOBAL ampliada",
+      "display_name": "Daniela Zambrano",
+      "role": "Backend",
+      "industry": "tecnología",
+      "location": "Santiago",
+      "province": "Santiago",
+      "country": "Chile",
+      "work_mode": "remote",
+      "segment": "digital_junior",
+      "skills": [
+        "Backend",
+        "SQL",
+        "Docker",
+        "Python",
+        "FastAPI"
+      ],
+      "evidence": {
+        "Backend": "Reduje la consulta más lenta de 8s a 300ms con índices.",
+        "SQL": "Migré el proceso de conciliación a SQL puro con transacciones.",
+        "Docker": "Dockericé la app completa: un compose levanta todo el stack local.",
+        "Python": "Escribí el scraper que consolida precios de 5 proveedores en Python.",
+        "FastAPI": "Expuse la API de turnos con FastAPI, 12 endpoints documentados en OpenAPI."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "API de stock multi-sucursal."
+        },
+        {
+          "category": "impact",
+          "text": "Hoy lo usa la administración para su operación diaria."
+        }
+      ],
+      "achievement_title": "API de stock multi-sucursal",
+      "transcript": "API de stock multi-sucursal: hoy lo usa la administración para su operación diaria. Lo hice como freelance junto a otra desarrolladora.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-daniela-backend",
+      "pubs_7d": 3,
+      "linkedin": true,
+      "x": false,
+      "template_id": "esencial",
+      "palette_id": "ocre-puna"
+    },
+    {
+      "session_id": "seed_ses_e100",
+      "matrix": "data GLOBAL ampliada",
+      "display_name": "Mauricio Avellaneda",
+      "role": "Data analyst",
+      "industry": "tecnología",
+      "location": "Ciudad de México",
+      "province": "Ciudad de México",
+      "country": "México",
+      "work_mode": "remote",
+      "segment": "digital_ssr",
+      "skills": [
+        "Data",
+        "Pandas",
+        "Excel",
+        "Looker",
+        "Analytics",
+        "SQL"
+      ],
+      "evidence": {
+        "Data": "Construí el dataset de turismo de la provincia para el análisis de temporada.",
+        "Pandas": "Limpié y normalicé el padrón de 80.000 registros con pandas.",
+        "Excel": "Automaticé el consolidado de ventas con Power Query y macros.",
+        "Looker": "Migré los reportes de marketing a Looker Studio con datos en vivo.",
+        "Analytics": "Detecté que el 70% del tráfico era mobile y prioricé esa experiencia.",
+        "SQL": "Migré el proceso de conciliación a SQL puro con transacciones."
+      },
+      "extra_facts": [
+        {
+          "category": "project",
+          "text": "Modelo de predicción de demanda."
+        },
+        {
+          "category": "impact",
+          "text": "El resultado se usa como caso de referencia del equipo."
+        }
+      ],
+      "achievement_title": "Modelo de predicción de demanda",
+      "transcript": "Modelo de predicción de demanda: el resultado se usa como caso de referencia del equipo. Proyecto final del bootcamp, con usuarios reales.",
+      "achievement_status": "approved",
+      "consent": true,
+      "slug": "seed-mauricio-data",
+      "pubs_7d": 8,
+      "linkedin": true,
+      "x": false,
+      "template_id": "caso",
+      "palette_id": "violeta-cerro"
     }
   ],
   "demo_searches": [
     {
       "id": "seed_search_ux_jujuy",
       "title": "Diseño UX en Jujuy",
-      "required_skills": ["UX"],
+      "required_skills": [
+        "UX"
+      ],
       "province": "Jujuy",
       "country": "Argentina",
       "location": "Jujuy, Argentina"
