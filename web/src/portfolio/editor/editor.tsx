@@ -1,6 +1,6 @@
 "use client"
 
-import { ExternalLink, Lock, Monitor, Palette as PaletteIcon, Smartphone } from "lucide-react"
+import { ExternalLink, Globe, Lock, Monitor, Palette as PaletteIcon, Smartphone } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
@@ -27,6 +27,7 @@ type PickerProps = {
   onTemplate: (template: PortfolioTemplate, cancel: () => void) => void
   onPalette: (id: string) => void
   onCustomize: () => void
+  onDomain: () => void
 }
 
 function templateLabel(template: PortfolioTemplate) {
@@ -88,7 +89,7 @@ function TemplatePicker({ tone, palette, templateId, onTemplate }: PickerProps) 
   )
 }
 
-function PalettePicker({ tone, paletteId, palette, onPalette, onCustomize }: PickerProps) {
+function PalettePicker({ tone, paletteId, palette, onPalette }: PickerProps) {
   const dark = tone === "dark"
   return (
     <div className="flex flex-col gap-3">
@@ -110,8 +111,21 @@ function PalettePicker({ tone, paletteId, palette, onPalette, onCustomize }: Pic
         ))}
       </RadioGroup>
       <p className={cn("text-sm", dark ? "text-on-dark" : "text-ink")}>{palette.name}</p>
-      <Button variant={dark ? "dark" : "secondary"} size="sm" className="w-fit" onClick={onCustomize}>
+    </div>
+  )
+}
+
+function ProOptions({ tone, onCustomize, onDomain }: PickerProps) {
+  const dark = tone === "dark"
+  const variant = dark ? "dark" : "secondary"
+  return (
+    <div className="flex flex-col items-start gap-2">
+      <Button variant={variant} size="sm" onClick={onCustomize}>
         <PaletteIcon aria-hidden /> Personalizar colores y tipografía
+        <Lock aria-hidden className="opacity-60" />
+      </Button>
+      <Button variant={variant} size="sm" onClick={onDomain}>
+        <Globe aria-hidden /> Usar tu propio dominio
         <Lock aria-hidden className="opacity-60" />
       </Button>
     </div>
@@ -148,14 +162,15 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
     },
     onPalette: setPaletteId,
     onCustomize: () => setProDoor({ trigger: "customize", itemId: null, itemName: null }),
+    onDomain: () => setProDoor({ trigger: "domain", itemId: null, itemName: null }),
   }
 
   return (
     <div className="flex flex-1 flex-col lg:grid lg:h-dvh lg:flex-none lg:grid-cols-[380px_1fr] lg:grid-rows-[minmax(0,1fr)]">
-      <aside className="hidden bg-night px-10 py-12 lg:flex lg:flex-col lg:gap-10 lg:overflow-y-auto">
+      <aside className="hidden bg-night px-10 py-12 [scrollbar-color:var(--color-slate-hover)_transparent] [scrollbar-width:thin] lg:flex lg:flex-col lg:gap-10 lg:overflow-y-auto">
         <header className="flex flex-col gap-2">
           <p className="font-display text-3xl tracking-display text-inverse">Tren Solar</p>
-          <p className="text-sm leading-relaxed text-on-dark-muted">Elegí cómo se ve tu portfolio. Los hechos son los que ya aprobaste.</p>
+          <p className="text-sm leading-relaxed text-on-dark-muted">Elegí plantilla y colores. Lo que dice ya lo aprobaste vos.</p>
         </header>
         <section className="-mx-2 flex flex-col gap-3">
           <h2 className="px-2 text-sm font-medium text-inverse">Plantilla</h2>
@@ -165,13 +180,17 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
           <h2 className="text-sm font-medium text-inverse">Colores</h2>
           <PalettePicker tone="dark" {...picker} />
         </section>
+        <section className="flex flex-col gap-3">
+          <h2 className="text-sm font-medium text-inverse">Con Pro</h2>
+          <ProOptions tone="dark" {...picker} />
+        </section>
         <p className="mt-auto text-[13px] text-on-dark-muted">Nada se publica sin tu OK.</p>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col lg:min-h-0 lg:bg-cream">
         <div className="flex flex-col gap-1 px-4 pt-8 lg:hidden">
           <p className="font-display text-2xl tracking-display text-inverse">Tren Solar</p>
-          <p className="text-[13px] text-on-dark-muted">Los hechos son los que ya aprobaste.</p>
+          <p className="text-[13px] text-on-dark-muted">Lo que dice ya lo aprobaste vos.</p>
         </div>
 
         <div className="flex flex-1 flex-col px-4 pt-5 pb-4 lg:min-h-0 lg:px-16 lg:pt-14 lg:pb-8">
@@ -203,6 +222,10 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
                 <h2 className="text-sm font-medium text-ink">Colores</h2>
                 <PalettePicker tone="light" {...picker} />
               </section>
+              <section className="flex flex-col gap-3">
+                <h2 className="text-sm font-medium text-ink">Con Pro</h2>
+                <ProOptions tone="light" {...picker} />
+              </section>
             </div>
           </div>
 
@@ -210,7 +233,7 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
             <div
               key={templateId}
               className={cn(
-                "relative animate-step-in overflow-hidden rounded-[22px] bg-paper shadow-panel transition-[width] duration-300 ease-out motion-reduce:animate-none motion-reduce:transition-none lg:overflow-y-auto lg:overscroll-contain lg:shadow-popover",
+                "relative animate-step-in overflow-hidden rounded-[22px] bg-paper shadow-panel transition-[width] duration-300 ease-out motion-reduce:animate-none motion-reduce:transition-none lg:overflow-y-auto lg:overscroll-contain lg:shadow-popover lg:[scrollbar-color:rgb(61_63_84/0.28)_transparent] lg:[scrollbar-width:thin]",
                 device === "mobile" ? "w-full lg:w-[390px]" : "w-full",
               )}
             >

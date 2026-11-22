@@ -3,7 +3,7 @@
 import type { ProInterest } from "./types"
 
 const responses = new Set<ProInterest["response"]>(["interested", "not_now"])
-const triggers = new Set<ProInterest["trigger"]>(["template", "palette", "customize"])
+const triggers = new Set<ProInterest["trigger"]>(["template", "palette", "customize", "domain"])
 const priceBands = new Set(["none", "up_to_2000", "2000_5000", "5000_10000", "over_10000"])
 
 export async function registerProInterest(body: ProInterest) {

@@ -5,9 +5,9 @@ import { firstName, initials } from "./theme"
 import type { FactCategory, FactSource, PublicPortfolio } from "./types"
 
 const origins: Record<FactSource, { icon: typeof AudioLines; label: string }> = {
-  transcript: { icon: AudioLines, label: "Lo contó en un audio" },
-  user: { icon: PenLine, label: "Lo agregó al revisar" },
-  mcp: { icon: GitPullRequest, label: "Lo trajo de su repositorio" },
+  transcript: { icon: AudioLines, label: "Lo contó por audio" },
+  user: { icon: PenLine, label: "Lo sumó al revisar" },
+  mcp: { icon: GitPullRequest, label: "Viene de su repositorio" },
 }
 
 const categoryLabels: Record<FactCategory, string> = {
@@ -58,7 +58,7 @@ export function Monogram({ portfolio, className }: { portfolio: PublicPortfolio;
 }
 
 export function Approved({ portfolio, className }: { portfolio: PublicPortfolio; className?: string }) {
-  return <p className={className}>{firstName(portfolio.display_name)} revisó y aprobó cada hecho de esta página.</p>
+  return <p className={className}>{firstName(portfolio.display_name)} revisó cada dato de esta página antes de publicarla.</p>
 }
 
 export function OriginKey({ portfolio, className }: { portfolio: PublicPortfolio; className?: string }) {
@@ -95,5 +95,5 @@ export function CvLink({ portfolio, className, ...props }: { portfolio: PublicPo
 }
 
 export function MadeWith({ className }: { className?: string }) {
-  return <p className={cn("text-xs text-(--pf-muted)", className)}>Hecho con Tren Solar a partir de audios.</p>
+  return <p className={cn("text-xs text-(--pf-muted)", className)}>Hecho con Tren Solar.</p>
 }
