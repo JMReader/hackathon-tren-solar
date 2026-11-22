@@ -11,3 +11,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## ui-sdk
 
 Before using ui-sdk (`@ui-sdk/react` / `@ui-sdk/core`), follow the `ui-sdk` skill if it's installed, and read `node_modules/@ui-sdk/react/docs/llms.txt`. To build a new component, also search `node_modules/@ui-sdk/react/docs/core.md` by heading, and read `rendering.md` next to it.
+
+## UI kit
+
+Styled wrappers live in `src/components/ui/` (Granola "oats" theme: cream `#f7f7f2`, ink `#292929`, olive accent `#5b6f00`, pill buttons, hairline borders). Tokens map to `--ui-*` in `src/app/globals.css`. The `/ui` route is a live showcase of every component and state — check it before adding a new pattern.
