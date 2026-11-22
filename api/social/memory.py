@@ -13,7 +13,11 @@ class InMemoryPublicationStore:
 
     def get_by_key(self, owner_id: str, idempotency_key: str) -> PublicationRecord | None:
         return next(
-            (r for r in self._by_id.values() if r.owner_id == owner_id and r.idempotency_key == idempotency_key),
+            (
+                r
+                for r in self._by_id.values()
+                if r.owner_id == owner_id and r.publication.idempotency_key == idempotency_key
+            ),
             None,
         )
 

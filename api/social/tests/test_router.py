@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from conftest import OWNER
+from conftest import KEY, OWNER, fixture
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from social.models import Platform, ProviderOutcome
@@ -17,65 +17,78 @@ def client(env):
     return TestClient(app)
 
 
-def post(client, key="k1", **body):
+def post(client, key=KEY, **body):
     headers = {"Idempotency-Key": key} if key else {}
     return client.post(
         "/api/v1/drafts/d-li/publications",
-        json={"draft_revision": 1, "confirmed": True, **body},
+        json={"draft_revision": 1, "confirm_publish": True, **body},
         headers=headers,
     )
 
 
-def test_connection_returns_matrix_row(client):
+def test_connection_status(client):
     response = client.get("/api/v1/social/x/connection")
     assert response.status_code == 200
-    assert response.json() | {"message": None} == {
-        "platform": "x",
-        "state": "connection_missing",
-        "can_publish": False,
-        "can_connect": True,
-        "assisted_share": {"official": True, "attaches_photo": False},
-        "reason_code": "connection_missing",
-        "message": None,
-    }
+    body = response.json()
+    assert (body["status"], body["can_publish_text"], body["can_publish_image"]) == ("disconnected", False, False)
+    assert body["assisted_share"] == {"official": True, "attaches_photo": False}
 
 
-def test_create_then_replay(client):
-    created = post(client)
-    assert created.status_code == 201
+def test_start_connection_returns_503_when_provider_blocks(client, env):
+    env.adapters[Platform.X].reason = "Sin créditos"
+    response = client.post("/api/v1/social/x/connection")
+    assert response.status_code == 503
+    assert (response.json()["status"], response.json()["reason"]) == ("access_unavailable", "Sin créditos")
+
+
+def test_start_connection_is_honest_until_oauth_exists(client):
+    response = client.post("/api/v1/social/linkedin/connection")
+    assert response.status_code == 501
+    assert response.json()["error"]["code"] == "OAUTH_NOT_IMPLEMENTED"
+
+
+def test_contract_request_body_publishes_then_replays(client):
+    contract = fixture("08-publications-states.response.json")
+    created = client.post(
+        "/api/v1/drafts/d-li/publications", json=contract["request_body"], headers=contract["request_headers"]
+    )
+    assert created.status_code == 200
     assert created.json()["status"] == "succeeded"
-    replay = post(client)
-    assert replay.status_code == 200
-    assert replay.headers["Idempotent-Replayed"] == "true"
+    replay = client.post(
+        "/api/v1/drafts/d-li/publications", json=contract["request_body"], headers=contract["request_headers"]
+    )
+    assert (replay.status_code, replay.headers["Idempotent-Replayed"]) == (200, "true")
     assert replay.json() == created.json()
 
 
-def test_errors_have_code_message_and_retryable(client):
-    response = post(client, key=None)
-    assert response.status_code == 400
-    assert response.json()["detail"] == {
-        "code": "idempotency_key_required",
-        "message": "Falta el encabezado Idempotency-Key.",
-        "retryable": False,
-    }
-
-
-def test_unknown_result_can_be_resolved(client, env):
+def test_unknown_result_is_202_and_can_be_resolved(client, env):
     env.adapters[Platform.LINKEDIN].outcome = TimeoutError()
-    publication = post(client).json()
-    assert publication["status"] == "unknown"
-    assert post(client, key="k2").json()["detail"]["code"] == "reconciliation_required"
+    response = post(client)
+    assert response.status_code == 202
+    publication = response.json()
+    assert (publication["status"], publication["error"]["code"]) == ("unknown", "PROVIDER_TIMEOUT_AFTER_SEND")
+
+    blocked = post(client, key="key-00000002")
+    assert (blocked.status_code, blocked.json()["error"]["code"]) == (409, "RECONCILIATION_REQUIRED")
 
     resolved = client.post(f"/api/v1/publications/{publication['id']}/resolution", json={"outcome": "not_published"})
     assert resolved.json()["status"] == "failed"
 
     env.adapters[Platform.LINKEDIN].outcome = ProviderOutcome.succeeded("post-2")
-    assert post(client, key="k2").status_code == 201
-    assert client.get(f"/api/v1/publications/{publication['id']}").json()["status"] == "failed"
+    assert post(client, key="key-00000002").status_code == 200
 
 
-def test_missing_publication_is_404(client):
-    assert client.get("/api/v1/publications/nope").status_code == 404
+def test_errors_use_contract_api_error_shape(client):
+    response = post(client, key=None)
+    assert response.status_code == 400
+    assert response.json() == {
+        "error": {
+            "code": "IDEMPOTENCY_KEY_REQUIRED",
+            "message": "Falta el encabezado Idempotency-Key.",
+            "retryable": False,
+        }
+    }
+    assert client.get("/api/v1/publications/nope").json()["error"]["code"] == "PUBLICATION_NOT_FOUND"
 
 
 def test_assisted_share_endpoint(client):
@@ -83,5 +96,5 @@ def test_assisted_share_endpoint(client):
     assert response.status_code == 200
     body = response.json()
     assert body["composer_url"] == "https://www.linkedin.com/feed/?shareActive=true&text=Texto%20d-li"
-    assert (body["platform"], body["official"], body["attaches_photo"]) == ("linkedin", False, False)
+    assert (body["platform"], body["official"], body["photo_id"]) == ("linkedin", False, "med_1")
     assert client.get("/api/v1/drafts/nope/assisted-share").status_code == 404

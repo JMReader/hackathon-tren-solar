@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -16,10 +18,10 @@ class Platform(StrEnum):
         return {Platform.LINKEDIN: "LinkedIn", Platform.X: "X"}[self]
 
 
-class AccessState(StrEnum):
-    AVAILABLE = "available"
-    CONNECTION_MISSING = "connection_missing"
-    RECONNECT_REQUIRED = "reconnect_required"
+class ConnectionState(StrEnum):
+    CONNECTED = "connected"
+    DISCONNECTED = "disconnected"
+    EXPIRED = "expired"
     ACCESS_UNAVAILABLE = "access_unavailable"
 
 
@@ -30,7 +32,7 @@ class PublicationStatus(StrEnum):
     UNKNOWN = "unknown"
 
 
-class ErrorInfo(BaseModel):
+class ErrorDetail(BaseModel):
     code: str
     message: str
     retryable: bool
@@ -41,26 +43,14 @@ class AssistedShareSupport(BaseModel):
     attaches_photo: bool
 
 
-class Availability(BaseModel):
+class SocialConnectionStatus(BaseModel):
     platform: Platform
-    state: AccessState
-    can_publish: bool
-    can_connect: bool
-    assisted_share: AssistedShareSupport
-    reason_code: str | None = None
-    message: str | None = None
-
-
-class AssistedShare(BaseModel):
-    draft_id: str
-    draft_revision: int
-    platform: Platform
-    text: str
-    photo_id: str
-    composer_url: str
-    official: bool
-    attaches_photo: bool
-    notice: str
+    status: ConnectionState
+    can_publish_text: bool
+    can_publish_image: bool
+    account_handle: str | None = None
+    reason: str | None = None
+    assisted_share: AssistedShareSupport | None = None
 
 
 class Publication(BaseModel):
@@ -68,41 +58,59 @@ class Publication(BaseModel):
     draft_id: str
     draft_revision: int
     platform: Platform
+    idempotency_key: str
     status: PublicationStatus
-    external_id: str | None = None
-    url: str | None = None
-    error: ErrorInfo | None = None
-    created_at: datetime
-    updated_at: datetime
+    external_post_id: str | None = None
+    external_url: str | None = None
+    published_at: datetime | None = None
+    error: ErrorDetail | None = None
+
+
+class AssistedShare(BaseModel):
+    draft_id: str
+    draft_revision: int
+    platform: Platform
+    text: str
+    photo_id: str | None
+    composer_url: str
+    official: bool
+    attaches_photo: bool
+    notice: str
 
 
 @dataclass(frozen=True)
 class PublicationRecord:
     owner_id: str
-    idempotency_key: str
     fingerprint: str
     publication: Publication
 
 
 @dataclass(frozen=True)
-class DraftSnapshot:
-    id: str
+class PublishableMedia:
+    photo_id: str
+    mime_type: str
+    local_path: str
+    alt_text: str | None = None
+
+
+@dataclass(frozen=True)
+class PublishableDraft:
+    draft_id: str
+    draft_revision: int
     platform: Platform
     body: str
-    revision: int
-    photo_id: str
+    media: PublishableMedia | None = None
 
-
-@dataclass(frozen=True)
-class Photo:
-    content_type: str
-    data: bytes = field(repr=False)
-
-
-@dataclass(frozen=True)
-class PublishContent:
-    body: str
-    photo: Photo
+    @classmethod
+    def from_handoff(cls, payload: Mapping[str, Any]) -> PublishableDraft:
+        media = payload.get("media")
+        return cls(
+            draft_id=payload["draft_id"],
+            draft_revision=payload["draft_revision"],
+            platform=Platform(payload["platform"]),
+            body=payload["body"],
+            media=PublishableMedia(**media) if media else None,
+        )
 
 
 @dataclass(frozen=True)
@@ -111,6 +119,7 @@ class Connection:
     access_token: str = field(repr=False)
     scopes: frozenset[str] = frozenset()
     expires_at: datetime | None = None
+    account_handle: str | None = None
 
 
 class OutcomeKind(StrEnum):
@@ -122,18 +131,18 @@ class OutcomeKind(StrEnum):
 @dataclass(frozen=True)
 class ProviderOutcome:
     kind: OutcomeKind
-    external_id: str | None = None
-    url: str | None = None
-    error: ErrorInfo | None = None
+    external_post_id: str | None = None
+    external_url: str | None = None
+    error: ErrorDetail | None = None
 
     @classmethod
-    def succeeded(cls, external_id: str | None, url: str | None = None) -> ProviderOutcome:
-        return cls(OutcomeKind.SUCCEEDED, external_id=external_id, url=url)
+    def succeeded(cls, external_post_id: str | None, external_url: str | None = None) -> ProviderOutcome:
+        return cls(OutcomeKind.SUCCEEDED, external_post_id=external_post_id, external_url=external_url)
 
     @classmethod
     def rejected(cls, code: str, message: str, retryable: bool) -> ProviderOutcome:
-        return cls(OutcomeKind.REJECTED, error=ErrorInfo(code=code, message=message, retryable=retryable))
+        return cls(OutcomeKind.REJECTED, error=ErrorDetail(code=code, message=message, retryable=retryable))
 
     @classmethod
     def unknown(cls, code: str, message: str) -> ProviderOutcome:
-        return cls(OutcomeKind.UNKNOWN, error=ErrorInfo(code=code, message=message, retryable=False))
+        return cls(OutcomeKind.UNKNOWN, error=ErrorDetail(code=code, message=message, retryable=False))

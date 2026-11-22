@@ -7,20 +7,20 @@ from uuid import uuid4
 
 from . import assisted
 from .models import (
-    AccessState,
     AssistedShare,
-    Availability,
-    ErrorInfo,
+    ConnectionState,
+    ErrorDetail,
     OutcomeKind,
     Platform,
     ProviderOutcome,
     Publication,
     PublicationRecord,
     PublicationStatus,
-    PublishContent,
+    SocialConnectionStatus,
 )
-from .ports import ConnectionStore, DraftSource, PhotoSource, PublicationStore, SocialAdapter
+from .ports import ConnectionStore, DraftSource, PublicationStore, SocialAdapter
 
+MIN_IDEMPOTENCY_KEY_LENGTH = 8
 MAX_IDEMPOTENCY_KEY_LENGTH = 255
 
 
@@ -34,8 +34,8 @@ class SocialError(Exception):
         self.retryable = retryable
         self.extra = extra
 
-    def detail(self) -> dict[str, object]:
-        return {"code": self.code, "message": self.message, "retryable": self.retryable, **self.extra}
+    def detail(self) -> ErrorDetail:
+        return ErrorDetail(code=self.code, message=self.message, retryable=self.retryable)
 
 
 class InvalidRequest(SocialError):
@@ -57,9 +57,8 @@ class SocialService:
         connections: ConnectionStore,
         publications: PublicationStore,
         drafts: DraftSource,
-        photos: PhotoSource,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
-        new_id: Callable[[], str] = lambda: uuid4().hex,
+        new_id: Callable[[], str] = lambda: f"pub_{uuid4().hex}",
     ) -> None:
         missing = set(Platform) - set(adapters)
         if missing:
@@ -68,50 +67,53 @@ class SocialService:
         self._connections = connections
         self._publications = publications
         self._drafts = drafts
-        self._photos = photos
         self._clock = clock
         self._new_id = new_id
         self._lock = threading.Lock()
 
-    def availability(self, owner_id: str, platform: Platform) -> Availability:
+    def connection_status(self, owner_id: str, platform: Platform) -> SocialConnectionStatus:
         adapter = self._adapters[platform]
-        if block := adapter.access_unavailable():
-            return _availability(platform, AccessState.ACCESS_UNAVAILABLE, block.code, block.message)
+        if reason := adapter.access_unavailable():
+            return _status(platform, ConnectionState.ACCESS_UNAVAILABLE, reason=reason)
         connection = self._connections.get(owner_id, platform)
         if connection is None:
-            return _availability(
+            return _status(
                 platform,
-                AccessState.CONNECTION_MISSING,
-                "connection_missing",
-                f"Conectá tu cuenta de {platform.label} para publicar directamente.",
+                ConnectionState.DISCONNECTED,
+                reason=f"Conectá tu cuenta de {platform.label} para publicar directamente.",
             )
         if connection.expires_at is not None and connection.expires_at <= self._clock():
-            return _availability(
+            return _status(
                 platform,
-                AccessState.RECONNECT_REQUIRED,
-                "connection_expired",
-                f"Tu sesión de {platform.label} venció. Volvé a conectar la cuenta.",
+                ConnectionState.EXPIRED,
+                account_handle=connection.account_handle,
+                reason=f"Tu sesión de {platform.label} venció. Volvé a conectar la cuenta.",
             )
         if adapter.required_scopes - connection.scopes:
-            return _availability(
+            return _status(
                 platform,
-                AccessState.RECONNECT_REQUIRED,
-                "missing_permission",
-                f"Falta el permiso para publicar en {platform.label}. Volvé a conectar la cuenta.",
+                ConnectionState.DISCONNECTED,
+                account_handle=connection.account_handle,
+                reason=f"Falta el permiso para publicar en {platform.label}. Volvé a conectar la cuenta.",
             )
-        return _availability(platform, AccessState.AVAILABLE)
+        return _status(
+            platform,
+            ConnectionState.CONNECTED,
+            can_publish_image=adapter.supports_image,
+            account_handle=connection.account_handle,
+        )
 
     def assisted_share(self, owner_id: str, draft_id: str) -> AssistedShare:
         draft = self._drafts.get(owner_id, draft_id)
         if draft is None:
-            raise NotFound("draft_not_found", "No encontramos ese borrador.")
+            raise NotFound("DRAFT_NOT_FOUND", "No encontramos ese borrador.")
         support = assisted.support(draft.platform)
         return AssistedShare(
-            draft_id=draft.id,
-            draft_revision=draft.revision,
+            draft_id=draft.draft_id,
+            draft_revision=draft.draft_revision,
             platform=draft.platform,
             text=draft.body,
-            photo_id=draft.photo_id,
+            photo_id=draft.media.photo_id if draft.media else None,
             composer_url=assisted.composer_url(draft.platform, draft.body),
             official=support.official,
             attaches_photo=support.attaches_photo,
@@ -124,11 +126,11 @@ class SocialService:
         draft_id: str,
         idempotency_key: str | None,
         draft_revision: int,
-        confirmed: bool,
+        confirm_publish: bool,
     ) -> tuple[Publication, bool]:
         key = self._validate_key(idempotency_key)
-        if not confirmed:
-            raise InvalidRequest("confirmation_required", "Confirmá el texto y la foto final antes de publicar.")
+        if not confirm_publish:
+            raise InvalidRequest("CONFIRMATION_REQUIRED", "Confirmá el texto y la foto final antes de publicar.")
         fingerprint = f"{draft_id}:{draft_revision}"
 
         latest = self._publications.latest_for_draft(owner_id, draft_id)
@@ -138,54 +140,59 @@ class SocialService:
         with self._lock:
             if existing := self._publications.get_by_key(owner_id, key):
                 if existing.fingerprint != fingerprint:
-                    raise Conflict("idempotency_key_reused", "Esa clave de idempotencia ya se usó para otro envío.")
+                    raise Conflict("IDEMPOTENCY_KEY_REUSED", "Esa clave de idempotencia ya se usó para otro envío.")
                 return existing.publication, True
 
             draft = self._drafts.get(owner_id, draft_id)
             if draft is None:
-                raise NotFound("draft_not_found", "No encontramos ese borrador.")
-            if draft.revision != draft_revision:
-                raise Conflict("stale_revision", "El borrador cambió. Revisá la versión actual antes de publicar.")
+                raise NotFound("DRAFT_NOT_FOUND", "No encontramos ese borrador.")
+            if draft.draft_revision != draft_revision:
+                raise Conflict("REVISION_CONFLICT", "El borrador cambió. Revisá la versión actual antes de publicar.")
 
-            availability = self.availability(owner_id, draft.platform)
-            if not availability.can_publish:
+            status = self.connection_status(owner_id, draft.platform)
+            if not status.can_publish_text:
                 raise Conflict(
-                    "platform_unavailable",
-                    availability.message or f"No se puede publicar en {draft.platform.label}.",
-                    availability=availability.model_dump(mode="json"),
+                    "ACCESS_UNAVAILABLE"
+                    if status.status is ConnectionState.ACCESS_UNAVAILABLE
+                    else "CONNECTION_REQUIRED",
+                    status.reason or f"No se puede publicar en {draft.platform.label}.",
+                    connection=status.model_dump(mode="json"),
+                )
+            if draft.media and not status.can_publish_image:
+                raise Conflict(
+                    "IMAGE_UNAVAILABLE",
+                    f"{draft.platform.label} no permite publicar la foto desde la app. "
+                    "Quitá la foto o publicala manualmente.",
                 )
 
             if latest := self._publications.latest_for_draft(owner_id, draft_id):
                 self._ensure_can_retry(latest.publication)
 
-            photo = self._photos.get(owner_id, draft.photo_id)
-            if photo is None:
-                raise Conflict("photo_unavailable", "No encontramos la foto del borrador.")
-
             connection = self._connections.get(owner_id, draft.platform)
-            now = self._clock()
             record = PublicationRecord(
                 owner_id=owner_id,
-                idempotency_key=key,
                 fingerprint=fingerprint,
                 publication=Publication(
                     id=self._new_id(),
                     draft_id=draft_id,
                     draft_revision=draft_revision,
                     platform=draft.platform,
+                    idempotency_key=key,
                     status=PublicationStatus.PUBLISHING,
-                    created_at=now,
-                    updated_at=now,
                 ),
             )
             self._publications.save(record)
 
-        adapter = self._adapters[draft.platform]
         try:
-            outcome = adapter.publish(connection, PublishContent(body=draft.body, photo=photo))
+            outcome = self._adapters[draft.platform].publish(connection, draft)
+        except TimeoutError:
+            outcome = ProviderOutcome.unknown(
+                "PROVIDER_TIMEOUT_AFTER_SEND",
+                f"{draft.platform.label} no confirmó a tiempo. Verificá en la red antes de reintentar para no duplicar.",
+            )
         except Exception:
             outcome = ProviderOutcome.unknown(
-                "provider_error",
+                "PROVIDER_RESULT_UNKNOWN",
                 f"No pudimos confirmar el resultado en {draft.platform.label}. Verificá en la red antes de reintentar.",
             )
         return self._apply(record, outcome).publication, False
@@ -200,9 +207,9 @@ class SocialService:
         with self._lock:
             record = self._require(owner_id, publication_id)
             if record.publication.status is not PublicationStatus.UNKNOWN:
-                raise Conflict("not_unknown", "Sólo se puede resolver una publicación con resultado incierto.")
-            error = ErrorInfo(
-                code="confirmed_not_published",
+                raise Conflict("NOT_UNKNOWN", "Sólo se puede resolver una publicación con resultado incierto.")
+            error = ErrorDetail(
+                code="CONFIRMED_NOT_PUBLISHED",
                 message="Confirmaste que no se publicó. Podés reintentar.",
                 retryable=True,
             )
@@ -210,36 +217,45 @@ class SocialService:
 
     def _validate_key(self, key: str | None) -> str:
         if not key:
-            raise InvalidRequest("idempotency_key_required", "Falta el encabezado Idempotency-Key.")
-        if len(key) > MAX_IDEMPOTENCY_KEY_LENGTH or not key.isascii() or not key.isprintable():
-            raise InvalidRequest("invalid_idempotency_key", "La clave de idempotencia no es válida.")
+            raise InvalidRequest("IDEMPOTENCY_KEY_REQUIRED", "Falta el encabezado Idempotency-Key.")
+        if (
+            not MIN_IDEMPOTENCY_KEY_LENGTH <= len(key) <= MAX_IDEMPOTENCY_KEY_LENGTH
+            or not key.isascii()
+            or not key.isprintable()
+        ):
+            raise InvalidRequest("INVALID_IDEMPOTENCY_KEY", "La clave de idempotencia no es válida.")
         return key
 
     def _ensure_can_retry(self, publication: Publication) -> None:
         label = publication.platform.label
         match publication.status:
             case PublicationStatus.PUBLISHING:
-                raise Conflict("publication_in_progress", f"Ya se está publicando en {label}.", retryable=True)
+                raise Conflict(
+                    "PUBLICATION_IN_PROGRESS",
+                    f"Ya se está publicando en {label}.",
+                    retryable=True,
+                    publication_id=publication.id,
+                )
             case PublicationStatus.UNKNOWN:
                 raise Conflict(
-                    "reconciliation_required",
+                    "RECONCILIATION_REQUIRED",
                     f"No sabemos si el post llegó a {label}. Verificá en la red antes de reintentar.",
                     publication_id=publication.id,
                 )
             case PublicationStatus.SUCCEEDED:
                 raise Conflict(
-                    "already_published",
+                    "ALREADY_PUBLISHED",
                     f"Este borrador ya se publicó en {label}.",
                     publication_id=publication.id,
-                    url=publication.url,
+                    external_url=publication.external_url,
                 )
             case PublicationStatus.FAILED if publication.error and not publication.error.retryable:
-                raise Conflict("not_retryable", publication.error.message, publication_id=publication.id)
+                raise Conflict("NOT_RETRYABLE", publication.error.message, publication_id=publication.id)
 
     def _require(self, owner_id: str, publication_id: str) -> PublicationRecord:
         record = self._publications.get(owner_id, publication_id)
         if record is None:
-            raise NotFound("publication_not_found", "No encontramos esa publicación.")
+            raise NotFound("PUBLICATION_NOT_FOUND", "No encontramos esa publicación.")
         return record
 
     def _reconcile(self, record: PublicationRecord) -> PublicationRecord:
@@ -257,18 +273,19 @@ class SocialService:
 
     def _apply(self, record: PublicationRecord, outcome: ProviderOutcome) -> PublicationRecord:
         with self._lock:
-            if outcome.kind is OutcomeKind.SUCCEEDED and (outcome.external_id or outcome.url):
+            if outcome.kind is OutcomeKind.SUCCEEDED and (outcome.external_post_id or outcome.external_url):
                 return self._update(
                     record,
                     status=PublicationStatus.SUCCEEDED,
-                    external_id=outcome.external_id,
-                    url=outcome.url,
+                    external_post_id=outcome.external_post_id,
+                    external_url=outcome.external_url,
+                    published_at=self._clock(),
                     error=None,
                 )
             if outcome.kind is OutcomeKind.REJECTED:
                 return self._update(record, status=PublicationStatus.FAILED, error=outcome.error)
-            error = outcome.error or ErrorInfo(
-                code="unconfirmed_result",
+            error = outcome.error or ErrorDetail(
+                code="PROVIDER_RESULT_UNCONFIRMED",
                 message=f"{record.publication.platform.label} no devolvió un identificador del post. "
                 "Verificá en la red antes de reintentar.",
                 retryable=False,
@@ -276,21 +293,26 @@ class SocialService:
             return self._update(record, status=PublicationStatus.UNKNOWN, error=error)
 
     def _update(self, record: PublicationRecord, **changes: object) -> PublicationRecord:
-        publication = record.publication.model_copy(update={**changes, "updated_at": self._clock()})
-        updated = PublicationRecord(record.owner_id, record.idempotency_key, record.fingerprint, publication)
+        updated = PublicationRecord(record.owner_id, record.fingerprint, record.publication.model_copy(update=changes))
         self._publications.save(updated)
         return updated
 
 
-def _availability(
-    platform: Platform, state: AccessState, reason_code: str | None = None, message: str | None = None
-) -> Availability:
-    return Availability(
+def _status(
+    platform: Platform,
+    state: ConnectionState,
+    *,
+    can_publish_image: bool = False,
+    account_handle: str | None = None,
+    reason: str | None = None,
+) -> SocialConnectionStatus:
+    connected = state is ConnectionState.CONNECTED
+    return SocialConnectionStatus(
         platform=platform,
-        state=state,
-        can_publish=state is AccessState.AVAILABLE,
-        can_connect=state in (AccessState.CONNECTION_MISSING, AccessState.RECONNECT_REQUIRED),
+        status=state,
+        can_publish_text=connected,
+        can_publish_image=connected and can_publish_image,
+        account_handle=account_handle,
+        reason=reason,
         assisted_share=assisted.support(platform),
-        reason_code=reason_code,
-        message=message,
     )
