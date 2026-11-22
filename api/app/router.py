@@ -1,3 +1,4 @@
+import json
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, Header, Request, UploadFile
@@ -91,10 +92,14 @@ def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
     @router.post("/achievements", status_code=201, tags=["achievements"])
     async def create_achievement(request: Request, session_id: Session) -> Achievement:
         content_type = request.headers.get("content-type", "")
-        if content_type.startswith("multipart/form-data"):
+        if content_type.startswith(("multipart/form-data",
+                                    "application/x-www-form-urlencoded")):
             form = await request.form()
             return await _create_multipart(service, session_id, form)
-        body = await request.json()
+        try:
+            body = await request.json()
+        except json.JSONDecodeError as e:
+            raise ApiError(400, "bad_request", f"Body JSON inválido: {e}") from e
         req: CreateAchievementTextRequest = _parse(CreateAchievementTextRequest, body)
         return service.create_achievement(
             session_id=session_id, input_type=req.input_type, text=req.text,
@@ -134,5 +139,30 @@ def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
 
 
 async def _create_multipart(service: CoreService, session_id: str, form) -> Achievement:
-    raise ApiError(501, "not_implemented",
-                   "La ingesta multipart (audio + foto) se habilita en la Parte 3.")
+    """POST /achievements multipart: `audio` + `photo` + `text` opcional (Parte 3)."""
+    input_type = str(form.get("input_type") or "audio")
+    if input_type not in ("audio", "text"):
+        raise ApiError(400, "bad_request",
+                       f"input_type '{input_type}' no soportado en multipart; usá 'audio' o 'text'.")
+
+    async def _file_tuple(field: str):
+        item = form.get(field)
+        if item is None or not getattr(item, "filename", None):
+            return None
+        return (await item.read(), item.filename, item.content_type)
+
+    audio = await _file_tuple("audio")
+    photo = await _file_tuple("photo")
+    text = form.get("text")
+    text = str(text) if text else None
+
+    if input_type == "audio" and audio is None and not (text and len(text) >= 10):
+        raise ApiError(400, "missing_audio",
+                       "input_type='audio' necesita el archivo `audio` (o `text` >= 10 chars).")
+    if input_type == "text" and not (text and len(text) >= 10):
+        raise ApiError(400, "missing_input",
+                       "input_type='text' necesita `text` de al menos 10 caracteres.")
+    return service.create_achievement(
+        session_id=session_id, input_type=input_type, text=text,
+        audio=audio, photo=photo,
+    )
