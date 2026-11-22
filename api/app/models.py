@@ -127,6 +127,7 @@ class UpdateAchievementRequest(BaseModel):
 
 class ApproveAchievementRequest(BaseModel):
     revision: int = Field(ge=1)
+    add_to_portfolio: bool = False
 
 
 class GenerateDraftsRequest(BaseModel):
@@ -156,6 +157,16 @@ StyleSyncStatus = Literal["skipped", "succeeded", "unavailable", "failed"]
 class SessionCreated(BaseModel):
     session_id: str
     expires_at: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    session_id: str
+    display_name: str
 
 
 class CvDocument(BaseModel):
@@ -203,6 +214,7 @@ class SetAuthorProfilePhotoRequest(BaseModel):
 class SyncStyleRequest(BaseModel):
     platforms: list[Platform] = ["linkedin", "x"]
     max_posts_per_platform: int = Field(default=5, ge=1, le=20)
+    linkedin_profile_url: str | None = Field(default=None, max_length=300)
 
 
 class CompleteOnboardingRequest(BaseModel):

@@ -4,6 +4,7 @@ import os
 from collections.abc import Mapping
 from dataclasses import dataclass
 
+from .apify import DEFAULT_ACTOR, ApifyConfig
 from .linkedin import DEFAULT_API_VERSION, LinkedInConfig
 from .x import XConfig
 
@@ -14,6 +15,7 @@ class Settings:
     web_base_url: str
     linkedin: LinkedInConfig | None = None
     x: XConfig | None = None
+    apify: ApifyConfig | None = None
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] = os.environ) -> Settings:
@@ -44,9 +46,15 @@ class Settings:
             if token_key and get("X_CLIENT_ID") and get("X_CLIENT_SECRET") and get("X_REDIRECT_URI")
             else None
         )
+        apify = (
+            ApifyConfig(get("APIFY_TOKEN"), get("APIFY_LINKEDIN_ACTOR") or DEFAULT_ACTOR)
+            if get("APIFY_TOKEN")
+            else None
+        )
         return cls(
             token_key=token_key,
             web_base_url=get("SOCIAL_WEB_BASE_URL") or "http://localhost:3000",
             linkedin=linkedin,
             x=x,
+            apify=apify,
         )

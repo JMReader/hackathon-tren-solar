@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Header, Response
 from ..session_service import SessionService
 
 from .models import (
+    AddPortfolioItemRequest,
     CreatePortfolioRequest,
     Portfolio,
     ProInterestRequest,
@@ -33,6 +34,14 @@ def create_portfolio_router(
     @router.post("/portfolios", status_code=201, tags=["portfolio"])
     def create_portfolio(session_id: SessionHeader, req: CreatePortfolioRequest) -> Portfolio:
         return service.create(session_id, req)
+
+    @router.get("/portfolios/current", tags=["portfolio"])
+    def get_current_portfolio(session_id: SessionHeader) -> Portfolio:
+        return service.get_current(session_id)
+
+    @router.post("/portfolios/current/items", tags=["portfolio"])
+    def add_current_item(session_id: SessionHeader, req: AddPortfolioItemRequest) -> Portfolio:
+        return service.add_to_current(session_id, req.achievement_id)
 
     @router.get("/portfolios/{portfolio_id}", tags=["portfolio"])
     def get_portfolio(session_id: SessionHeader, portfolio_id: str) -> Portfolio:

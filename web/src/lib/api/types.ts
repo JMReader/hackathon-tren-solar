@@ -69,6 +69,7 @@ export interface SetAuthorProfilePhotoRequest {
 export interface SyncStyleRequest {
   platforms?: Platform[]
   max_posts_per_platform?: number
+  linkedin_profile_url?: string | null
 }
 
 export interface CompleteOnboardingRequest {
@@ -163,6 +164,33 @@ export interface GenerateDraftsResponse {
   achievement_id: string
   achievement_revision: number
   drafts: Draft[]
+}
+
+export type PublicationStatus = "publishing" | "succeeded" | "failed" | "unknown"
+
+export interface Publication {
+  id: string
+  draft_id: string
+  draft_revision: number
+  platform: Platform
+  idempotency_key: string
+  status: PublicationStatus
+  external_post_id?: string | null
+  external_url?: string | null
+  published_at?: string | null
+  error?: ErrorDetail | null
+}
+
+export interface AssistedShare {
+  draft_id: string
+  draft_revision: number
+  platform: Platform
+  text: string
+  photo_id: string | null
+  composer_url: string
+  official: boolean
+  attaches_photo: boolean
+  notice: string
 }
 
 export interface ErrorDetail {

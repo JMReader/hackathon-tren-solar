@@ -4,10 +4,9 @@ import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tansta
 import { useSyncExternalStore } from "react"
 import { toast } from "@/components/ui/toast"
 import { achievementsIndex, type AchievementEntry } from "@/lib/achievements-index"
-import { fetchPortfolio } from "@/portfolio/portfolio-api"
-import { getStoredPortfolioId } from "@/portfolio/storage"
+import { addCurrentPortfolioItem, fetchCurrentPortfolio } from "@/portfolio/portfolio-api"
 import { ApiRequestError, apiFetch } from "./client"
-import type { Achievement, ApiError, Draft, Fact, GenerateDraftsResponse, Platform } from "./types"
+import type { Achievement, ApiError, AssistedShare, Draft, Fact, GenerateDraftsResponse, Platform, Publication } from "./types"
 
 const achievementKey = (id: string) => ["achievement", id] as const
 /** Same key the portfolio editor uses, so both read one list. */
@@ -75,10 +74,29 @@ export function useStoredPortfolio(sessionId: string | undefined) {
   return useQuery({
     queryKey: ["portfolio-summary", sessionId],
     enabled: Boolean(sessionId),
-    queryFn: async () => {
-      const id = getStoredPortfolioId()
-      if (!id) return null
-      return fetchPortfolio(id).catch(() => null)
+    queryFn: () => fetchCurrentPortfolio().catch(() => null),
+  })
+}
+
+/** The person chose to add this approved achievement to their portfolio. */
+export function useAddToPortfolio(achievementId: string, sessionId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => addCurrentPortfolioItem(achievementId),
+    onSuccess: (portfolio) => {
+      queryClient.setQueryData(["portfolio-summary", sessionId], portfolio)
+      void queryClient.invalidateQueries({ queryKey: ["portfolio-draft"] })
+    },
+    onError: (error) => {
+      const code = apiErrorCode(error)
+      toast.error("No se pudo sumar al portfolio", {
+        description:
+          code === "portfolio_full"
+            ? "Tu portfolio ya tiene 12 logros. Quitá uno para sumar otro."
+            : code === "cv_required"
+              ? "Primero subí tu CV."
+              : apiErrorMessage(error, "Revisá tu conexión e intentá de nuevo."),
+      })
     },
   })
 }
@@ -181,5 +199,49 @@ export function useUpdateDraft(id: string) {
     },
     onSuccess: (d) => queryClient.setQueryData(draftKey(id), d),
     onError: (error) => onConflictOrError(queryClient, draftKey(id), error),
+  })
+}
+
+const publicationsKey = (draftId: string) => ["publications", draftId] as const
+
+/** Publications already attempted for a draft, newest first (persisted server-side). */
+export function useDraftPublications(draftId: string | undefined, sessionId: string | undefined) {
+  return useQuery({
+    queryKey: publicationsKey(draftId ?? ""),
+    enabled: Boolean(draftId && sessionId),
+    queryFn: () => apiFetch<Publication[]>(`/drafts/${draftId}/publications`),
+    refetchInterval: (query) =>
+      query.state.data?.some((p) => p.status === "publishing" || p.status === "unknown") ? 4000 : false,
+  })
+}
+
+export function usePublishDraft(draft: Draft) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () =>
+      apiFetch<Publication>(`/drafts/${draft.id}/publications`, {
+        method: "POST",
+        headers: { "Idempotency-Key": crypto.randomUUID() },
+        json: { draft_revision: draft.revision, confirm_publish: true },
+      }),
+    onSuccess: (publication) => {
+      queryClient.setQueryData(publicationsKey(draft.id), (old: Publication[] | undefined) => [
+        publication,
+        ...(old ?? []),
+      ])
+      void queryClient.invalidateQueries({ queryKey: publicationsKey(draft.id) })
+    },
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: publicationsKey(draft.id) })
+    },
+  })
+}
+
+export function useAssistedShare(draftId: string | undefined, sessionId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ["assisted-share", draftId ?? ""],
+    enabled: Boolean(draftId && sessionId && enabled),
+    queryFn: () => apiFetch<AssistedShare>(`/drafts/${draftId}/assisted-share`),
+    staleTime: 60_000,
   })
 }

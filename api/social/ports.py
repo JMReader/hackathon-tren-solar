@@ -11,6 +11,20 @@ class OAuthError(Exception):
         self.code = code
 
 
+class ProviderReadError(Exception):
+    def __init__(self, code: str, message: str, retryable: bool) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.retryable = retryable
+
+
+class PostReader(Protocol):
+    def read_recent_posts(
+        self, connection: Connection, limit: int, profile_url: str | None = None
+    ) -> list[str]: ...
+
+
 class SocialAdapter(Protocol):
     platform: Platform
     required_scopes: frozenset[str]
@@ -52,5 +66,7 @@ class PublicationStore(Protocol):
     def get_by_key(self, owner_id: str, idempotency_key: str) -> PublicationRecord | None: ...
 
     def latest_for_draft(self, owner_id: str, draft_id: str) -> PublicationRecord | None: ...
+
+    def list_for_draft(self, owner_id: str, draft_id: str) -> list[PublicationRecord]: ...
 
     def save(self, record: PublicationRecord) -> None: ...

@@ -84,18 +84,20 @@ def drafts_with_photo(client: TestClient, auth: dict) -> dict[str, dict]:
 
 
 def connect_linkedin(client: TestClient, auth: dict) -> None:
-    start = client.post("/api/v1/social/linkedin/connection", headers=auth, json={"return_to": "/crear/publicar"})
+    start = client.post("/api/v1/social/linkedin/connection", headers=auth, json={"return_to": "/?step=2"})
     assert start.status_code == 200, start.text
     callback = client.get(
         "/api/v1/social/linkedin/callback", params={"state": start.json()["state"], "code": "code-1"}
     )
     assert callback.status_code == 302
     location = urlsplit(callback.headers["location"])
-    assert (location.netloc, location.path, parse_qs(location.query)["result"]) == (
-        "web.test",
-        "/crear/publicar",
-        ["connected"],
-    )
+    assert (location.netloc, location.path) == ("web.test", "/")
+    assert parse_qs(location.query) == {
+        "step": ["2"],
+        "social": ["linkedin"],
+        "result": ["connected"],
+        "connected": ["linkedin"],
+    }
 
 
 def publish(client: TestClient, auth: dict, draft: dict, key: str = "key-00000001"):

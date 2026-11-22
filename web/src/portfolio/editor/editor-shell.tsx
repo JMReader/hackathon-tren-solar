@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { ArrowRight, LayoutTemplate } from "lucide-react"
 import Link from "next/link"
+import { useState } from "react"
 import { buttonStyles } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { apiFetch } from "@/lib/api/client"
@@ -12,12 +13,13 @@ import { buildEditorPreview, defaultAchievementTitle } from "../build-preview"
 import { demoPortfolio } from "../demo"
 import {
   createPortfolio,
-  fetchPortfolio,
+  fetchCurrentPortfolio,
   publishPortfolio,
   updatePortfolio,
   type PortfolioRecord,
 } from "../portfolio-api"
-import { clearStoredPortfolioId, getStoredPortfolioId, setStoredPortfolioId } from "../storage"
+import { setStoredPortfolioId } from "../storage"
+import { CvGate } from "./cv-gate"
 import { PortfolioEditor } from "./editor"
 
 const toItem = (a: Achievement) => ({
@@ -31,24 +33,10 @@ async function loadOrCreatePortfolio(
   profile: AuthorProfile,
   approved: Achievement[],
 ): Promise<PortfolioRecord> {
-  const storedId = getStoredPortfolioId()
-  if (storedId) {
-    let stored: PortfolioRecord | null = null
-    try {
-      stored = await fetchPortfolio(storedId)
-    } catch {
-      clearStoredPortfolioId()
-    }
-    if (stored) {
-      // Achievements approved after the portfolio was created join it automatically.
-      const present = new Set(stored.items.map((item) => item.achievement_id))
-      const missing = approved.filter((a) => !present.has(a.id)).slice(0, Math.max(0, 12 - stored.items.length))
-      if (missing.length === 0) return stored
-      return updatePortfolio(stored.id, {
-        revision: stored.revision,
-        items: [...stored.items, ...missing.map(toItem)],
-      })
-    }
+  const current = await fetchCurrentPortfolio()
+  if (current) {
+    setStoredPortfolioId(current.id)
+    return current
   }
   const displayName =
     (profile.profession?.trim().length ?? 0) >= 2
@@ -99,6 +87,8 @@ export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean 
   const session = useSessionId()
   const sessionId = session.data
   const profileQuery = useProfile(sessionId)
+  const [showExample, setShowExample] = useState(false)
+  const cvId = profileQuery.data?.cv_document?.cv_id ?? null
 
   const achievementsQuery = useQuery({
     queryKey: ["achievements", sessionId],
@@ -113,7 +103,7 @@ export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean 
     (!sessionId || approved.length === 0)
 
   const portfolioQuery = useQuery({
-    queryKey: ["portfolio-draft", sessionId, approved.map((a) => a.id).join(",")],
+    queryKey: ["portfolio-draft", sessionId, approved.map((a) => a.id).join(","), cvId],
     enabled: Boolean(sessionId && profileQuery.data && approved.length > 0),
     queryFn: () => loadOrCreatePortfolio(profileQuery.data!, approved),
   })
@@ -124,6 +114,14 @@ export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean 
         <Spinner className="size-8 text-on-dark" />
       </div>
     )
+  }
+
+  if (showExample) {
+    return <PortfolioEditor portfolio={demoPortfolio} isDemo embedded={embedded} />
+  }
+
+  if (sessionId && profileQuery.data && !cvId) {
+    return <CvGate sessionId={sessionId} embedded={embedded} onExample={() => setShowExample(true)} />
   }
 
   if (useDemo) {

@@ -25,8 +25,15 @@ class InMemoryPublicationStore:
         )
 
     def latest_for_draft(self, owner_id: str, draft_id: str) -> PublicationRecord | None:
-        records = [r for r in self._by_id.values() if r.owner_id == owner_id and r.publication.draft_id == draft_id]
-        return records[-1] if records else None
+        records = self.list_for_draft(owner_id, draft_id)
+        return records[0] if records else None
+
+    def list_for_draft(self, owner_id: str, draft_id: str) -> list[PublicationRecord]:
+        return [
+            r
+            for r in reversed(list(self._by_id.values()))
+            if r.owner_id == owner_id and r.publication.draft_id == draft_id
+        ]
 
     def save(self, record: PublicationRecord) -> None:
         self._by_id[record.publication.id] = record

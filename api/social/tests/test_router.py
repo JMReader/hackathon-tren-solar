@@ -110,3 +110,13 @@ def test_assisted_share_endpoint(client):
     assert body["composer_url"] == "https://www.linkedin.com/feed/?shareActive=true&text=Texto%20d-li"
     assert (body["platform"], body["official"], body["photo_id"]) == ("linkedin", False, "med_1")
     assert client.get("/api/v1/drafts/nope/assisted-share").status_code == 404
+
+
+def test_list_draft_publications(client):
+    assert client.get("/api/v1/drafts/d-li/publications").json() == []
+    assert client.get("/api/v1/drafts/nope/publications").status_code == 404
+
+    published = post(client).json()
+    listed = client.get("/api/v1/drafts/d-li/publications")
+    assert listed.status_code == 200
+    assert [p["id"] for p in listed.json()] == [published["id"]]

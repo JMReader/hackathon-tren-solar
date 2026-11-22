@@ -42,6 +42,18 @@ def _slugify(name: str) -> str:
     return slug[:60]
 
 
+DEFAULT_TEMPLATE_ID = "esencial"
+DEFAULT_PALETTE_ID = "azul-salina"
+MAX_ITEMS = 12
+
+
+def _default_title(achievement) -> str:
+    text = achievement.facts[0].text.strip() if achievement.facts else ""
+    if len(text) < 3:
+        return "Mi logro"
+    return text if len(text) <= 80 else f"{text[:77]}..."
+
+
 class PortfolioService:
     def __init__(self, store, media: MediaStore):
         self.store = store
@@ -151,6 +163,64 @@ class PortfolioService:
     def get(self, portfolio_id: str, session_id: str) -> Portfolio:
         row = self._require_owned(portfolio_id, session_id)
         return self._row_to_portfolio(row, session_id)
+
+    def get_current(self, session_id: str) -> Portfolio:
+        row = self.store.get_portfolio_by_session(session_id)
+        if row is None:
+            raise not_found("portfolio", "current")
+        return self._row_to_portfolio(_as_dict(row), session_id)
+
+    def add_achievement(self, session_id: str, achievement) -> str:
+        """Suma un logro aprobado al borrador del portfolio de la sesión (Issue #37).
+
+        No toca el snapshot publicado. Devuelve qué pasó, sin lanzar errores:
+        aprobar un logro no puede fallar porque el portfolio no lo recibió.
+        """
+        if achievement.status != "approved":
+            return "not_approved"
+        if not self._has_cv(session_id):
+            return "cv_required"
+        item = PortfolioItemInput(
+            achievement_id=achievement.id, title=_default_title(achievement))
+        existing = self.store.get_portfolio_by_session(session_id)
+        if existing is None:
+            profile, _ = self.store.get_profile(session_id)
+            name = (profile.profession or "").strip()
+            self.create(session_id, CreatePortfolioRequest(
+                display_name=name[:60] if len(name) >= 2 else "Tu portfolio",
+                items=[item],
+                template_id=DEFAULT_TEMPLATE_ID,
+                palette_id=DEFAULT_PALETTE_ID,
+            ))
+            return "created"
+        row = _as_dict(existing)
+        items = json.loads(row["items"])
+        if any(i["achievement_id"] == achievement.id for i in items):
+            return "already_present"
+        if len(items) >= MAX_ITEMS:
+            return "full"
+        items.append(item.model_dump())
+        row["items"] = json.dumps(items, ensure_ascii=False)
+        row["revision"] = row["revision"] + 1
+        row["updated_at"] = _now()
+        self.store.save_portfolio(row)
+        return "added"
+
+    def add_to_current(self, session_id: str, achievement_id: str) -> Portfolio:
+        """La persona eligió sumar un logro aprobado a su portfolio."""
+        achievement = self.store.get_achievement(achievement_id)
+        if achievement is None or self.store.achievement_session(achievement_id) != session_id:
+            raise not_found("achievement", achievement_id)
+        outcome = self.add_achievement(session_id, achievement)
+        if outcome == "not_approved":
+            raise ApiError(422, "achievement_not_approved",
+                           f"El logro '{achievement_id}' debe estar aprobado.")
+        if outcome == "cv_required":
+            raise ApiError(422, "cv_required", "Subí tu CV para tener portfolio.")
+        if outcome == "full":
+            raise ApiError(422, "portfolio_full",
+                           f"El portfolio ya tiene {MAX_ITEMS} logros. Quitá uno para sumar otro.")
+        return self.get_current(session_id)
 
     def update(self, portfolio_id: str, session_id: str,
                req: UpdatePortfolioRequest) -> Portfolio:

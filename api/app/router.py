@@ -1,5 +1,5 @@
 import json
-from typing import Annotated
+from typing import Annotated, Callable
 
 from fastapi import APIRouter, Depends, Form, Header, Request, UploadFile
 from pydantic import ValidationError
@@ -14,6 +14,8 @@ from .models import (
     Draft,
     GenerateDraftsRequest,
     GenerateDraftsResponse,
+    LoginRequest,
+    LoginResponse,
     MediaAsset,
     SessionCreated,
     SetAuthorProfilePhotoRequest,
@@ -35,7 +37,11 @@ def _parse(model, body) -> object:
                                  for err in e.errors())) from e
 
 
-def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
+def create_router(
+    service: CoreService,
+    sessions: SessionService,
+    on_approved: Callable[[str, Achievement], object] | None = None,
+) -> APIRouter:
     router = APIRouter()
 
     def require_session(x_session_id: str | None = Header(None)) -> str:
@@ -48,6 +54,10 @@ def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
     @router.post("/session", status_code=201, tags=["session"])
     def create_session() -> SessionCreated:
         return sessions.create_session()
+
+    @router.post("/auth/login", tags=["auth"])
+    def demo_login(req: LoginRequest) -> LoginResponse:
+        return sessions.demo_login(req.email, req.password)
 
     @router.get("/session/profile", tags=["session"])
     def get_profile(session_id: Session) -> AuthorProfile:
@@ -122,7 +132,10 @@ def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
     @router.post("/achievements/{achievement_id}/approve", tags=["achievements"])
     def approve_achievement(session_id: Session, achievement_id: str,
                             req: ApproveAchievementRequest) -> Achievement:
-        return service.approve_achievement(session_id, achievement_id, req)
+        achievement = service.approve_achievement(session_id, achievement_id, req)
+        if req.add_to_portfolio and on_approved is not None:
+            on_approved(session_id, achievement)
+        return achievement
 
     @router.post("/achievements/{achievement_id}/drafts",
                  status_code=201, tags=["drafts"])

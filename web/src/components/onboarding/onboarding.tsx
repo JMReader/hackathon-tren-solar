@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { DiscoveryConsent } from "./discovery-consent"
 import { ArrowRight, Camera, Check, ChevronLeft, FileCheck, FileText, ImagePlus } from "lucide-react"
 import type { AuthorProfile, Platform, StyleSyncResult } from "@/lib/api/types"
 import {
@@ -396,7 +397,7 @@ function Wizard({
                   onSaveSample={saveSample}
                 />
               )}
-              {step === 3 && <ProfileRows profile={profile} goToStep={goTo} />}
+              {step === 3 && <><ProfileRows profile={profile} goToStep={goTo} /><DiscoveryConsent /></>}
             </div>
           </>
         )}
@@ -778,7 +779,56 @@ function SocialCard({
           </Button>
         </div>
       )}
+      {status?.reason && (
+        <p className="text-xs leading-relaxed text-ink-muted">{status.reason}</p>
+      )}
+      {state === "connected" &&
+        imported.posts_imported === 0 &&
+        imported.message && (
+          <p className="text-xs leading-relaxed text-ink-muted">
+            {imported.message}
+          </p>
+        )}
+      {platform === "linkedin" &&
+        state === "connected" &&
+        status?.can_read_posts && <LinkedInImport sessionId={sessionId} />}
     </div>
+  )
+}
+
+function LinkedInImport({ sessionId }: { sessionId: string }) {
+  const sync = useSyncStyle(sessionId)
+  const [url, setUrl] = useState("")
+  const value = url.trim()
+
+  return (
+    <form
+      className="flex gap-2"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (value)
+          sync.mutate({ platforms: ["linkedin"], linkedin_profile_url: value })
+      }}
+    >
+      <Input
+        name="linkedin_profile_url"
+        inputMode="url"
+        autoComplete="url"
+        value={url}
+        placeholder="linkedin.com/in/tu-perfil"
+        aria-label="URL de tu perfil de LinkedIn"
+        onChange={(e) => setUrl(e.target.value)}
+      />
+      <Button
+        type="submit"
+        variant="outline"
+        size="sm"
+        className="shrink-0"
+        disabled={!value || sync.isPending}
+      >
+        {sync.isPending ? "Importando…" : "Importar posts"}
+      </Button>
+    </form>
   )
 }
 

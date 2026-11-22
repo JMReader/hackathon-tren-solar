@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "tren-solar": {
+      "command": "/Users/korita/hackathons/hackathon-tren-solar/api/.venv/bin/python",
+      "args": ["-m", "app.mcp_server"],
+      "cwd": "/Users/korita/hackathons/hackathon-tren-solar/api"
+    }
+  }
+}

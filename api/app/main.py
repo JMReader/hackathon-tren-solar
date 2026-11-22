@@ -18,6 +18,8 @@ from .errors import ApiError, ProfileResponse
 from .llm.providers import build_llm
 from .media_store import MediaStore, SupabaseMediaStore
 from .models import ApiErrorBody, ErrorDetail
+from .employer.router import create_employer_router
+from .employer.service import EmployerService
 from .portfolio.router import create_portfolio_router
 from .portfolio.service import PortfolioService
 from .router import create_router
@@ -60,8 +62,10 @@ class Services:
             fake_posts = os.environ.get("FAKE_STYLE_POSTS")
             style_reader = (build_style_reader(fake_posts) if fake_posts
                             else SocialStyleReader(self.social.service))
-        self.sessions = SessionService(store, media, style_reader, ttl)
+        self.sessions = SessionService(store, media, style_reader, ttl,
+                                       demo_accounts=settings.demo_accounts)
         self.portfolio = PortfolioService(store, media)
+        self.employer = EmployerService(store, demo_enabled=settings.employer_demo)
 
 
 def create_app(services: Services | None = None,
@@ -102,10 +106,18 @@ def create_app(services: Services | None = None,
             ErrorDetail(code=code, message=str(exc.detail), retryable=False)))
 
     svc = app.state.services
-    app.include_router(create_router(svc.core, svc.sessions), prefix="/api/v1")
+    app.include_router(
+        create_router(svc.core, svc.sessions, on_approved=svc.portfolio.add_achievement),
+        prefix="/api/v1",
+    )
 
     app.include_router(
         create_portfolio_router(svc.portfolio, svc.sessions),
+        prefix="/api/v1",
+    )
+
+    app.include_router(
+        create_employer_router(svc.employer, svc.sessions),
         prefix="/api/v1",
     )
 

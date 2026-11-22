@@ -21,6 +21,11 @@ def clean_pg_dsn(dsn: str) -> str:
     return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(qs), parts.fragment))
 
 
+def _iso(value):
+    """TIMESTAMPTZ vuelve como datetime; los modelos esperan str ISO."""
+    return value.isoformat() if hasattr(value, "isoformat") else value
+
+
 class PostgresStore:
     """Persistencia Postgres (Supabase) con la misma superficie que Store (SQLite)."""
 
@@ -37,7 +42,8 @@ class PostgresStore:
     def save_session(self, session_id: str, created_at: str, expires_at: str) -> None:
         with self._lock, self._conn() as conn:
             conn.execute(
-                "INSERT INTO sessions (id, created_at, expires_at) VALUES (%s, %s, %s)",
+                """INSERT INTO sessions (id, created_at, expires_at) VALUES (%s, %s, %s)
+                   ON CONFLICT (id) DO NOTHING""",
                 (session_id, created_at, expires_at),
             )
 
@@ -315,7 +321,7 @@ class PostgresStore:
                 (
                     row["id"], row["session_id"], row["status"], row["revision"],
                     row["display_name"], row["headline"], row["items"],
-                    row["template_id"], row["palette_id"], row["cv_downloadable"],
+                    row["template_id"], row["palette_id"], bool(row["cv_downloadable"]),
                     row["slug"], row["published_revision"], row["published_snapshot"],
                     row["published_at"], row["created_at"], row["updated_at"],
                 ),
@@ -325,6 +331,12 @@ class PostgresStore:
         with self._conn() as conn:
             return conn.execute(
                 "SELECT * FROM portfolios WHERE id=%s", (portfolio_id,)).fetchone()
+
+    def get_portfolio_by_session(self, session_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            return conn.execute(
+                "SELECT * FROM portfolios WHERE session_id=%s ORDER BY updated_at DESC LIMIT 1",
+                (session_id,)).fetchone()
 
     def get_portfolio_by_slug(self, slug: str) -> dict[str, Any] | None:
         with self._conn() as conn:
@@ -355,6 +367,229 @@ class PostgresStore:
                     row["item_id"], row["price_band_ars_month"], row["created_at"],
                 ),
             )
+
+    # --- empresas (#9–#12) ---
+
+    def save_candidate_profile(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT INTO candidate_profiles
+                   (session_id,display_name,role,industry,location,province,country,
+                    segment,work_mode,declared_skills,is_synthetic,discovery_public_id)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                   ON CONFLICT (session_id) DO UPDATE SET
+                    display_name=EXCLUDED.display_name,
+                    role=EXCLUDED.role,
+                    industry=EXCLUDED.industry,
+                    location=EXCLUDED.location,
+                    province=EXCLUDED.province,
+                    country=EXCLUDED.country,
+                    segment=EXCLUDED.segment,
+                    work_mode=EXCLUDED.work_mode,
+                    declared_skills=EXCLUDED.declared_skills,
+                    is_synthetic=EXCLUDED.is_synthetic,
+                    discovery_public_id=EXCLUDED.discovery_public_id""",
+                (
+                    row["session_id"], row["display_name"], row.get("role"),
+                    row.get("industry"), row.get("location"), row.get("province"),
+                    row.get("country", "Argentina"), row.get("segment"),
+                    row.get("work_mode"),
+                    json.dumps(row.get("declared_skills") or [], ensure_ascii=False),
+                    row.get("is_synthetic", True),
+                    row.get("discovery_public_id"),
+                ),
+            )
+
+    def get_candidate_profile(self, session_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM candidate_profiles WHERE session_id=%s", (session_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            "session_id": row["session_id"],
+            "display_name": row["display_name"],
+            "role": row["role"],
+            "industry": row["industry"],
+            "location": row["location"],
+            "province": row.get("province"),
+            "country": row.get("country") or "Argentina",
+            "segment": row.get("segment"),
+            "work_mode": row["work_mode"],
+            "declared_skills": json.loads(row["declared_skills"])
+            if isinstance(row["declared_skills"], str) else (row["declared_skills"] or []),
+            "is_synthetic": bool(row["is_synthetic"]),
+            "discovery_public_id": row.get("discovery_public_id"),
+        }
+
+    def get_candidate_by_discovery_id(self, discovery_public_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT session_id FROM candidate_profiles WHERE discovery_public_id=%s",
+                (discovery_public_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return self.get_candidate_profile(row["session_id"])
+
+    def save_discovery_consent(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT INTO discovery_consents
+                   (session_id,active,shared_fields,share_portfolio,share_linkedin,
+                    share_x,publications_last_7_days,linkedin_url,x_url,revoked_at,updated_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                   ON CONFLICT (session_id) DO UPDATE SET
+                    active=EXCLUDED.active,
+                    shared_fields=EXCLUDED.shared_fields,
+                    share_portfolio=EXCLUDED.share_portfolio,
+                    share_linkedin=EXCLUDED.share_linkedin,
+                    share_x=EXCLUDED.share_x,
+                    publications_last_7_days=EXCLUDED.publications_last_7_days,
+                    linkedin_url=EXCLUDED.linkedin_url,
+                    x_url=EXCLUDED.x_url,
+                    revoked_at=EXCLUDED.revoked_at,
+                    updated_at=EXCLUDED.updated_at""",
+                (
+                    row["session_id"], row["active"],
+                    json.dumps(row.get("shared_fields") or [], ensure_ascii=False),
+                    row.get("share_portfolio", False),
+                    row.get("share_linkedin", False),
+                    row.get("share_x", False),
+                    row.get("publications_last_7_days"),
+                    row.get("linkedin_url"), row.get("x_url"),
+                    row.get("revoked_at"), row["updated_at"],
+                ),
+            )
+
+    def get_discovery_consent(self, session_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM discovery_consents WHERE session_id=%s", (session_id,),
+            ).fetchone()
+        return self._discovery_row(row) if row else None
+
+    def list_active_discovery_consents(self) -> list[dict[str, Any]]:
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT * FROM discovery_consents WHERE active=TRUE",
+            ).fetchall()
+        return [self._discovery_row(r) for r in rows]
+
+    @staticmethod
+    def _discovery_row(row: dict[str, Any]) -> dict[str, Any]:
+        shared = row["shared_fields"]
+        if isinstance(shared, str):
+            shared = json.loads(shared)
+        return {
+            "session_id": row["session_id"],
+            "active": bool(row["active"]),
+            "shared_fields": shared,
+            "share_portfolio": bool(row["share_portfolio"]),
+            "share_linkedin": bool(row["share_linkedin"]),
+            "share_x": bool(row["share_x"]),
+            "publications_last_7_days": row["publications_last_7_days"],
+            "linkedin_url": row["linkedin_url"],
+            "x_url": row["x_url"],
+            "revoked_at": _iso(row["revoked_at"]),
+            "updated_at": _iso(row["updated_at"]),
+        }
+
+    def save_employer(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT INTO employers (id,name,verified,plan,plan_expires_at)
+                   VALUES (%s,%s,%s,%s,%s)
+                   ON CONFLICT (id) DO UPDATE SET
+                    name=EXCLUDED.name,
+                    verified=EXCLUDED.verified,
+                    plan=EXCLUDED.plan,
+                    plan_expires_at=EXCLUDED.plan_expires_at""",
+                (row["id"], row["name"], row.get("verified", False),
+                 row.get("plan", "free"), row.get("plan_expires_at")),
+            )
+
+    def get_employer(self, employer_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM employers WHERE id=%s", (employer_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {**row, "plan_expires_at": _iso(row["plan_expires_at"])}
+
+    def save_employer_search(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT INTO employer_searches
+                   (id,employer_id,title,required_skills,industry,location,province,
+                    country,work_mode,job_proposal,created_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                   ON CONFLICT (id) DO UPDATE SET
+                    title=EXCLUDED.title,
+                    required_skills=EXCLUDED.required_skills,
+                    province=EXCLUDED.province,
+                    country=EXCLUDED.country""",
+                (
+                    row["id"], row["employer_id"], row["title"],
+                    json.dumps(row["required_skills"], ensure_ascii=False),
+                    row.get("industry"), row.get("location"),
+                    row.get("province"), row.get("country"),
+                    row.get("work_mode"), row.get("job_proposal"), row["created_at"],
+                ),
+            )
+
+    def get_employer_search(self, search_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM employer_searches WHERE id=%s", (search_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        skills = row["required_skills"]
+        if isinstance(skills, str):
+            skills = json.loads(skills)
+        return {**row, "required_skills": skills, "created_at": _iso(row["created_at"])}
+
+    def save_contact_request(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT INTO contact_requests
+                   (id,employer_id,search_id,candidate_session_id,message,status,
+                    created_at,updated_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                   ON CONFLICT (id) DO UPDATE SET
+                    status=EXCLUDED.status, updated_at=EXCLUDED.updated_at""",
+                (
+                    row["id"], row["employer_id"], row["search_id"],
+                    row["candidate_session_id"], row["message"], row["status"],
+                    row["created_at"], row["updated_at"],
+                ),
+            )
+
+    def get_contact_request(self, contact_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM contact_requests WHERE id=%s", (contact_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            **row,
+            "created_at": _iso(row["created_at"]),
+            "updated_at": _iso(row["updated_at"]),
+        }
+
+    def get_published_portfolio_for_session(self, session_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                """SELECT slug FROM portfolios
+                   WHERE session_id=%s AND status='published' AND slug IS NOT NULL
+                   ORDER BY published_at DESC NULLS LAST LIMIT 1""",
+                (session_id,),
+            ).fetchone()
+        return {"slug": row["slug"]} if row else None
 
 
 def _ready(

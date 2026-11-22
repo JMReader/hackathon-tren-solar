@@ -10,15 +10,15 @@ Dura unos 2 minutos. Las indicaciones entre corchetes no se leen.
 
 **[Apertura: una pregunta a la sala]**
 
-Antes de arrancar: levanten la mano los que se acuerdan de estar en la facu, ir a eventos, hacer proyectos, y no conseguir nada porque no tenían a quién contarle de lo que eran capaces. *[Pausa. Mirar las manos.]*
+Antes de arrancar: levanten la mano los que se acuerdan de estar en la facu, ir a eventos, hacer proyectos, y después no tener a quién contarle de lo que eran capaces. *[Pausa. Mirar las manos.]*
 
 Eso que hacían ya era experiencia. Nadie la vio.
 
 **[El otro lado tiene el mismo problema]**
 
-Y del otro lado pasa lo mismo. Hoy hablamos con una persona que trabaja en recruiting: nos dijo que le cuesta llegar al talento de Jujuy. Los estudiantes no encuentran a quién mostrarse, y quienes contratan no los encuentran a ellos.
+Y del otro lado pasa lo mismo. Hoy a los recruiters también les cuesta llegar al talento de Jujuy. Los estudiantes no encuentran a quién mostrarse, y quienes contratan no los encuentran a ellos.
 
-No es solo una charla. En la Argentina, el 60,8% de las empresas cubre vacantes por referidos, pero solo el 36,4% de los jóvenes busca por esa vía *(Junior Achievement y ManpowerGroup, 2026)*. Se están buscando por caminos distintos.
+Los números lo muestran: en la Argentina, el 60,8% de las empresas cubre vacantes por referidos, pero solo el 36,4% de los jóvenes busca por esa vía *(Junior Achievement y ManpowerGroup, 2026)*. Se están buscando por caminos distintos.
 
 *[El 5,9% de empresas que contrata sin experiencia y los 30.000 ocupados que buscan otro empleo en Jujuy-Palpalá (EPH, 2° trimestre de 2026) quedan para las preguntas.]*
 
@@ -26,7 +26,17 @@ No es solo una charla. En la Argentina, el 60,8% de las empresas cubre vacantes 
 
 Por eso hicimos chambeAR. Grabás un audio de un minuto contando qué hiciste y sacás una foto. chambeAR saca de ese audio los hechos: qué problema resolviste, con qué, y qué parte hiciste vos y qué parte el grupo. Vos los corregís y los aprobás. Con eso sale tu página profesional y los borradores para LinkedIn y X, con tu manera de escribir.
 
-**[Demo: audio → hechos con su cita → algo marcado como dudoso → aprobar → borradores]**
+**[Recorrido, unos 40 segundos. Se dice mientras se hace clic.]**
+
+1. *[Pantalla de inicio]* La primera vez, te presentás: quién sos, qué estudiás y un texto tuyo, para que chambeAR aprenda cómo escribís. Se hace una sola vez.
+2. *[Grabar]* Contás un proyecto, como se lo contarías a un amigo. «Con mi grupo hicimos un sistema de turnos para el centro de salud. Yo armé la base de datos…» Y sacás una foto de lo que hiciste.
+3. *[Hechos]* chambeAR saca los hechos. Al lado de cada uno está la frase exacta del audio de donde salió. Lo que hizo el grupo y lo que hiciste vos van separados.
+4. *[Pregunta abierta]* Acá no dijiste cuántas personas lo usan, así que no lo inventa: te lo pregunta.
+5. *[Aprobar]* Corregís lo que quieras y aprobás. Sin tu OK no sale nada.
+6. *[Borradores]* Con eso salen el post para LinkedIn y el de X, escritos como escribís vos, listos para publicar.
+7. *[Página, si está conectada]* Y los mismos hechos arman tu página, la que le mandás a una empresa por WhatsApp.
+
+*[Tener el audio de la demo grabado de antes. Si en vivo falla el micrófono o la red, se usa ese.]*
 
 **[El diferencial, en una idea]**
 
@@ -35,6 +45,10 @@ Fíjense en lo que acaba de pasar: chambeAR **no inventó nada**. Cada hecho sal
 **[Por qué Jujuy]**
 
 Un desarrollador puede mostrar su GitHub. Un técnico electrónico que cableó un tablero o una pasante que corrió ensayos en un laboratorio no tiene dónde mostrarlo. Tiene una foto y algo para contar. En una provincia donde el empleo que crece es industrial y técnico, ese es el talento que hoy no se ve.
+
+**[Qué gana quien contrata]**
+
+¿Y el recruiter? Hoy recibe CVs que dicen todos lo mismo, o posts que suenan a ChatGPT, y no sabe qué es cierto. Con chambeAR abre un link y ve qué problema resolvió esa persona, con qué herramientas y qué parte hizo ella, cada hecho con la frase de donde salió. Es la confianza que hoy le da un referido, pero sin que el chico tenga que conocer a nadie. Y es talento de Jujuy al que hoy no llega.
 
 **[Modelo]**
 

@@ -12,6 +12,7 @@ from .models import (
     AuthorProfile,
     CompleteOnboardingRequest,
     CvDocument,
+    LoginResponse,
     SamplePosts,
     SessionCreated,
     SetAuthorProfilePhotoRequest,
@@ -44,11 +45,13 @@ class SessionService:
     """Sesiones anónimas + onboarding de autor (decisión 2026-11-22)."""
 
     def __init__(self, store: Store, media: MediaStore,
-                 style_reader: StyleReaderPort, ttl_hours: int = DEFAULT_TTL_HOURS):
+                 style_reader: StyleReaderPort, ttl_hours: int = DEFAULT_TTL_HOURS,
+                 demo_accounts: list[dict] | None = None):
         self.store = store
         self.media = media
         self.style_reader = style_reader
         self.ttl_hours = ttl_hours
+        self.demo_accounts = demo_accounts or []
 
     # --- sesión ---
 
@@ -75,6 +78,24 @@ class SessionService:
             raise ApiError(401, "session_expired",
                            "La sesión venció; creá una nueva con POST /session.")
         return session_id
+
+    def demo_login(self, email: str, password: str) -> LoginResponse:
+        """Login de pitch (docs/spec-login-demo.md): cuenta fija → sesión real
+        con el nombre visible en el perfil. Mismo 401 para cualquier fallo."""
+        normalized = email.strip().lower()
+        account = next(
+            (a for a in self.demo_accounts
+             if str(a.get("email", "")).lower() == normalized
+             and a.get("password") == password), None)
+        if account is None:
+            raise ApiError(401, "invalid_credentials",
+                           "Correo o contraseña incorrectos.")
+        display_name = str(account.get("display_name") or normalized)
+        created = self.create_session()
+        self.update_profile(created.session_id, UpdateAuthorProfileRequest(
+            revision=1, profession=display_name))
+        return LoginResponse(session_id=created.session_id,
+                             display_name=display_name)
 
     # --- perfil ---
 
@@ -164,7 +185,8 @@ class SessionService:
         any_success = False
         for platform in dict.fromkeys(req.platforms):
             outcome = self.style_reader.fetch_recent_posts(
-                session_id, platform, req.max_posts_per_platform)
+                session_id, platform, req.max_posts_per_platform,
+                req.linkedin_profile_url if platform == "linkedin" else None)
             result = StyleSyncResult(
                 status=outcome.status, posts_imported=len(outcome.posts),
                 message=outcome.message)

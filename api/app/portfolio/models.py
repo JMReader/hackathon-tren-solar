@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 PortfolioStatus = Literal["draft", "published", "revoked"]
 ProResponse = Literal["interested", "not_now"]
-ProTrigger = Literal["template", "palette", "customize"]
+ProTrigger = Literal["template", "palette", "customize", "domain"]
 PriceBand = Literal["none", "up_to_2000", "2000_5000", "5000_10000", "over_10000"]
 
 
@@ -16,6 +16,10 @@ class PortfolioItemInput(BaseModel):
     title: str = Field(min_length=3, max_length=80)
     occurred_on: str | None = None
     show_photo: bool = True
+
+
+class AddPortfolioItemRequest(BaseModel):
+    achievement_id: str
 
 
 class CreatePortfolioRequest(BaseModel):

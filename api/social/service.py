@@ -16,9 +16,11 @@ from .models import (
     Publication,
     PublicationRecord,
     PublicationStatus,
+    ReadStatus,
+    RecentPosts,
     SocialConnectionStatus,
 )
-from .ports import ConnectionStore, DraftSource, PublicationStore, SocialAdapter
+from .ports import ConnectionStore, DraftSource, PostReader, ProviderReadError, PublicationStore, SocialAdapter
 
 MIN_IDEMPOTENCY_KEY_LENGTH = 8
 MAX_IDEMPOTENCY_KEY_LENGTH = 255
@@ -104,6 +106,30 @@ class SocialService:
             account_handle=connection.account_handle,
         )
 
+    def recent_posts(
+        self, owner_id: str, platform: Platform, limit: int, profile_url: str | None = None
+    ) -> RecentPosts:
+        status = self.connection_status(owner_id, platform)
+        if status.status is not ConnectionState.CONNECTED:
+            return RecentPosts(ReadStatus.SKIPPED, message=status.reason)
+        if not status.can_read_posts:
+            return RecentPosts(
+                ReadStatus.UNAVAILABLE,
+                message=f"{platform.label} no permite leer tus posts desde la app. Usá la muestra de escritura.",
+            )
+        reader: PostReader = self._adapters[platform]
+        try:
+            posts = reader.read_recent_posts(self._connections.get(owner_id, platform), limit, profile_url)
+        except ProviderReadError as error:
+            return RecentPosts(ReadStatus.FAILED if error.retryable else ReadStatus.UNAVAILABLE, message=error.message)
+        except Exception:
+            return RecentPosts(ReadStatus.FAILED, message=f"No pudimos leer tus posts de {platform.label}.")
+        if not posts:
+            return RecentPosts(
+                ReadStatus.UNAVAILABLE, message=f"No encontramos posts propios recientes en {platform.label}."
+            )
+        return RecentPosts(ReadStatus.SUCCEEDED, posts=tuple(posts))
+
     def assisted_share(self, owner_id: str, draft_id: str) -> AssistedShare:
         draft = self._drafts.get(owner_id, draft_id)
         if draft is None:
@@ -120,6 +146,20 @@ class SocialService:
             attaches_photo=support.attaches_photo,
             notice=assisted.notice(draft.platform),
         )
+
+    def list_draft_publications(self, owner_id: str, draft_id: str) -> list[Publication]:
+        draft = self._drafts.get(owner_id, draft_id)
+        if draft is None:
+            raise NotFound("DRAFT_NOT_FOUND", "No encontramos ese borrador.")
+        records = self._publications.list_for_draft(owner_id, draft_id)
+        return [
+            (
+                self._reconcile(record).publication
+                if record.publication.status in (PublicationStatus.PUBLISHING, PublicationStatus.UNKNOWN)
+                else record.publication
+            )
+            for record in records
+        ]
 
     def publish(
         self,
