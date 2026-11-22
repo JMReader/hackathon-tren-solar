@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogBackdrop, DialogContent, DialogDescription, DialogDismiss, DialogFooter, DialogTitle } from "@/components/ui/dialog"
 import { Radio, RadioGroup } from "@/components/ui/radio"
 import { toast } from "@/components/ui/toast"
+import { getSessionId } from "@/lib/api/client"
 import { registerProInterest } from "../actions"
 import type { ProInterest } from "../types"
 
@@ -25,6 +26,17 @@ const priceBands: { value: NonNullable<ProInterest["price_band_ars_month"]>; lab
   { value: "over_10000", label: "Más de $10.000" },
 ]
 
+async function sendInterest(body: ProInterest) {
+  const sessionId = getSessionId()
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "/api/v1"}/pro-interest`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(sessionId ? { "X-Session-Id": sessionId } : {}) },
+    body: JSON.stringify(body),
+  }).catch(() => null)
+  if (response?.ok) return { ok: true as const }
+  return registerProInterest(body).catch(() => ({ ok: false as const }))
+}
+
 export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; onClose: () => void }) {
   const [priceBand, setPriceBand] = useState<ProInterest["price_band_ars_month"]>(null)
 
@@ -37,7 +49,7 @@ export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; 
 
   async function answer(response: ProInterest["response"]) {
     if (!request) return
-    const result = await registerProInterest({ response, trigger: request.trigger, item_id: request.itemId, price_band_ars_month: priceBand }).catch(() => ({ ok: false as const }))
+    const result = await sendInterest({ response, trigger: request.trigger, item_id: request.itemId, price_band_ars_month: priceBand })
     onClose()
     setPriceBand(null)
     if (!result.ok) toast("No pudimos guardar tu respuesta", { description: "Probá de nuevo en un momento.", type: "error" })
