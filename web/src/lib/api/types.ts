@@ -98,6 +98,71 @@ export interface StartSocialConnectionResponse {
   state: string
 }
 
+export type AchievementStatus = "processing" | "needs_review" | "approved" | "failed"
+
+export type FactCategory =
+  | "project"
+  | "role"
+  | "tech"
+  | "impact"
+  | "date"
+  | "learning"
+  | "context"
+
+export interface Fact {
+  id: string
+  category?: FactCategory | null
+  text: string
+  source_quote?: string | null
+  source: "transcript" | "user" | "mcp"
+}
+
+export interface OpenQuestion {
+  id: string
+  field: string
+  question: string
+}
+
+export interface Achievement {
+  id: string
+  input_type: "text" | "audio" | "mcp"
+  status: AchievementStatus
+  revision: number
+  photo_id: string | null
+  transcript: string
+  facts: Fact[]
+  open_questions: OpenQuestion[]
+  error: ErrorDetail | null
+}
+
+export type DraftStatus =
+  | "draft"
+  | "ready_to_publish"
+  | "publishing"
+  | "succeeded"
+  | "failed"
+  | "unknown"
+
+export interface Draft {
+  id: string
+  achievement_id: string
+  achievement_revision: number
+  platform: Platform
+  revision: number
+  status: DraftStatus
+  photo_id: string | null
+  body: string
+  char_count: number
+  max_chars: number
+  used_fact_ids: string[]
+}
+
+export interface GenerateDraftsResponse {
+  achievement_id: string
+  achievement_revision: number
+  drafts: Draft[]
+}
+
 export interface ErrorDetail {
   code: string
   message: string
