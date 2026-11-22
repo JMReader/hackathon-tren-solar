@@ -7,7 +7,7 @@ import { achievementsIndex, type AchievementEntry } from "@/lib/achievements-ind
 import { fetchPortfolio } from "@/portfolio/portfolio-api"
 import { getStoredPortfolioId } from "@/portfolio/storage"
 import { ApiRequestError, apiFetch } from "./client"
-import type { Achievement, ApiError, Draft, Fact, GenerateDraftsResponse, Platform } from "./types"
+import type { Achievement, ApiError, AssistedShare, Draft, Fact, GenerateDraftsResponse, Platform, Publication } from "./types"
 
 const achievementKey = (id: string) => ["achievement", id] as const
 /** Same key the portfolio editor uses, so both read one list. */
@@ -181,5 +181,49 @@ export function useUpdateDraft(id: string) {
     },
     onSuccess: (d) => queryClient.setQueryData(draftKey(id), d),
     onError: (error) => onConflictOrError(queryClient, draftKey(id), error),
+  })
+}
+
+const publicationsKey = (draftId: string) => ["publications", draftId] as const
+
+/** Publications already attempted for a draft, newest first (persisted server-side). */
+export function useDraftPublications(draftId: string | undefined, sessionId: string | undefined) {
+  return useQuery({
+    queryKey: publicationsKey(draftId ?? ""),
+    enabled: Boolean(draftId && sessionId),
+    queryFn: () => apiFetch<Publication[]>(`/drafts/${draftId}/publications`),
+    refetchInterval: (query) =>
+      query.state.data?.some((p) => p.status === "publishing" || p.status === "unknown") ? 4000 : false,
+  })
+}
+
+export function usePublishDraft(draft: Draft) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () =>
+      apiFetch<Publication>(`/drafts/${draft.id}/publications`, {
+        method: "POST",
+        headers: { "Idempotency-Key": crypto.randomUUID() },
+        json: { draft_revision: draft.revision, confirm_publish: true },
+      }),
+    onSuccess: (publication) => {
+      queryClient.setQueryData(publicationsKey(draft.id), (old: Publication[] | undefined) => [
+        publication,
+        ...(old ?? []),
+      ])
+      void queryClient.invalidateQueries({ queryKey: publicationsKey(draft.id) })
+    },
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: publicationsKey(draft.id) })
+    },
+  })
+}
+
+export function useAssistedShare(draftId: string | undefined, sessionId: string | undefined, enabled: boolean) {
+  return useQuery({
+    queryKey: ["assisted-share", draftId ?? ""],
+    enabled: Boolean(draftId && sessionId && enabled),
+    queryFn: () => apiFetch<AssistedShare>(`/drafts/${draftId}/assisted-share`),
+    staleTime: 60_000,
   })
 }

@@ -1,8 +1,8 @@
 "use client"
 
-import { ChevronLeft, Download, LayoutTemplate, Mic, Pencil, UserRound } from "lucide-react"
+import { Check, ChevronLeft, Download, ExternalLink, LayoutTemplate, Mic, Pencil, Send, UserRound } from "lucide-react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonStyles } from "@/components/ui/button"
@@ -11,7 +11,20 @@ import { CopyButton } from "@/components/ui/copy-button"
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
-import { useAchievement, useAchievementEntries, useApproveAndDraft, useDraft, useUpdateDraft } from "@/lib/api/achievements"
+import { toast } from "@/components/ui/toast"
+import {
+  apiErrorCode,
+  apiErrorMessage,
+  useAchievement,
+  useAchievementEntries,
+  useApproveAndDraft,
+  useAssistedShare,
+  useDraft,
+  useDraftPublications,
+  usePublishDraft,
+  useUpdateDraft,
+} from "@/lib/api/achievements"
+import { useConnectSocial, useSocialConnection } from "@/lib/api/hooks"
 import type { AuthorProfile, Draft, Platform } from "@/lib/api/types"
 import { getPhotoPreview } from "@/lib/photo-preview"
 import { useIsClient } from "@/lib/use-is-client"
@@ -22,6 +35,108 @@ import { AppPage, CreateSteps, PageTitle } from "./shell"
 const NETWORK: Record<Platform, { name: string; mark: string; tone: string; handle: (p?: AuthorProfile) => string }> = {
   linkedin: { name: "LinkedIn", mark: "in", tone: "bg-[#0a66c2]", handle: (p) => p?.profession ?? "Tu profesión" },
   x: { name: "X", mark: "X", tone: "bg-[#111]", handle: () => "@tu_usuario" },
+}
+
+function PublishPanel({ draft, editing }: { draft: Draft; editing: boolean }) {
+  const { sessionId } = useAppSession()
+  const pathname = usePathname()
+  const connection = useSocialConnection(draft.platform, sessionId)
+  const connect = useConnectSocial(draft.platform, sessionId)
+  const publications = useDraftPublications(draft.id, sessionId)
+  const publish = usePublishDraft(draft)
+  const net = NETWORK[draft.platform]
+  const state = connection.data?.status ?? "disconnected"
+  const latest = publications.data?.[0]
+  const succeeded = publications.data?.find((p) => p.status === "succeeded")
+  const assisted = useAssistedShare(draft.id, sessionId, !succeeded)
+  const inFlight = publish.isPending || latest?.status === "publishing"
+
+  const onPublish = () =>
+    publish.mutate(undefined, {
+      onError: (error) => {
+        const code = apiErrorCode(error)
+        if (code === "ALREADY_PUBLISHED") return void publications.refetch()
+        if (code === "CONNECTION_REQUIRED" || code === "ACCESS_UNAVAILABLE") {
+          void connection.refetch()
+          toast.error(`Conectá tu cuenta de ${net.name}`, {
+            description: apiErrorMessage(error, "Así el post sale con tu usuario."),
+          })
+          return
+        }
+        toast.error(`No se pudo publicar en ${net.name}`, {
+          description: apiErrorMessage(error, "Revisá tu conexión e intentá de nuevo."),
+        })
+      },
+    })
+
+  return (
+    <div className="flex flex-col gap-3 rounded-[18px] bg-fill-soft p-4">
+      {succeeded ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <Badge variant="accent">
+            <Check aria-hidden /> Publicado
+          </Badge>
+          {succeeded.external_url ? (
+            <a
+              href={succeeded.external_url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[13px] font-medium text-accent-strong hover:underline"
+            >
+              Ver en {net.name} <ExternalLink aria-hidden className="size-3.5" />
+            </a>
+          ) : (
+            <span className="text-[13px] text-ink-muted">Quedó en tu {net.name}.</span>
+          )}
+        </div>
+      ) : state === "connected" ? (
+        <>
+          <p className="text-[13px] leading-relaxed text-ink-muted">
+            {connection.data?.account_handle ? `Conectado como ${connection.data.account_handle}. ` : ""}
+            {draft.photo_id && !connection.data?.can_publish_image
+              ? `${net.name} puede rechazar la foto desde acá; si pasa, abrí el post asistido abajo.`
+              : "Sale con el texto y la foto tal como están arriba."}
+          </p>
+          <div>
+            <Button size="sm" disabled={editing || inFlight} onClick={onPublish}>
+              <Send aria-hidden /> {inFlight ? "Publicando…" : `Publicar en ${net.name}`}
+            </Button>
+          </div>
+        </>
+      ) : state === "access_unavailable" ? (
+        <p className="text-[13px] leading-relaxed text-ink-muted">
+          {connection.data?.reason ?? `${net.name} no permite publicar desde la app.`} Usá el texto listo abajo.
+        </p>
+      ) : (
+        <div className="flex flex-wrap items-center gap-3">
+          <Button variant="dark" size="sm" disabled={connect.isPending} onClick={() => connect.mutate(pathname)}>
+            {connect.isPending ? "Abriendo…" : `Conectar ${net.name}`}
+          </Button>
+          <p className="text-xs text-ink-muted">Así el post sale con tu cuenta, sin copiar nada.</p>
+        </div>
+      )}
+      {!succeeded && latest?.status === "failed" && (
+        <p role="alert" className="text-xs leading-relaxed text-danger">
+          {latest.error?.message ?? "La última publicación falló. Podés reintentar."}
+        </p>
+      )}
+      {!succeeded && latest?.status === "unknown" && (
+        <p role="alert" className="text-xs leading-relaxed text-ink-muted">
+          No confirmamos si el último intento llegó a {net.name}. Verificá tu perfil antes de reintentar.
+        </p>
+      )}
+      {assisted.data && !succeeded && (
+        <a
+          href={assisted.data.composer_url}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 self-start text-xs font-medium text-ink-muted hover:text-ink hover:underline"
+        >
+          Abrir {net.name} con el texto listo <ExternalLink aria-hidden className="size-3" />
+        </a>
+      )}
+    </div>
+  )
 }
 
 function DraftCard({
@@ -121,6 +236,8 @@ function DraftCard({
         <img src={photo} alt="Foto del proyecto" className="max-h-64 w-full rounded-2xl object-cover" />
       )}
 
+      <PublishPanel draft={draft} editing={editing} />
+
       <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-divider pt-4">
         <span className="text-xs text-ink-muted tabular-nums">
           {draft.char_count} / {draft.max_chars}
@@ -200,7 +317,7 @@ export function PublishAchievement() {
   return (
     <AppPage>
       <CreateSteps current={3} />
-      <PageTitle title="Tus posts, listos para copiar" lead="Editá lo que quieras, copiá el texto y pegalo en cada red con la foto. No publicamos nada desde acá." />
+      <PageTitle title="Tus posts, listos" lead="Editá lo que quieras y publicalos con tu cuenta, o copiá el texto y pegalo en cada red con la foto." />
 
       {isLoading || achievement.isPending ? (
         <div className="mt-8">
