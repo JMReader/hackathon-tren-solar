@@ -64,7 +64,7 @@ class LinkedInAdapter:
         )
         return f"{AUTHORIZATION_URL}?{query}"
 
-    def complete(self, code: str) -> Connection:
+    def complete(self, code: str, state: str | None = None) -> Connection:
         token = self._http.post(
             TOKEN_URL,
             data={

@@ -68,7 +68,7 @@ import { Toggle, ToggleGroup } from "@/components/ui/toggle"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Display, Eyebrow, Highlight } from "@/components/ui/typography"
 import { ShimmeringText } from "@/components/audio/shimmering-text"
-import { CompactPlayerDemo, PlayerDemo, RecorderDemo, VoiceButtonDemo } from "./audio-demos"
+import { CompactPlayerDemo, OrbDemo, PlayerDemo, RecorderDemo, VoiceButtonDemo } from "./audio-demos"
 
 const sections = [
   ["fundamentos", "Fundamentos"],
@@ -224,22 +224,27 @@ export default function UIPage() {
                 <Demo label="Grabador (usa tu micrófono)">
                   <RecorderDemo />
                 </Demo>
-                <Demo label="Reproductor con transcripción">
-                  <PlayerDemo />
+                <Demo label="Orbe · estados y paletas">
+                  <OrbDemo />
                 </Demo>
               </div>
               <div className="grid gap-8 lg:grid-cols-2">
-                <Demo label="Voice button">
-                  <VoiceButtonDemo />
+                <Demo label="Reproductor con transcripción">
+                  <PlayerDemo />
                 </Demo>
-                <Demo label="Reproductor compacto y estado de carga">
-                  <div className="flex flex-col gap-5">
-                    <CompactPlayerDemo />
-                    <p className="text-[15px]">
-                      <ShimmeringText>Generando tus borradores para LinkedIn y X…</ShimmeringText>
-                    </p>
-                  </div>
-                </Demo>
+                <div className="flex flex-col gap-8">
+                  <Demo label="Voice button">
+                    <VoiceButtonDemo />
+                  </Demo>
+                  <Demo label="Reproductor compacto y estado de carga">
+                    <div className="flex flex-col gap-5">
+                      <CompactPlayerDemo />
+                      <p className="text-[15px]">
+                        <ShimmeringText>Generando tus borradores para LinkedIn y X…</ShimmeringText>
+                      </p>
+                    </div>
+                  </Demo>
+                </div>
               </div>
             </Section>
 

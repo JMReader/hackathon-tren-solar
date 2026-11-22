@@ -5,15 +5,14 @@ from pathlib import Path
 
 import httpx2
 
-from social.adapters import default_adapters
 from social.crypto import TokenCipher
-from social.linkedin import LinkedInAdapter
 from social.models import ConnectionState, Platform, PublishableDraft
 from social.oauth import ConnectionFlow
 from social.pg_store import PgConnectionStore, PgDatabase, PgOAuthStateStore, PgPublicationStore
 from social.service import SocialService
 from social.settings import Settings as SocialSettings
 from social.sqlite import SqliteConnectionStore, SqliteDatabase, SqlitePublicationStore
+from social.wiring import build_providers
 
 from .errors import ApiError
 from .service import CoreService
@@ -68,22 +67,17 @@ def build_social(
     cipher = TokenCipher(settings.token_key or TokenCipher.generate_key())
     if pg_dsn:
         db = PgDatabase(pg_dsn)
-        connections = PgConnectionStore(db, cipher)
+        store = PgConnectionStore(db, cipher)
         publications = PgPublicationStore(db)
         state_store = PgOAuthStateStore(db)
     else:
         db = SqliteDatabase(data_dir / "social.db")
-        connections = SqliteConnectionStore(db, cipher)
+        store = SqliteConnectionStore(db, cipher)
         publications = SqlitePublicationStore(db)
         state_store = None
-    linkedin = (
-        LinkedInAdapter(settings.linkedin, http or httpx2.Client(timeout=httpx2.Timeout(20.0, connect=5.0)))
-        if settings.linkedin
-        else None
-    )
-    service = SocialService(default_adapters(linkedin), connections, publications, CoreDraftSource(core))
+    providers = build_providers(settings, store, http or httpx2.Client(timeout=httpx2.Timeout(20.0, connect=5.0)))
+    service = SocialService(providers.adapters, providers.connections, publications, CoreDraftSource(core))
     flow = ConnectionFlow(
-        service, {Platform.LINKEDIN: linkedin} if linkedin else {}, connections,
-        settings.web_base_url, state_store=state_store
+        service, providers.oauth, providers.connections, settings.web_base_url, state_store=state_store
     )
     return SocialModule(service, flow)

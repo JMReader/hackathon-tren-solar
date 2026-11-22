@@ -7,11 +7,12 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from urllib.parse import urlencode
 
-from .models import ConnectionState, Platform, SocialConnectionStatus, StartSocialConnectionResponse
-from .ports import ConnectionStore, OAuthError, OAuthProvider
+from .models import Connection, ConnectionState, Platform, SocialConnectionStatus, StartSocialConnectionResponse
+from .ports import ConnectionStore, OAuthError, OAuthProvider, TokenRefresher
 from .service import InvalidRequest, SocialError, SocialService
 
 STATE_TTL = timedelta(minutes=10)
+REFRESH_MARGIN = timedelta(minutes=2)
 DEFAULT_RETURN_TO = "/crear"
 
 
@@ -23,6 +24,46 @@ class ProviderUnavailable(Exception):
 
 class Unsupported(SocialError):
     http_status = 501
+
+
+class RefreshingConnectionStore:
+    def __init__(
+        self,
+        store: ConnectionStore,
+        refreshers: Mapping[Platform, TokenRefresher],
+        clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+    ) -> None:
+        self._store = store
+        self._refreshers = refreshers
+        self._clock = clock
+        self._lock = threading.Lock()
+
+    def get(self, owner_id: str, platform: Platform) -> Connection | None:
+        connection = self._store.get(owner_id, platform)
+        refresher = self._refreshers.get(platform)
+        if refresher is None or not self._stale(connection):
+            return connection
+        with self._lock:
+            connection = self._store.get(owner_id, platform)
+            if not self._stale(connection):
+                return connection
+            try:
+                refreshed = refresher.refresh(connection)
+            except OAuthError:
+                return connection
+            self._store.put(owner_id, refreshed)
+            return refreshed
+
+    def put(self, owner_id: str, connection: Connection) -> None:
+        self._store.put(owner_id, connection)
+
+    def _stale(self, connection: Connection | None) -> bool:
+        return (
+            connection is not None
+            and connection.refresh_token is not None
+            and connection.expires_at is not None
+            and connection.expires_at - REFRESH_MARGIN <= self._clock()
+        )
 
 
 @dataclass(frozen=True)
@@ -95,7 +136,7 @@ class ConnectionFlow:
         if error or not code:
             return self._redirect(pending, "error", error or "missing_code")
         try:
-            connection = self._providers[platform].complete(code)
+            connection = self._providers[platform].complete(code, state)
         except OAuthError as failure:
             return self._redirect(pending, "error", failure.code)
         self._connections.put(pending.owner_id, connection)

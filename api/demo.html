@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Tren Solar — demo cruda</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 2em auto; padding: 0 1em; }
+  section { border: 1px solid #ccc; padding: 1em; margin: 1em 0; border-radius: 6px; }
+  button { padding: .5em 1em; margin: .25em 0; }
+  input, textarea { width: 100%; box-sizing: border-box; margin: .25em 0; padding: .4em; }
+  pre { background: #f4f4f4; padding: .5em; font-size: 12px; overflow: auto; }
+  .ok { color: green; } .err { color: #b00; } .muted { color: #777; }
+</style>
+</head>
+<body>
+<h1>Tren Solar — demo</h1>
+
+<section id="s-session">
+  <h2>1. Sesión</h2>
+  <div id="session-status" class="muted">creando…</div>
+  <button onclick="newSession()">Nueva sesión</button>
+</section>
+
+<section id="s-oauth">
+  <h2>2. Conectar redes</h2>
+  <div id="oauth-landing" class="muted"></div>
+  <button onclick="connect('linkedin')">Conectar LinkedIn</button>
+  <button onclick="connect('x')">Conectar X</button>
+  <pre id="conn-status"></pre>
+</section>
+
+<section id="s-profile">
+  <h2>3. Perfil</h2>
+  <input id="profession" placeholder="profesión (ej: Backend Engineer)">
+  <textarea id="sample" rows="3" placeholder="muestra de escritura (≥20 chars)"></textarea>
+  <input id="photo" type="file" accept="image/*">
+  <button onclick="saveProfile()">Guardar + subir foto</button>
+  <button onclick="completeOnboarding()">Completar onboarding</button>
+  <pre id="profile-out"></pre>
+</section>
+
+<section id="s-ach">
+  <h2>4. Logro</h2>
+  <textarea id="ach-text" rows="3" placeholder="contá tu logro"></textarea>
+  <button onclick="createAch()">Crear achievement</button>
+  <pre id="ach-out"></pre>
+  <button onclick="approveAch()">Aprobar</button>
+  <button onclick="makeDrafts()">Generar drafts</button>
+  <pre id="drafts-out"></pre>
+</section>
+
+<section id="s-audio">
+  <h2>4b. Logro por audio (Whisper real)</h2>
+  <input id="audio-file" type="file" accept="audio/*">
+  <button id="rec-btn" onclick="toggleRec()">Grabar</button>
+  <span id="rec-status" class="muted"></span>
+  <button onclick="createAchAudio()">Crear achievement desde audio</button>
+  <pre id="audio-out"></pre>
+</section>
+
+<section id="s-pub">
+  <h2>5. Publicar</h2>
+  <div id="pub-buttons"></div>
+  <pre id="pub-out"></pre>
+</section>
+
+<script>
+const API = "/api/v1";
+let sid = localStorage.getItem("ts_sid");
+let profileRev = 1, photoId = null, achId = null, achRev = 1;
+let drafts = [];
+
+const H = () => ({ "X-Session-Id": sid });
+const log = (id, v) => document.getElementById(id).textContent =
+  typeof v === "string" ? v : JSON.stringify(v, null, 2);
+
+async function call(method, path, body, headers = {}) {
+  const r = await fetch(API + path, {
+    method, headers: { ...H(), ...(body ? { "Content-Type": "application/json" } : {}), ...headers },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await r.json();
+  if (!r.ok) throw data.error?.message || data.error?.code || r.status;
+  return data;
+}
+
+async function ensureSession() {
+  if (sid) {
+    try { await call("GET", "/session/profile"); }
+    catch { sid = null; }
+  }
+  if (!sid) {
+    const s = await call("POST", "/session");
+    sid = s.session_id; localStorage.setItem("ts_sid", sid);
+  }
+  document.getElementById("session-status").textContent = "session_id: " + sid;
+}
+function newSession() { sid = null; localStorage.removeItem("ts_sid"); ensureSession(); }
+
+// aterrizaje post-OAuth: /demo?social=linkedin&result=connected
+const q = new URLSearchParams(location.search);
+if (q.get("social")) {
+  const el = document.getElementById("oauth-landing");
+  const ok = q.get("result") === "connected";
+  el.innerHTML = `<b class="${ok ? "ok" : "err"}">${q.get("social")}: ${q.get("result")}${q.get("reason") ? " (" + q.get("reason") + ")" : ""}</b>`;
+  history.replaceState({}, "", "/demo");
+}
+
+async function connect(platform) {
+  try {
+    const r = await call("POST", `/social/${platform}/connection`, { return_to: "/demo" });
+    location.href = r.authorization_url;
+  } catch (e) {
+    log("conn-status", `${platform}: ` + (typeof e === "string" ? e : JSON.stringify(e)));
+    try { log("conn-status", await call("GET", `/social/${platform}/connection`)); } catch {}
+  }
+}
+
+async function saveProfile() {
+  const out = document.getElementById("profile-out");
+  try {
+    const p = await call("GET", "/session/profile"); profileRev = p.revision;
+    const f = document.getElementById("photo").files[0];
+    if (f) {
+      const fd = new FormData(); fd.append("file", f); fd.append("alt_text", "foto perfil");
+      const m = await (await fetch(API + "/media", { method: "POST", headers: H(), body: fd })).json();
+      photoId = m.photo_id;
+    }
+    await call("PATCH", "/session/profile", {
+      revision: profileRev,
+      profession: document.getElementById("profession").value,
+      writing_sample: document.getElementById("sample").value,
+    });
+    const p2 = await call("GET", "/session/profile"); profileRev = p2.revision;
+    if (photoId) {
+      await call("PUT", "/session/profile/photo", { revision: profileRev, photo_id: photoId });
+      profileRev = (await call("GET", "/session/profile")).revision;
+    }
+    log("profile-out", await call("GET", "/session/profile"));
+  } catch (e) { log("profile-out", "error: " + JSON.stringify(e)); }
+}
+
+async function completeOnboarding() {
+  try {
+    const p = await call("GET", "/session/profile");
+    const r = await call("POST", "/session/profile/complete", { revision: p.revision });
+    log("profile-out", r);
+  } catch (e) { log("profile-out", "error: " + JSON.stringify(e)); }
+}
+
+async function createAch() {
+  try {
+    const a = await call("POST", "/achievements", {
+      input_type: "text", text: document.getElementById("ach-text").value });
+    achId = a.id; achRev = a.revision;
+    log("ach-out", a);
+  } catch (e) { log("ach-out", "error: " + JSON.stringify(e)); }
+}
+
+// --- audio ---
+let rec = null, recBlob = null;
+async function toggleRec() {
+  const btn = document.getElementById("rec-btn"), st = document.getElementById("rec-status");
+  if (rec && rec.state === "recording") { rec.stop(); return; }
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  rec = new MediaRecorder(stream);
+  const chunks = [];
+  rec.ondataavailable = e => chunks.push(e.data);
+  rec.onstop = () => {
+    recBlob = new Blob(chunks, { type: rec.mimeType });
+    stream.getTracks().forEach(t => t.stop());
+    btn.textContent = "Grabar"; st.textContent = ` grabado ${(recBlob.size/1024).toFixed(0)}KB`;
+  };
+  rec.start(); btn.textContent = "Parar"; st.textContent = " grabando…";
+}
+
+async function createAchAudio() {
+  try {
+    let blob = recBlob, name = "nota.webm", type = "audio/webm";
+    const f = document.getElementById("audio-file").files[0];
+    if (f) { blob = f; name = f.name; type = f.type; }
+    if (!blob) return log("audio-out", "grabá o elegí un audio");
+    const fd = new FormData();
+    fd.append("input_type", "audio");
+    fd.append("audio", blob, name);
+    log("audio-out", "transcribiendo con Whisper…");
+    const r = await fetch(API + "/achievements", { method: "POST", headers: H(), body: fd });
+    const a = await r.json();
+    if (!r.ok) throw a.error;
+    achId = a.id; achRev = a.revision;
+    log("audio-out", a);
+  } catch (e) { log("audio-out", "error: " + JSON.stringify(e)); }
+}
+
+async function approveAch() {
+  try {
+    const a = await call("POST", `/achievements/${achId}/approve`, { revision: achRev });
+    achRev = a.revision; log("ach-out", a);
+  } catch (e) { log("ach-out", "error: " + JSON.stringify(e)); }
+}
+
+async function makeDrafts() {
+  try {
+    const r = await call("POST", `/achievements/${achId}/drafts`,
+      { achievement_revision: achRev, platforms: ["linkedin", "x"] });
+    drafts = r.drafts;
+    log("drafts-out", drafts);
+    document.getElementById("pub-buttons").innerHTML = drafts.map(d =>
+      `<button onclick="publish('${d.id}', ${d.revision}, '${d.platform}')">Publicar en ${d.platform}</button>
+       <button onclick="assisted('${d.id}')">Compartir asistido (${d.platform})</button>`).join(" ");
+  } catch (e) { log("drafts-out", "error: " + JSON.stringify(e)); }
+}
+
+async function publish(draftId, rev, platform) {
+  try {
+    const p = await call("POST", `/drafts/${draftId}/publications`,
+      { draft_revision: rev, confirm_publish: true },
+      { "Idempotency-Key": crypto.randomUUID() });
+    log("pub-out", p);
+  } catch (e) { log("pub-out", platform + " error: " + JSON.stringify(e)); }
+}
+
+async function assisted(draftId) {
+  try { log("pub-out", await call("GET", `/drafts/${draftId}/assisted-share`)); }
+  catch (e) { log("pub-out", "error: " + JSON.stringify(e)); }
+}
+
+ensureSession();
+</script>
+</body>
+</html>

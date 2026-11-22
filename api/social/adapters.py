@@ -23,7 +23,9 @@ class BlockedAdapter:
         return None
 
 
-def default_adapters(linkedin: SocialAdapter | None = None) -> dict[Platform, SocialAdapter]:
+def default_adapters(
+    linkedin: SocialAdapter | None = None, x: SocialAdapter | None = None
+) -> dict[Platform, SocialAdapter]:
     return {
         Platform.LINKEDIN: linkedin
         or BlockedAdapter(
@@ -31,9 +33,9 @@ def default_adapters(linkedin: SocialAdapter | None = None) -> dict[Platform, So
             "La publicación directa en LinkedIn no está configurada en este entorno. "
             "Abrí LinkedIn con el texto listo o copialo.",
         ),
-        Platform.X: BlockedAdapter(
+        Platform.X: x
+        or BlockedAdapter(
             Platform.X,
-            "La publicación directa en X no está disponible: la API requiere créditos que el equipo no aprobó. "
-            "Abrí X con el texto listo o copialo.",
+            "La publicación directa en X no está configurada en este entorno. Abrí X con el texto listo o copialo.",
         ),
     }
