@@ -53,7 +53,7 @@ export type PublicPortfolio = {
 
 export type ProInterest = {
   response: "interested" | "not_now"
-  trigger: "template" | "palette" | "customize"
+  trigger: "template" | "palette" | "customize" | "domain"
   item_id: string | null
   price_band_ars_month: "none" | "up_to_2000" | "2000_5000" | "5000_10000" | "over_10000" | null
 }
