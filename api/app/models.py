@@ -127,7 +127,7 @@ class UpdateAchievementRequest(BaseModel):
 
 class ApproveAchievementRequest(BaseModel):
     revision: int = Field(ge=1)
-    add_to_portfolio: bool = True
+    add_to_portfolio: bool = False
 
 
 class GenerateDraftsRequest(BaseModel):
