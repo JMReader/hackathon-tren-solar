@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sqlite3
+from dataclasses import replace
 from datetime import timedelta
 
 import pytest
@@ -72,3 +73,20 @@ def test_database_rejects_reusing_an_idempotency_key_for_another_publication(tmp
     store.save(record("pub-1", "key-1"))
     with pytest.raises(sqlite3.IntegrityError):
         store.save(record("pub-2", "key-1"))
+
+
+def test_refresh_token_is_encrypted_and_old_databases_are_migrated(tmp_path):
+    path = tmp_path / "social.db"
+    with sqlite3.connect(path) as conn:
+        conn.execute(
+            "CREATE TABLE social_connections (owner_id TEXT NOT NULL, platform TEXT NOT NULL, "
+            "encrypted_token BLOB NOT NULL, scopes TEXT NOT NULL, expires_at TEXT, account_id TEXT, "
+            "account_handle TEXT, PRIMARY KEY (owner_id, platform))"
+        )
+    store = SqliteConnectionStore(SqliteDatabase(path), TokenCipher(KEY))
+    store.put(OWNER, replace(connection(), platform=Platform.X, refresh_token="refresh-secret-456"))
+    store.put(OWNER, connection())
+
+    assert store.get(OWNER, Platform.X).refresh_token == "refresh-secret-456"
+    assert store.get(OWNER, Platform.LINKEDIN).refresh_token is None
+    assert b"refresh-secret-456" not in path.read_bytes()
