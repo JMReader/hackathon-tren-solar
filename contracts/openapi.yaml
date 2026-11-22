@@ -1,0 +1,798 @@
+openapi: 3.1.0
+info:
+  title: Hackathon Tren Solar API
+  version: 0.1.0
+  description: >
+    Contrato compartido entre Issue #3 (ingesta modular texto/audio/MCP, extracción,
+    revisión y borradores LinkedIn/X), Issue #4 (frontend Next.js) e Issue #5
+    (conexiones OAuth y publicación idempotente en LinkedIn y X).
+    En este corte no se exige registro/login ni onboarding persistido.
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Desarrollo local FastAPI
+
+tags:
+  - name: media
+    description: Carga privada de imagen adjunta (Issue #3)
+  - name: achievements
+    description: Ingesta modular (texto/audio/MCP), revisión y aprobación (Issue #3)
+  - name: drafts
+    description: Generación y edición independiente de borradores LinkedIn y X (Issue #3)
+  - name: social
+    description: Estado de conexión OAuth y publicación por red (Issue #5 - Mayko)
+
+paths:
+  /media:
+    post:
+      tags: [media]
+      summary: Subir foto privada para asociar a un logro o publicación
+      operationId: uploadMedia
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                alt_text:
+                  type: [string, "null"]
+      responses:
+        "201":
+          description: Imagen almacenada de forma privada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaAsset"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /achievements:
+    post:
+      tags: [achievements]
+      summary: Crear logro e iniciar extracción de hechos (texto, audio o MCP)
+      operationId: createAchievement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAchievementTextRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/CreateAchievementMultipartRequest"
+      responses:
+        "201":
+          description: Logro creado y extraído (o en procesamiento)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Achievement"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /achievements/{id}:
+    parameters:
+      - $ref: "#/components/parameters/AchievementId"
+    get:
+      tags: [achievements]
+      summary: Consultar estado, texto/transcripción, hechos y preguntas abiertas
+      operationId: getAchievement
+      responses:
+        "200":
+          description: Estado actual del logro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Achievement"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [achievements]
+      summary: Corregir, eliminar o agregar hechos con control de revisión
+      operationId: updateAchievement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAchievementRequest"
+      responses:
+        "200":
+          description: Revisión actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Achievement"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/RevisionConflict"
+
+  /achievements/{id}/approve:
+    parameters:
+      - $ref: "#/components/parameters/AchievementId"
+    post:
+      tags: [achievements]
+      summary: Aprobar explícitamente una revisión concreta del logro
+      operationId: approveAchievement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApproveAchievementRequest"
+      responses:
+        "200":
+          description: Revisión aprobada y congelada para generar borradores
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Achievement"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/RevisionConflict"
+
+  /achievements/{id}/drafts:
+    parameters:
+      - $ref: "#/components/parameters/AchievementId"
+    post:
+      tags: [drafts]
+      summary: Generar borradores independientes para LinkedIn y X desde una revisión aprobada
+      operationId: generateDrafts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateDraftsRequest"
+      responses:
+        "201":
+          description: Borradores generados por plataforma
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateDraftsResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/RevisionConflict"
+
+  /drafts/{id}:
+    parameters:
+      - $ref: "#/components/parameters/DraftId"
+    get:
+      tags: [drafts]
+      summary: Obtener un borrador individual (LinkedIn o X)
+      operationId: getDraft
+      responses:
+        "200":
+          description: Borrador encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Draft"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [drafts]
+      summary: Editar texto o foto de un borrador sin afectar la otra red
+      operationId: updateDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDraftRequest"
+      responses:
+        "200":
+          description: Borrador actualizado con nueva revisión
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Draft"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/RevisionConflict"
+
+  /social/{platform}/connection:
+    parameters:
+      - $ref: "#/components/parameters/SocialPlatform"
+    get:
+      tags: [social]
+      summary: Consultar estado de conexión y capacidades reales de publicación por red (Issue #5)
+      operationId: getSocialConnection
+      responses:
+        "200":
+          description: Estado de conexión de la plataforma
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SocialConnectionStatus"
+    post:
+      tags: [social]
+      summary: Iniciar flujo OAuth para conectar cuenta propia de LinkedIn o X (Issue #5)
+      operationId: startSocialConnection
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartSocialConnectionRequest"
+      responses:
+        "200":
+          description: URL de autorización OAuth generada con state ligado a sesión
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StartSocialConnectionResponse"
+        "503":
+          description: Proveedor sin acceso/scopes habilitados para publicación directa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SocialConnectionStatus"
+
+  /social/{platform}/callback:
+    parameters:
+      - $ref: "#/components/parameters/SocialPlatform"
+    get:
+      tags: [social]
+      summary: Callback OAuth del proveedor (Issue #5)
+      operationId: handleSocialCallback
+      parameters:
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: error
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirección al frontend tras guardar token cifrado o registrar error
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /drafts/{id}/publications:
+    parameters:
+      - $ref: "#/components/parameters/DraftId"
+      - $ref: "#/components/parameters/IdempotencyKey"
+    post:
+      tags: [social]
+      summary: Publicar un borrador confirmado en su red correspondiente (Issue #5)
+      operationId: publishDraft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePublicationRequest"
+      responses:
+        "200":
+          description: Resultado confirmado (o respuesta idempotente previa para la misma clave)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Publication"
+        "202":
+          description: Publicación en curso o pendiente de conciliación
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Publication"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          description: >
+            Revisión de borrador desactualizada, o existe un intento en estado `unknown`
+            pendiente de verificación antes de permitir otro envío.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+
+  /publications/{id}:
+    parameters:
+      - $ref: "#/components/parameters/PublicationId"
+    get:
+      tags: [social]
+      summary: Consultar estado y enlace externo confirmado de una publicación (Issue #5)
+      operationId: getPublication
+      responses:
+        "200":
+          description: Estado actual de la publicación
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Publication"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    AchievementId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        examples: [ach_01J9X8K2M4]
+    DraftId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        examples: [drf_x_01J9X9002]
+    PublicationId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        examples: [pub_01J9XA550]
+    SocialPlatform:
+      name: platform
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Platform"
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: UUID estable por intento de confirmación para evitar publicaciones duplicadas.
+      schema:
+        type: string
+        minLength: 8
+        examples: [9f8c2b10-44a1-4e7d-9b31-0a12bc34de56]
+
+  responses:
+    BadRequest:
+      description: Solicitud inválida
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    RevisionConflict:
+      description: La revisión enviada no coincide con la revisión actual del recurso
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+    UnprocessableEntity:
+      description: Error de validación de payload o archivo
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+
+  schemas:
+    Platform:
+      type: string
+      enum: [linkedin, x]
+
+    InputType:
+      type: string
+      enum: [text, audio, mcp]
+
+    AchievementStatus:
+      type: string
+      enum: [processing, needs_review, approved, failed]
+
+    FactCategory:
+      type: string
+      enum: [project, role, tech, impact, date, learning, context]
+
+    FactSource:
+      type: string
+      enum: [transcript, user, mcp]
+
+    DraftStatus:
+      type: string
+      enum: [draft, ready_to_publish, publishing, succeeded, failed, unknown]
+
+    ConnectionState:
+      type: string
+      enum: [connected, disconnected, expired, access_unavailable]
+
+    PublicationStatus:
+      type: string
+      enum: [publishing, succeeded, failed, unknown]
+
+    MediaAsset:
+      type: object
+      required: [photo_id, mime_type]
+      properties:
+        photo_id:
+          type: string
+        mime_type:
+          type: string
+          examples: [image/jpeg, image/png, image/webp]
+        alt_text:
+          type: [string, "null"]
+        size_bytes:
+          type: [integer, "null"]
+
+    CreateAchievementTextRequest:
+      type: object
+      required: [input_type, text]
+      properties:
+        input_type:
+          type: string
+          enum: [text, mcp]
+          default: text
+        text:
+          type: string
+          minLength: 10
+        photo_id:
+          type: [string, "null"]
+          default: null
+        source_metadata:
+          type: [object, "null"]
+          additionalProperties: true
+          description: Metadatos opcionales cuando la ingesta proviene de MCP (ej. repo, PR, URI).
+
+    CreateAchievementMultipartRequest:
+      type: object
+      properties:
+        input_type:
+          type: string
+          enum: [audio, text]
+          default: audio
+        audio:
+          type: string
+          format: binary
+        text:
+          type: string
+        photo:
+          type: string
+          format: binary
+
+    Fact:
+      type: object
+      required: [id, text, source]
+      properties:
+        id:
+          type: string
+        category:
+          $ref: "#/components/schemas/FactCategory"
+        text:
+          type: string
+        source_quote:
+          type: [string, "null"]
+        source:
+          $ref: "#/components/schemas/FactSource"
+
+    OpenQuestion:
+      type: object
+      required: [id, field, question]
+      properties:
+        id:
+          type: string
+        field:
+          type: string
+        question:
+          type: string
+
+    Achievement:
+      type: object
+      required: [id, input_type, status, revision, transcript, facts, open_questions]
+      properties:
+        id:
+          type: string
+        input_type:
+          $ref: "#/components/schemas/InputType"
+        status:
+          $ref: "#/components/schemas/AchievementStatus"
+        revision:
+          type: integer
+          minimum: 1
+        photo_id:
+          type: [string, "null"]
+        transcript:
+          type: string
+        facts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Fact"
+        open_questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenQuestion"
+        error:
+          oneOf:
+            - $ref: "#/components/schemas/ErrorDetail"
+            - type: "null"
+
+    UpdateAchievementRequest:
+      type: object
+      required: [revision, facts]
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+        photo_id:
+          type: [string, "null"]
+        facts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Fact"
+
+    ApproveAchievementRequest:
+      type: object
+      required: [revision]
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+
+    VoiceContext:
+      type: object
+      description: >
+        Datos de estilo/tono del autor para imitar su forma de escribir en cada red.
+        Usado exclusivamente para estilo; nunca como fuente de hechos nuevos.
+      properties:
+        language:
+          type: string
+          default: es-AR
+        author_hint:
+          type: [string, "null"]
+          description: Breve descripción verificada del rol/contexto del autor.
+        sample_posts:
+          type: object
+          properties:
+            linkedin:
+              type: array
+              items:
+                type: string
+            x:
+              type: array
+              items:
+                type: string
+        preferences:
+          type: object
+          properties:
+            use_emojis:
+              type: boolean
+              default: false
+            use_hashtags:
+              type: boolean
+              default: false
+
+    GenerateDraftsRequest:
+      type: object
+      required: [achievement_revision]
+      properties:
+        achievement_revision:
+          type: integer
+          minimum: 1
+        platforms:
+          type: array
+          items:
+            $ref: "#/components/schemas/Platform"
+          default: [linkedin, x]
+        voice_context:
+          oneOf:
+            - $ref: "#/components/schemas/VoiceContext"
+            - type: "null"
+
+    Draft:
+      type: object
+      required:
+        - id
+        - achievement_id
+        - achievement_revision
+        - platform
+        - revision
+        - status
+        - body
+        - char_count
+        - max_chars
+      properties:
+        id:
+          type: string
+        achievement_id:
+          type: string
+        achievement_revision:
+          type: integer
+        platform:
+          $ref: "#/components/schemas/Platform"
+        revision:
+          type: integer
+          minimum: 1
+        status:
+          $ref: "#/components/schemas/DraftStatus"
+        photo_id:
+          type: [string, "null"]
+        body:
+          type: string
+        char_count:
+          type: integer
+        max_chars:
+          type: integer
+        used_fact_ids:
+          type: array
+          items:
+            type: string
+
+    GenerateDraftsResponse:
+      type: object
+      required: [achievement_id, achievement_revision, drafts]
+      properties:
+        achievement_id:
+          type: string
+        achievement_revision:
+          type: integer
+        drafts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Draft"
+
+    UpdateDraftRequest:
+      type: object
+      required: [revision, body]
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+        body:
+          type: string
+          minLength: 1
+        photo_id:
+          type: [string, "null"]
+
+    PublishableMedia:
+      type: object
+      required: [photo_id, mime_type, local_path]
+      properties:
+        photo_id:
+          type: string
+        mime_type:
+          type: string
+        local_path:
+          type: string
+          description: Ruta privada local en servidor para subir el binario al proveedor social.
+        alt_text:
+          type: [string, "null"]
+
+    PublishableDraft:
+      type: object
+      description: >
+        Contrato interno de handoff #3 -> #5. Esto es lo que recibe el módulo
+        `api/social` de Mayko al publicar un borrador confirmado.
+      required: [draft_id, draft_revision, platform, body]
+      properties:
+        draft_id:
+          type: string
+        draft_revision:
+          type: integer
+          minimum: 1
+        platform:
+          $ref: "#/components/schemas/Platform"
+        body:
+          type: string
+        media:
+          oneOf:
+            - $ref: "#/components/schemas/PublishableMedia"
+            - type: "null"
+
+    SocialConnectionStatus:
+      type: object
+      required: [platform, status, can_publish_text, can_publish_image]
+      properties:
+        platform:
+          $ref: "#/components/schemas/Platform"
+        status:
+          $ref: "#/components/schemas/ConnectionState"
+        can_publish_text:
+          type: boolean
+        can_publish_image:
+          type: boolean
+        account_handle:
+          type: [string, "null"]
+        reason:
+          type: [string, "null"]
+          description: Motivo concreto si `status` es `access_unavailable`, `expired` o `disconnected`.
+
+    StartSocialConnectionRequest:
+      type: object
+      properties:
+        return_to:
+          type: [string, "null"]
+          description: Ruta relativa del frontend a la que volver luego del callback OAuth.
+
+    StartSocialConnectionResponse:
+      type: object
+      required: [platform, authorization_url, state]
+      properties:
+        platform:
+          $ref: "#/components/schemas/Platform"
+        authorization_url:
+          type: string
+          format: uri
+        state:
+          type: string
+
+    CreatePublicationRequest:
+      type: object
+      required: [draft_revision, confirm_publish]
+      properties:
+        draft_revision:
+          type: integer
+          minimum: 1
+        confirm_publish:
+          type: boolean
+          const: true
+
+    Publication:
+      type: object
+      required: [id, draft_id, draft_revision, platform, idempotency_key, status]
+      properties:
+        id:
+          type: string
+        draft_id:
+          type: string
+        draft_revision:
+          type: integer
+        platform:
+          $ref: "#/components/schemas/Platform"
+        idempotency_key:
+          type: string
+        status:
+          $ref: "#/components/schemas/PublicationStatus"
+        external_post_id:
+          type: [string, "null"]
+        external_url:
+          type: [string, "null"]
+        published_at:
+          type: [string, "null"]
+          format: date-time
+        error:
+          oneOf:
+            - $ref: "#/components/schemas/ErrorDetail"
+            - type: "null"
+
+    ErrorDetail:
+      type: object
+      required: [code, message, retryable]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        retryable:
+          type: boolean
+
+    ApiError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          $ref: "#/components/schemas/ErrorDetail"

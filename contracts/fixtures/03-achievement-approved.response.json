@@ -1,0 +1,26 @@
+{
+  "id": "ach_01J9X8K2M4",
+  "input_type": "text",
+  "status": "approved",
+  "revision": 2,
+  "photo_id": "med_01J9X8A7B6",
+  "transcript": "Este finde en Jujuy hicimos una app de turnos médicos en React para una clínica local. Éramos 3 en el equipo; yo diseñé todas las pantallas en Figma y armé el flujo de reserva en 3 pasos. Todavía no medimos cuánta gente la usó.",
+  "facts": [
+    {
+      "id": "fact_1",
+      "category": "project",
+      "text": "Equipo de 3 personas construyó una app de turnos médicos en React para una clínica local en Jujuy.",
+      "source_quote": "hicimos una app de turnos médicos en React para una clínica local. Éramos 3 en el equipo",
+      "source": "transcript"
+    },
+    {
+      "id": "fact_2",
+      "category": "role",
+      "text": "Diseñó todas las pantallas en Figma, el flujo de reserva en 3 pasos y maquetó los componentes base en React.",
+      "source_quote": null,
+      "source": "user"
+    }
+  ],
+  "open_questions": [],
+  "error": null
+}

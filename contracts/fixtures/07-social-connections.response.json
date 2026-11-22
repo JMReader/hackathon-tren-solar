@@ -1,0 +1,18 @@
+{
+  "linkedin_connected": {
+    "platform": "linkedin",
+    "status": "connected",
+    "can_publish_text": true,
+    "can_publish_image": true,
+    "account_handle": "Ana Gómez",
+    "reason": null
+  },
+  "x_access_unavailable": {
+    "platform": "x",
+    "status": "access_unavailable",
+    "can_publish_text": false,
+    "can_publish_image": false,
+    "account_handle": null,
+    "reason": "La app de X no tiene habilitado el permiso de escritura (tweet.write) en este entorno. Podés copiar el borrador y descargar la foto."
+  }
+}

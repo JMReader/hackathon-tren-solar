@@ -10,10 +10,14 @@ Una persona cuenta por audio un proyecto o logro. Una herramienta organiza lo qu
 
 El PDF aportado por Juan propone **AbreNorte** como marca y el recorrido audio → transcripción → revisión → portfolio → borrador de publicación → oportunidades. Se conserva como inspiración, pendiente de decisiones y validación con usuarios.
 
-## Documentación
+## Documentación y contratos
 
+- [Especificación funcional](docs/spec-funcional.md).
+- [Especificación técnica](docs/spec-tecnica.md).
+- [Contratos e integración entre #3, #4 y #5](contracts/README.md) (`contracts/openapi.yaml` + `contracts/fixtures/`).
 - [Inspiración y preguntas abiertas](docs/inspiracion.md).
 - [Recorrido y experimento propuestos](docs/mvp-propuesto.md).
+- [Investigación de negocio](docs/investigacion-negocio.md).
 - [Instrucciones para agentes](AGENTS.md).
 
 ## Memoria personal
