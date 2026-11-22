@@ -1,6 +1,5 @@
 import { PLACES, START_HREF } from "../content";
 import { Button, Eyebrow, Reveal } from "../kit";
-import { Llamas } from "../llamas";
 import { Scene } from "../scene";
 
 export function Hero() {
@@ -8,10 +7,9 @@ export function Hero() {
     <section id="inicio" className="relative isolate flex min-h-[100svh] flex-col overflow-hidden">
       <div className="absolute inset-0 -z-10">
         <Scene />
-        <Llamas layout="hero" className="absolute inset-0" />
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center px-5 pt-24 pb-10 text-center">
+      <div className="flex flex-1 flex-col items-center px-5 pt-[clamp(7rem,19vh,11rem)] pb-10 text-center">
         <Reveal>
           <h1 className="text-[clamp(2.25rem,5vw,3.25rem)] leading-none font-medium tracking-[-0.02em] text-white [text-shadow:0_2px_30px_rgb(0_0_0/0.25)]">
             Que tu talento se mueva.
