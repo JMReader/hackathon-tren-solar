@@ -28,8 +28,8 @@ def default_adapters(linkedin: SocialAdapter | None = None) -> dict[Platform, So
         Platform.LINKEDIN: linkedin
         or BlockedAdapter(
             Platform.LINKEDIN,
-            "La publicación directa en LinkedIn no está disponible: la app de desarrollador requiere una "
-            "página de empresa. Abrí LinkedIn con el texto listo o copialo.",
+            "La publicación directa en LinkedIn no está configurada en este entorno. "
+            "Abrí LinkedIn con el texto listo o copialo.",
         ),
         Platform.X: BlockedAdapter(
             Platform.X,
