@@ -81,11 +81,8 @@ class CoreService:
 
     # --- achievements ---
 
-    def _check_ready(self, session_id: str, input_type: str) -> None:
-        """403 si el onboarding no está completo. `mcp` es ingesta machine-to-machine
-        y queda exenta (no hay pantalla de onboarding detrás del adaptador)."""
-        if input_type == "mcp":
-            return
+    def _check_ready(self, session_id: str) -> None:
+        """403 si el onboarding no está completo (HTTP siempre pasa por acá)."""
         found = self.store.get_profile(session_id)
         ready = found[0].ready_for_achievement if found else False
         if not ready:
@@ -99,13 +96,15 @@ class CoreService:
         *,
         session_id: str,
         input_type: str,
+        bypass_onboarding_gate: bool = False,
         text: str | None = None,
         photo_id: str | None = None,
         source_metadata: dict | None = None,
         audio: tuple[bytes, str | None, str | None] | None = None,
         photo: tuple[bytes, str | None, str | None] | None = None,
     ) -> Achievement:
-        self._check_ready(session_id, input_type)
+        if not bypass_onboarding_gate:
+            self._check_ready(session_id)
         if photo is not None:
             photo_id = self.media.save_photo(*photo, alt_text=None,
                                              session_id=session_id).photo_id

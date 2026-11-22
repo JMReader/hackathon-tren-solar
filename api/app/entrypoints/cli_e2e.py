@@ -49,6 +49,21 @@ def _p(title: str, data) -> None:
     print(json.dumps(data, ensure_ascii=False, indent=2) if not isinstance(data, str) else data)
 
 
+def _json(resp, step: str) -> dict:
+    """Devuelve el JSON 2xx o aborta mostrando el error de API (shape ApiError)."""
+    body = resp.json()
+    if resp.status_code >= 400:
+        print(f"\nFAIL {step}: HTTP {resp.status_code}")
+        _p("error", body)
+        raise SystemExit(1)
+    # Achievement/Draft incluyen "error": null; sólo ApiError tiene body["error"] como objeto.
+    if isinstance(body, dict) and body.get("error"):
+        print(f"\nFAIL {step}: HTTP {resp.status_code}")
+        _p("error", body)
+        raise SystemExit(1)
+    return body
+
+
 def run(transcript: str, demo_voice: bool) -> int:
     services = Services()  # lee env: LLM_PROVIDER, STT_PROVIDER, *_API_KEY
     client = TestClient(create_app(services))
@@ -56,7 +71,7 @@ def run(transcript: str, demo_voice: bool) -> int:
     print(f"LLM_PROVIDER={provider} | STT_PROVIDER={services.settings.stt_provider}")
 
     # 1. sesión + onboarding
-    session = client.post("/api/v1/session").json()
+    session = _json(client.post("/api/v1/session"), "POST /session")
     auth = {"X-Session-Id": session["session_id"]}
     print(f"\nsesión: {session['session_id']} (expira {session['expires_at']})")
 
@@ -72,8 +87,9 @@ def run(transcript: str, demo_voice: bool) -> int:
     assert done.status_code == 400, "sin foto debería fallar"
     print("complete sin foto -> 400", done.json()["error"]["code"])
 
-    photo = client.post("/api/v1/media", headers=auth,
-                        files={"file": ("foto.png", _tiny_png(), "image/png")}).json()
+    photo = _json(client.post("/api/v1/media", headers=auth,
+                              files={"file": ("foto.png", _tiny_png(), "image/png")}),
+                  "POST /media")
     prof = client.get("/api/v1/session/profile", headers=auth).json()
     client.put("/api/v1/session/profile/photo", headers=auth,
                json={"revision": prof["revision"], "photo_id": photo["photo_id"]})
@@ -84,9 +100,10 @@ def run(transcript: str, demo_voice: bool) -> int:
     _p("onboarding completo (voice_context congelado)", done.json()["voice_context"])
 
     # 2. logro por texto
-    ach = client.post("/api/v1/achievements", headers=auth,
-                      json={"input_type": "text", "text": transcript,
-                            "photo_id": photo["photo_id"]}).json()
+    ach = _json(client.post("/api/v1/achievements", headers=auth,
+                            json={"input_type": "text", "text": transcript,
+                                  "photo_id": photo["photo_id"]}),
+                "POST /achievements")
     _p("achievement (needs_review)", {
         "id": ach["id"], "status": ach["status"], "revision": ach["revision"],
         "facts": ach["facts"], "open_questions": ach["open_questions"],
@@ -98,17 +115,20 @@ def run(transcript: str, demo_voice: bool) -> int:
         "text": "El equipo de la clínica lo probó con 12 pacientes.",
         "source_quote": None, "source": "user",
     }]
-    ach = client.patch(f"/api/v1/achievements/{ach['id']}", headers=auth,
-                       json={"revision": ach["revision"], "facts": facts}).json()
-    ach = client.post(f"/api/v1/achievements/{ach['id']}/approve", headers=auth,
-                      json={"revision": ach["revision"]}).json()
+    ach = _json(client.patch(f"/api/v1/achievements/{ach['id']}", headers=auth,
+                             json={"revision": ach["revision"], "facts": facts}),
+                "PATCH /achievements")
+    ach = _json(client.post(f"/api/v1/achievements/{ach['id']}/approve", headers=auth,
+                            json={"revision": ach["revision"]}),
+                "POST approve")
     print(f"\napproved revision={ach['revision']} status={ach['status']}")
 
     # 4. borradores: snapshot del perfil + voice explícito si --demo-voice
     voice = DEMO_VOICE if demo_voice else None
-    out = client.post(f"/api/v1/achievements/{ach['id']}/drafts", headers=auth,
-                      json={"achievement_revision": ach["revision"],
-                            "voice_context": voice}).json()
+    out = _json(client.post(f"/api/v1/achievements/{ach['id']}/drafts", headers=auth,
+                            json={"achievement_revision": ach["revision"],
+                                  "voice_context": voice}),
+                "POST /drafts")
     for d in out["drafts"]:
         _p(f"draft {d['platform']} ({d['char_count']}/{d['max_chars']}, {d['status']})",
            d["body"])

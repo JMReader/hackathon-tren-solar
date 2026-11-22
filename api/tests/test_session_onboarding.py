@@ -84,6 +84,20 @@ def test_photo_must_belong_to_session(client, auth):
     assert ok.json()["photo_id"] == own
 
 
+def test_ready_false_until_complete_even_with_all_fields(client, auth):
+    """Campos llenos sin /complete: ready_for_achievement sigue false (Opus review)."""
+    client.patch("/api/v1/session/profile", headers=auth,
+                 json={"revision": _rev(client, auth), "profession": "Dev"})
+    photo_id = upload_photo(client, auth)
+    client.put("/api/v1/session/profile/photo", headers=auth,
+               json={"revision": _rev(client, auth), "photo_id": photo_id})
+    client.patch("/api/v1/session/profile", headers=auth,
+                 json={"revision": _rev(client, auth), "writing_sample": WRITING_SAMPLE})
+    p = _profile(client, auth)
+    assert p["onboarding_status"] == "in_progress"
+    assert p["ready_for_achievement"] is False
+
+
 def test_complete_requires_fields(client, auth):
     client.patch("/api/v1/session/profile", headers=auth,
                  json={"revision": _rev(client, auth), "profession": "Dev"})

@@ -32,6 +32,14 @@ def test_author_profile_schema(client, auth, openapi):
     validate_schema(resp.json(), "AuthorProfile", openapi)
 
 
+def test_complete_profile_schema(client, ready, openapi):
+    """El perfil completo (voice_context congelado) también cumple el schema."""
+    resp = client.get("/api/v1/session/profile", headers=ready)
+    body = resp.json()
+    assert body["onboarding_status"] == "complete"
+    validate_schema(body, "AuthorProfile", openapi)
+
+
 def test_achievement_schema_against_contract(client, ready, openapi):
     ach = create_text(client, ready)
     validate_schema(ach, "Achievement", openapi)

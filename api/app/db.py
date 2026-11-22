@@ -87,6 +87,17 @@ class Store:
                 );
                 """
             )
+            self._migrate_schema(conn)
+
+    @staticmethod
+    def _migrate_schema(conn: sqlite3.Connection) -> None:
+        """Columnas session_id añadidas tras el primer cut; IF NOT EXISTS no altera tablas viejas."""
+        for table in ("media", "achievements", "drafts"):
+            cols = {row[1] for row in conn.execute(f"PRAGMA table_info({table})")}
+            if cols and "session_id" not in cols:
+                conn.execute(
+                    f"ALTER TABLE {table} ADD COLUMN session_id TEXT NOT NULL DEFAULT ''"
+                )
 
     def _conn(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
@@ -143,9 +154,13 @@ class Store:
             session_id=row["session_id"],
             onboarding_status=row["onboarding_status"],
             revision=row["revision"],
-            ready_for_achievement=_ready(row["profession"], row["photo_id"],
-                                         row["writing_sample"],
-                                         json.loads(row["sample_posts"])),
+            ready_for_achievement=_ready(
+                row["onboarding_status"],
+                row["profession"],
+                row["photo_id"],
+                row["writing_sample"],
+                json.loads(row["sample_posts"]),
+            ),
             profession=row["profession"],
             photo_id=row["photo_id"],
             writing_sample=row["writing_sample"],
@@ -173,9 +188,13 @@ class Store:
                    alt_text: str | None, size_bytes: int, local_path: str,
                    created_at: str) -> None:
         with self._lock, self._conn() as conn:
-            conn.execute("INSERT INTO media VALUES (?,?,?,?,?,?,?)",
-                         (photo_id, session_id, mime_type, alt_text,
-                          size_bytes, local_path, created_at))
+            conn.execute(
+                """INSERT INTO media
+                   (photo_id,session_id,mime_type,alt_text,size_bytes,local_path,created_at)
+                   VALUES (?,?,?,?,?,?,?)""",
+                (photo_id, session_id, mime_type, alt_text,
+                 size_bytes, local_path, created_at),
+            )
 
     def get_media(self, photo_id: str) -> MediaAsset | None:
         with self._conn() as conn:
@@ -293,9 +312,16 @@ class Store:
         return row["session_id"] if row else None
 
 
-def _ready(profession: str | None, photo_id: str | None,
-           writing_sample: str | None, sample_posts: dict) -> bool:
-    """ready_for_achievement: profesión + foto + fuente de estilo (OB-2)."""
+def _ready(
+    onboarding_status: str,
+    profession: str | None,
+    photo_id: str | None,
+    writing_sample: str | None,
+    sample_posts: dict,
+) -> bool:
+    """Listo para POST /achievements: onboarding complete + campos (OB-2)."""
+    if onboarding_status != "complete":
+        return False
     has_posts = any(sample_posts.get(p) for p in ("linkedin", "x"))
     has_sample = bool(writing_sample) and len(writing_sample) >= 20
     return bool(profession) and bool(photo_id) and (has_posts or has_sample)

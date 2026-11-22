@@ -20,6 +20,7 @@ from .models import (
     SyncStyleRequest,
     UpdateAuthorProfileRequest,
     VoiceContext,
+    VoicePreferences,
 )
 from .style_reader import StyleReaderPort
 
@@ -197,7 +198,7 @@ class SessionService:
                                 x=[profile.writing_sample])
         profile.voice_context = VoiceContext(
             language="es-AR", author_hint=profile.profession,
-            sample_posts=posts,
+            sample_posts=posts, preferences=VoicePreferences(),
         )
         profile.onboarding_status = "complete"
         return self._save(profile, sample_posts)

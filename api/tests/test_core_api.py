@@ -105,6 +105,17 @@ def test_onboarding_gate_403(client, auth):
     assert resp.json()["error"]["code"] == "onboarding_incomplete"
 
 
+def test_http_mcp_input_still_requires_onboarding(client, auth):
+    """input_type=mcp por REST no saltea onboarding (solo bypass interno del adapter MCP)."""
+    resp = client.post(
+        "/api/v1/achievements",
+        headers=auth,
+        json={"input_type": "mcp", "text": TRANSCRIPT, "source_metadata": {"repo": "x"}},
+    )
+    assert resp.status_code == 403
+    assert resp.json()["error"]["code"] == "onboarding_incomplete"
+
+
 def test_patch_revision_conflict_409(client, ready):
     ach = create_text(client, ready)
     resp = client.patch(

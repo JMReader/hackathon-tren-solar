@@ -2,7 +2,7 @@
 
 Corre por stdio: `python -m app.mcp_server`. Las tools comparten el mismo
 CoreService/SessionService que el HTTP — la sesión se crea sola si falta y la
-ingesta MCP queda exenta del gate de onboarding (es machine-to-machine).
+la ingesta MCP salta el gate HTTP vía bypass interno (no usar input_type=mcp por REST).
 
 Tools: ingest_achievement, get_achievement, update_achievement,
 approve_achievement, generate_drafts, get_publishable_draft.
@@ -49,8 +49,12 @@ def build_mcp_server(services: Services) -> MCPServer:
     ) -> dict[str, Any]:
         sid = _ensure_session(session_id)
         ach = services.core.create_achievement(
-            session_id=sid, input_type="mcp", text=text,
-            photo_id=photo_id, source_metadata=source_metadata,
+            session_id=sid,
+            input_type="mcp",
+            text=text,
+            photo_id=photo_id,
+            source_metadata=source_metadata,
+            bypass_onboarding_gate=True,
         )
         out = ach.model_dump(mode="json")
         out["session_id"] = sid
