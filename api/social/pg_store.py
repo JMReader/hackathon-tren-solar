@@ -98,6 +98,10 @@ class PgPublicationStore:
         return self._one("owner_id = %s AND draft_id = %s ORDER BY seq DESC LIMIT 1",
                          (owner_id, draft_id))
 
+    def list_for_draft(self, owner_id: str, draft_id: str) -> list[PublicationRecord]:
+        return self._many("owner_id = %s AND draft_id = %s ORDER BY seq DESC",
+                          (owner_id, draft_id))
+
     def save(self, record: PublicationRecord) -> None:
         publication = record.publication
         with self._db.connect() as conn:
@@ -118,15 +122,20 @@ class PgPublicationStore:
             )
 
     def _one(self, where: str, params: tuple[str, ...]) -> PublicationRecord | None:
+        rows = self._many(where, params)
+        return rows[0] if rows else None
+
+    def _many(self, where: str, params: tuple[str, ...]) -> list[PublicationRecord]:
         with self._db.connect() as conn:
-            row = conn.execute(f"SELECT * FROM social_publications WHERE {where}", params).fetchone()
-        if row is None:
-            return None
-        return PublicationRecord(
-            owner_id=row["owner_id"],
-            fingerprint=row["fingerprint"],
-            publication=Publication.model_validate_json(row["publication"]),
-        )
+            rows = conn.execute(f"SELECT * FROM social_publications WHERE {where}", params).fetchall()
+        return [
+            PublicationRecord(
+                owner_id=row["owner_id"],
+                fingerprint=row["fingerprint"],
+                publication=Publication.model_validate_json(row["publication"]),
+            )
+            for row in rows
+        ]
 
 
 class PgOAuthStateStore:

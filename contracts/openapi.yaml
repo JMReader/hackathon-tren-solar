@@ -511,6 +511,22 @@ paths:
     parameters:
     - $ref: '#/components/parameters/DraftId'
     - $ref: '#/components/parameters/IdempotencyKey'
+    get:
+      tags:
+      - social
+      summary: Listar publicaciones registradas de un borrador, más reciente primero
+      operationId: listDraftPublications
+      responses:
+        '200':
+          description: Intentos de publicación del borrador (vacío si nunca se publicó)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Publication'
+        '404':
+          $ref: '#/components/responses/NotFound'
     post:
       tags:
       - social

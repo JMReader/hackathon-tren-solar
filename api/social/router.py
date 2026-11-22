@@ -73,6 +73,13 @@ def create_router(service: SocialService, flow: ConnectionFlow, current_owner: C
         except SocialError as error:
             return _error(error)
 
+    @router.get("/drafts/{draft_id}/publications", response_model=list[Publication])
+    def list_publications(draft_id: str, owner_id: Owner) -> list[Publication] | JSONResponse:
+        try:
+            return service.list_draft_publications(owner_id, draft_id)
+        except SocialError as error:
+            return _error(error)
+
     @router.post("/drafts/{draft_id}/publications", response_model=Publication)
     def publish_draft(
         draft_id: str,

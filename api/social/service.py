@@ -147,6 +147,20 @@ class SocialService:
             notice=assisted.notice(draft.platform),
         )
 
+    def list_draft_publications(self, owner_id: str, draft_id: str) -> list[Publication]:
+        draft = self._drafts.get(owner_id, draft_id)
+        if draft is None:
+            raise NotFound("DRAFT_NOT_FOUND", "No encontramos ese borrador.")
+        records = self._publications.list_for_draft(owner_id, draft_id)
+        return [
+            (
+                self._reconcile(record).publication
+                if record.publication.status in (PublicationStatus.PUBLISHING, PublicationStatus.UNKNOWN)
+                else record.publication
+            )
+            for record in records
+        ]
+
     def publish(
         self,
         owner_id: str,

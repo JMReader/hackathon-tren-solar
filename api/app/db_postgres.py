@@ -37,7 +37,8 @@ class PostgresStore:
     def save_session(self, session_id: str, created_at: str, expires_at: str) -> None:
         with self._lock, self._conn() as conn:
             conn.execute(
-                "INSERT INTO sessions (id, created_at, expires_at) VALUES (%s, %s, %s)",
+                """INSERT INTO sessions (id, created_at, expires_at) VALUES (%s, %s, %s)
+                   ON CONFLICT (id) DO NOTHING""",
                 (session_id, created_at, expires_at),
             )
 
@@ -315,7 +316,7 @@ class PostgresStore:
                 (
                     row["id"], row["session_id"], row["status"], row["revision"],
                     row["display_name"], row["headline"], row["items"],
-                    row["template_id"], row["palette_id"], row["cv_downloadable"],
+                    row["template_id"], row["palette_id"], bool(row["cv_downloadable"]),
                     row["slug"], row["published_revision"], row["published_snapshot"],
                     row["published_at"], row["created_at"], row["updated_at"],
                 ),
