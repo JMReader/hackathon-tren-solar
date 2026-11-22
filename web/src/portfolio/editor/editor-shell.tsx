@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { ArrowRight, LayoutTemplate } from "lucide-react"
 import Link from "next/link"
+import { useState } from "react"
 import { buttonStyles } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { apiFetch } from "@/lib/api/client"
@@ -18,6 +19,7 @@ import {
   type PortfolioRecord,
 } from "../portfolio-api"
 import { clearStoredPortfolioId, getStoredPortfolioId, setStoredPortfolioId } from "../storage"
+import { CvGate } from "./cv-gate"
 import { PortfolioEditor } from "./editor"
 
 const toItem = (a: Achievement) => ({
@@ -99,6 +101,8 @@ export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean 
   const session = useSessionId()
   const sessionId = session.data
   const profileQuery = useProfile(sessionId)
+  const [showExample, setShowExample] = useState(false)
+  const cvId = profileQuery.data?.cv_document?.cv_id ?? null
 
   const achievementsQuery = useQuery({
     queryKey: ["achievements", sessionId],
@@ -113,7 +117,7 @@ export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean 
     (!sessionId || approved.length === 0)
 
   const portfolioQuery = useQuery({
-    queryKey: ["portfolio-draft", sessionId, approved.map((a) => a.id).join(",")],
+    queryKey: ["portfolio-draft", sessionId, approved.map((a) => a.id).join(","), cvId],
     enabled: Boolean(sessionId && profileQuery.data && approved.length > 0),
     queryFn: () => loadOrCreatePortfolio(profileQuery.data!, approved),
   })
@@ -124,6 +128,14 @@ export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean 
         <Spinner className="size-8 text-on-dark" />
       </div>
     )
+  }
+
+  if (showExample) {
+    return <PortfolioEditor portfolio={demoPortfolio} isDemo embedded={embedded} />
+  }
+
+  if (sessionId && profileQuery.data && !cvId) {
+    return <CvGate sessionId={sessionId} embedded={embedded} onExample={() => setShowExample(true)} />
   }
 
   if (useDemo) {
