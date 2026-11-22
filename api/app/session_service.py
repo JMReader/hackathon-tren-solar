@@ -143,8 +143,13 @@ class SessionService:
         if len(data) > self.media.max_photo_bytes:
             raise bad_request("El CV supera el máximo de 10 MB.", code="media_too_large")
         cv_id = new_id("cv")
-        local_path = self.media.dir / f"{cv_id}{ext or '.bin'}"
-        local_path.write_bytes(data)
+        ext = Path(filename or "").suffix.lower()
+        local_path = self.media.cv_path(cv_id, ext)
+        if hasattr(self.media, "backend"):
+            local_path = self.media.backend.put(local_path, data, mime or "application/octet-stream")
+        else:
+            Path(local_path).parent.mkdir(parents=True, exist_ok=True)
+            Path(local_path).write_bytes(data)
         self.store.save_cv(cv_id, session_id, mime or "application/octet-stream",
                            len(data), str(local_path), _now().isoformat())
         profile.cv_document = CvDocument(cv_id=cv_id, mime_type=mime or "application/octet-stream",

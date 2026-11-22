@@ -83,6 +83,7 @@ class ConnectionFlow:
         web_base_url: str,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         new_state: Callable[[], str] = lambda: secrets.token_urlsafe(32),
+        state_store=None,
     ) -> None:
         self._service = service
         self._providers = providers
@@ -92,6 +93,7 @@ class ConnectionFlow:
         self._new_state = new_state
         self._pending: dict[str, PendingAuthorization] = {}
         self._lock = threading.Lock()
+        self._state_store = state_store  # opcional; persiste `state` entre instancias (serverless)
 
     def start(self, owner_id: str, platform: Platform, return_to: str | None) -> StartSocialConnectionResponse:
         status = self._service.connection_status(owner_id, platform)
@@ -105,16 +107,28 @@ class ConnectionFlow:
         target = _safe_return_to(return_to)
         state = self._new_state()
         now = self._clock()
+        expires = now + STATE_TTL
+        if self._state_store is not None:
+            self._state_store.save(state, owner_id, platform.value, target, expires.isoformat())
         with self._lock:
             self._pending = {k: v for k, v in self._pending.items() if v.expires_at > now}
-            self._pending[state] = PendingAuthorization(owner_id, platform, target, now + STATE_TTL)
+            self._pending[state] = PendingAuthorization(owner_id, platform, target, expires)
         return StartSocialConnectionResponse(
             platform=platform, authorization_url=provider.authorization_url(state), state=state
         )
 
     def complete(self, platform: Platform, state: str, code: str | None, error: str | None) -> str:
-        with self._lock:
-            pending = self._pending.pop(state, None)
+        pending: PendingAuthorization | None = None
+        if self._state_store is not None:
+            row = self._state_store.pop(state, platform.value)
+            if row is not None:
+                pending = PendingAuthorization(
+                    row["owner_id"], platform, row["return_to"],
+                    datetime.fromisoformat(row["expires_at"]),
+                )
+        else:
+            with self._lock:
+                pending = self._pending.pop(state, None)
         if pending is None or pending.platform is not platform or pending.expires_at <= self._clock():
             raise InvalidRequest(
                 "OAUTH_STATE_INVALID", "El enlace de conexión venció o no es válido. Volvé a intentar."

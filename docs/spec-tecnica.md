@@ -5,7 +5,7 @@
 Frontend en Next.js con TypeScript (`web/`). Backend en Python con FastAPI (`api/`) y contrato OpenAPI versionado en `contracts/openapi.yaml` junto con ejemplos ejecutables en `contracts/fixtures/`.
 
 La ruta funcional soporta ingesta modular (`input_type`: `text`, `audio` o `mcp`) hacia un mismo núcleo de revisión y generación para LinkedIn y X:
-- **Corte inmediato (E2E modular):** entrada por `text` (con `photo_id` opcional) + imitación de estilo del usuario mediante `voice_context` inline, sin bloquear por registro/login ni onboarding persistido.
+- **Corte inmediato (E2E modular):** onboarding de pantalla con sesión anónima (`POST /session`) y perfil persistido; luego entrada por `text` (con `photo_id` opcional) + `voice_context` desde perfil o inline. Onboarding: carpeta `docs/features/onboarding/` (SDD aislado de esa feature).
 - **Adaptadores siguientes sobre el mismo núcleo:** entrada por `audio` + foto desde móvil (transcripción STT hacia el mismo `transcript`) e integración `mcp` (consumir evidencia o exponer herramientas MCP sobre los mismos servicios de dominio).
 - El portfolio y el CV siguen opcionales y fuera del primer corte. Pinterest se usa sólo como referencia visual del portfolio y nunca como destino de publicación.
 
@@ -63,7 +63,7 @@ El portfolio reutiliza logros y fotos aprobados. Para crearlo se carga un CV vá
 
 Nadie modifica los archivos de otro issue sin coordinar el contrato.
 
-En el primer corte funcional no se exige registro/login ni onboarding para ejecutar el flujo de logros, borradores y conexión OAuth de prueba; cuando se incorpore sesión de usuario y onboarding, cada recurso validará propiedad por sesión y poblará `voice_context`. Audio y archivos originales usan almacenamiento privado. La extracción cita el texto/audio cuando puede, marca incertidumbre y no inventa roles, fechas o impacto. Los tokens de redes se cifran y se guardan del lado servidor. El permiso para publicar en cada red y el permiso para hacer público un portfolio se piden por separado.
+En el primer corte hay sesión anónima sin contraseña y onboarding obligatorio antes de `POST /achievements`. Cada recurso valida `X-Session-Id` y pobla `voice_context` desde el perfil al generar borradores. Audio y archivos originales usan almacenamiento privado. La extracción cita el texto/audio cuando puede, marca incertidumbre y no inventa roles, fechas o impacto. Los tokens de redes se cifran y se guardan del lado servidor. El permiso para publicar en cada red y el permiso para hacer público un portfolio se piden por separado.
 
 ## Prueba integrada
 

@@ -12,6 +12,7 @@ from .prompts import EXTRACT_SYSTEM, draft_system
 
 OPENAI_URL = "https://api.openai.com/v1/chat/completions"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+XAI_URL = "https://api.x.ai/v1/chat/completions"
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
 
@@ -27,7 +28,7 @@ def _draft_user_payload(facts: list[Fact], voice: VoiceContext | None) -> str:
 
 
 class _OpenAICompatible:
-    """OpenAI y Groq comparten el API de chat/completions con JSON mode."""
+    """OpenAI, Groq y xAI comparten el API de chat/completions con JSON mode."""
 
     def __init__(self, url: str, api_key: str, model: str):
         self.url = url
@@ -137,6 +138,8 @@ def build_llm(settings: Settings) -> LLMPort:
             provider = "gemini"
         elif settings.groq_api_key:
             provider = "groq"
+        elif settings.xai_api_key:
+            provider = "xai"
         else:
             return FakeLLM()
     if provider == "openai":
@@ -147,6 +150,10 @@ def build_llm(settings: Settings) -> LLMPort:
         if not settings.groq_api_key:
             raise LLMError("LLM_PROVIDER=groq requiere GROQ_API_KEY.", code="missing_api_key")
         return _OpenAICompatible(GROQ_URL, settings.groq_api_key, settings.groq_model)
+    if provider == "xai":
+        if not settings.xai_api_key:
+            raise LLMError("LLM_PROVIDER=xai requiere XAI_API_KEY.", code="missing_api_key")
+        return _OpenAICompatible(XAI_URL, settings.xai_api_key, settings.xai_model)
     if provider == "gemini":
         if not settings.gemini_api_key:
             raise LLMError("LLM_PROVIDER=gemini requiere GEMINI_API_KEY.", code="missing_api_key")

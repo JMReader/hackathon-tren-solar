@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import io
 
-from conftest import PNG_BYTES, TRANSCRIPT, WRITING_SAMPLE, upload_photo
+from conftest import (PNG_BYTES, TRANSCRIPT, WRITING_SAMPLE, approve, fixture,
+                      upload_photo)
 
 
 def _profile(client, auth) -> dict:
@@ -196,3 +197,36 @@ def test_edit_after_complete_keeps_snapshot_until_recomplete(client, ready):
     assert p["profession"] == "Backend dev"
     assert p["onboarding_status"] == "complete"  # sigue completo
     assert p["voice_context"] == old_vc          # snapshot congelado
+
+
+def test_fixture_12_onboarding_handoff(client, ready):
+    """Fixture 12: el mismo X-Session-Id pasa de complete a POST /achievements;
+    voice_context puede omitirse en drafts (usa el snapshot del perfil)."""
+    fx = fixture("12-onboarding-handoff-to-achievement.json")
+
+    # Sesión sin onboarding → 403 onboarding_incomplete
+    fresh = {"X-Session-Id": client.post("/api/v1/session")
+             .json()["session_id"]}
+    body = dict(fx["create_achievement_request"],
+                photo_id=upload_photo(client, fresh))
+    resp = client.post("/api/v1/achievements", headers=fresh, json=body)
+    assert resp.status_code == 403
+    assert resp.json()["error"]["code"] == "onboarding_incomplete"
+
+    # Sesión con onboarding completo → 201, approve, drafts
+    body = dict(fx["create_achievement_request"],
+                photo_id=upload_photo(client, ready))
+    resp = client.post("/api/v1/achievements", headers=ready, json=body)
+    assert resp.status_code == 201
+    ach = approve(client, ready, resp.json())
+
+    payload = dict(fx["generate_drafts_request_minimal"],
+                   achievement_revision=ach["revision"])
+    resp = client.post(f"/api/v1/achievements/{ach['id']}/drafts",
+                       headers=ready, json=payload)
+    assert resp.status_code == 201
+    drafts = resp.json()["drafts"]
+    assert {d["platform"] for d in drafts} == {"linkedin", "x"}
+    # voice_context omitido → snapshot del perfil (writing_sample minúsculas/casual)
+    x = next(d for d in drafts if d["platform"] == "x")
+    assert x["body"][0].islower()
