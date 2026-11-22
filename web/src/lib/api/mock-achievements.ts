@@ -20,7 +20,7 @@ const DEFAULT_TRANSCRIPT =
 const MAX_CHARS: Record<Platform, number> = { linkedin: 3000, x: 280 }
 
 interface Store {
-  achievements: Map<string, { owner: string; value: Achievement }>
+  achievements: Map<string, { owner: string; value: Achievement; updatedAt: number }>
   drafts: Map<string, { owner: string; value: Draft }>
 }
 const g = globalThis as typeof globalThis & { __trenSolarAchievements?: Store }
@@ -81,10 +81,25 @@ function draftBody(platform: Platform, facts: Fact[]): string {
   return text.length <= MAX_CHARS.x ? text : `${text.slice(0, MAX_CHARS.x - 1).replace(/\s+\S*$/, "")}…`
 }
 
-function owned<T>(map: Map<string, { owner: string; value: T }>, key: string, s: Session, kind: string): T | Response {
+function owned<T>(map: Map<string, { owner: string; value: T; updatedAt?: number }>, key: string, s: Session, kind: string): T | Response {
   const found = map.get(key)
   if (!found || found.owner !== s.id) return apiError(404, "not_found", `No existe ese ${kind}`)
+  if ("updatedAt" in found) found.updatedAt = Date.now()
   return found.value
+}
+
+/** Used by the portfolio mock: approved achievements of a session, by id. */
+export function findOwnedAchievement(sessionId: string, achievementId: string): Achievement | null {
+  const found = store.achievements.get(achievementId)
+  return found && found.owner === sessionId ? found.value : null
+}
+
+export function listAchievements(request: Request): Response {
+  const s = requireSession(request)
+  if (s instanceof Response) return s
+  const mine = [...store.achievements.values()].filter((e) => e.owner === s.id)
+  mine.sort((a, b) => b.updatedAt - a.updatedAt)
+  return Response.json(mine.map((e) => e.value))
 }
 
 function revisionConflict(current: number, sent: unknown): Response | null {
@@ -140,7 +155,7 @@ export async function createAchievement(request: Request): Promise<Response> {
     open_questions: questions,
     error: null,
   }
-  store.achievements.set(achievement.id, { owner: s.id, value: achievement })
+  store.achievements.set(achievement.id, { owner: s.id, value: achievement, updatedAt: Date.now() })
   return Response.json(achievement, { status: 201 })
 }
 

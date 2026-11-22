@@ -82,27 +82,6 @@ export interface MediaAsset {
   size_bytes?: number | null
 }
 
-export type AchievementStatus = "processing" | "needs_review" | "approved" | "failed"
-
-export interface AchievementFact {
-  id: string
-  category?: string | null
-  text: string
-  source_quote?: string | null
-  source: string
-}
-
-export interface Achievement {
-  id: string
-  input_type: string
-  status: AchievementStatus
-  revision: number
-  photo_id?: string | null
-  transcript: string
-  facts: AchievementFact[]
-  open_questions: { id: string; field: string; question: string }[]
-}
-
 export interface SocialConnectionStatus {
   platform: Platform
   status: ConnectionState
@@ -137,6 +116,8 @@ export interface Fact {
   source_quote?: string | null
   source: "transcript" | "user" | "mcp"
 }
+
+export type AchievementFact = Fact
 
 export interface OpenQuestion {
   id: string

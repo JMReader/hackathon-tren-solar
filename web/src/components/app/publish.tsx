@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronLeft, Download, Mic, Pencil, UserRound } from "lucide-react"
+import { ChevronLeft, Download, LayoutTemplate, Mic, Pencil, UserRound } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useState } from "react"
@@ -235,7 +235,12 @@ export function PublishAchievement() {
         <Link href={`/app/crear/${id}/revisar`} className={buttonStyles({ variant: "ghost" })}>
           <ChevronLeft aria-hidden /> Volver a revisar
         </Link>
-        <span className="ml-auto hidden text-xs text-ink-muted sm:inline">Editar un post no cambia el otro.</span>
+        <span className="ml-auto hidden text-xs text-ink-muted xl:inline">Editar un post no cambia el otro.</span>
+        {achievement.data?.status === "approved" && (
+          <Link href="/app/portfolio" className={buttonStyles({ variant: "ghost" })}>
+            <LayoutTemplate aria-hidden /> Ver en mi portfolio
+          </Link>
+        )}
         <Link href="/app/crear" className={buttonStyles({ variant: "outline" })}>
           <Mic aria-hidden /> Contar otro logro
         </Link>

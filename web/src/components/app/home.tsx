@@ -6,7 +6,7 @@ import { Orb } from "@/components/audio/orb"
 import { buttonStyles } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useAchievementEntries, useAchievements } from "@/lib/api/achievements"
+import { useAchievementEntries, useAchievementList, useStoredPortfolio } from "@/lib/api/achievements"
 import { cn } from "@/lib/utils"
 import {
   NeedsOnboarding,
@@ -23,10 +23,11 @@ const dateFormat = new Intl.DateTimeFormat("es-AR", { day: "numeric", month: "sh
 export function AppHome() {
   const { sessionId, profile, isLoading, ready } = useAppSession()
   const entries = useAchievementEntries(sessionId)
-  const results = useAchievements(
-    entries.map((e) => e.id),
-    sessionId,
-  )
+  const list = useAchievementList(sessionId)
+  const portfolio = useStoredPortfolio(sessionId)
+  const achievements = list.data ?? []
+  const createdAt = new Map(entries.map((e) => [e.id, e.createdAt]))
+  const approvedCount = achievements.filter((a) => a.status === "approved").length
 
   if (isLoading || !profile)
     return (
@@ -75,9 +76,18 @@ export function AppHome() {
               <h2 id="logros" className="text-[15px] font-medium text-ink">
                 Tus logros
               </h2>
-              {entries.length > 0 && <span className="text-xs text-ink-muted tabular-nums">{entries.length}</span>}
+              {achievements.length > 0 && <span className="text-xs text-ink-muted tabular-nums">{achievements.length}</span>}
             </div>
-            {entries.length === 0 ? (
+            {list.isPending ? (
+              <Card className="gap-3 p-5">
+                <Skeleton className="h-4 w-3/4 rounded-md" />
+                <Skeleton className="h-4 w-1/2 rounded-md" />
+              </Card>
+            ) : list.isError ? (
+              <Card variant="muted" className="p-5 text-[13px] text-ink-muted">
+                No pudimos cargar tus logros. Recargá la página.
+              </Card>
+            ) : achievements.length === 0 ? (
               <Card variant="muted" className="items-start gap-2 p-5">
                 <p className="text-sm text-ink">Todavía no contaste ningún logro.</p>
                 <p className="text-[13px] text-ink-muted">
@@ -86,32 +96,19 @@ export function AppHome() {
               </Card>
             ) : (
               <Card className="divide-y divide-divider overflow-hidden p-0">
-                {entries.map((entry, i) => {
-                  const q = results[i]
-                  if (q?.isPending)
-                    return (
-                      <div key={entry.id} className="flex items-center gap-4 px-5 py-4">
-                        <Skeleton className="h-4 flex-1 rounded-md" />
-                        <Skeleton className="h-6 w-20 rounded-full" />
-                      </div>
-                    )
-                  const a = q?.data
-                  if (!a)
-                    return (
-                      <div key={entry.id} className="px-5 py-4 text-[13px] text-ink-muted">
-                        No pudimos cargar este logro.
-                      </div>
-                    )
+                {achievements.map((a) => {
+                  const when = createdAt.get(a.id)
                   return (
                     <Link
-                      key={entry.id}
+                      key={a.id}
                       href={achievementHref(a)}
                       className="focus-ring group flex items-center gap-4 px-5 py-4 hover:bg-fill-soft"
                     >
                       <span className="min-w-0 flex-1">
                         <span className="line-clamp-2 text-sm leading-snug text-ink">{achievementTitle(a)}</span>
                         <span className="mt-1 block text-xs text-ink-muted">
-                          {dateFormat.format(new Date(entry.createdAt))} · {a.facts.length} hecho{a.facts.length === 1 ? "" : "s"}
+                          {when ? `${dateFormat.format(new Date(when))} · ` : ""}
+                          {a.facts.length} hecho{a.facts.length === 1 ? "" : "s"}
                         </span>
                       </span>
                       <StatusBadge status={a.status} />
@@ -144,11 +141,24 @@ export function AppHome() {
               <LayoutTemplate aria-hidden className="size-4" /> Tu portfolio
             </span>
             <p className="text-[13px] leading-relaxed text-ink-muted">
-              Elegí una plantilla y mostrá tus logros aprobados en una página propia.
+              {portfolio.data?.status === "published"
+                ? portfolio.data.published_revision === portfolio.data.revision
+                  ? `Publicado con ${portfolio.data.items.length} logro${portfolio.data.items.length === 1 ? "" : "s"}. Los nuevos aprobados se suman al abrirlo.`
+                  : "Publicado, con cambios nuevos sin publicar. Abrilo y tocá «Actualizar página»."
+                : approvedCount > 0
+                  ? `${approvedCount} logro${approvedCount === 1 ? " aprobado listo" : "s aprobados listos"} para mostrar. Elegí plantilla y colores.`
+                  : "Se arma solo con tus logros aprobados. Elegí plantilla y colores."}
             </p>
-            <Link href="/portfolio" className={cn(buttonStyles({ variant: "outline", size: "sm" }), "self-start")}>
-              Ver portfolio <ArrowRight aria-hidden />
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/app/portfolio" className={cn(buttonStyles({ variant: "outline", size: "sm" }), "self-start")}>
+                {portfolio.data ? "Editar portfolio" : "Armar portfolio"} <ArrowRight aria-hidden />
+              </Link>
+              {portfolio.data?.status === "published" && portfolio.data.slug && (
+                <Link href={`/p/${portfolio.data.slug}`} target="_blank" className={buttonStyles({ variant: "ghost", size: "sm" })}>
+                  Ver página
+                </Link>
+              )}
+            </div>
           </Card>
         </aside>
       </div>

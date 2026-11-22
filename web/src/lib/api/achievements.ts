@@ -1,13 +1,17 @@
 "use client"
 
-import { useMutation, useQueries, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query"
 import { useSyncExternalStore } from "react"
 import { toast } from "@/components/ui/toast"
 import { achievementsIndex, type AchievementEntry } from "@/lib/achievements-index"
+import { fetchPortfolio } from "@/portfolio/portfolio-api"
+import { getStoredPortfolioId } from "@/portfolio/storage"
 import { ApiRequestError, apiFetch } from "./client"
 import type { Achievement, ApiError, Draft, Fact, GenerateDraftsResponse, Platform } from "./types"
 
 const achievementKey = (id: string) => ["achievement", id] as const
+/** Same key the portfolio editor uses, so both read one list. */
+const listKey = (sessionId: string | undefined) => ["achievements", sessionId] as const
 const draftKey = (id: string) => ["draft", id] as const
 
 export function apiErrorMessage(error: unknown, fallback: string) {
@@ -59,13 +63,23 @@ export function useAchievement(id: string | undefined, sessionId: string | undef
   })
 }
 
-export function useAchievements(ids: string[], sessionId: string | undefined) {
-  return useQueries({
-    queries: ids.map((id) => ({
-      queryKey: achievementKey(id),
-      enabled: Boolean(sessionId),
-      queryFn: () => apiFetch<Achievement>(`/achievements/${id}`),
-    })),
+export function useAchievementList(sessionId: string | undefined) {
+  return useQuery({
+    queryKey: listKey(sessionId),
+    enabled: Boolean(sessionId),
+    queryFn: () => apiFetch<Achievement[]>("/achievements"),
+  })
+}
+
+export function useStoredPortfolio(sessionId: string | undefined) {
+  return useQuery({
+    queryKey: ["portfolio-summary", sessionId],
+    enabled: Boolean(sessionId),
+    queryFn: async () => {
+      const id = getStoredPortfolioId()
+      if (!id) return null
+      return fetchPortfolio(id).catch(() => null)
+    },
   })
 }
 
@@ -88,6 +102,7 @@ export function useCreateAchievement(sessionId: string | undefined) {
     },
     onSuccess: (achievement) => {
       queryClient.setQueryData(achievementKey(achievement.id), achievement)
+      void queryClient.invalidateQueries({ queryKey: listKey(sessionId) })
       if (sessionId) achievementsIndex.add(sessionId, achievement.id)
     },
   })
@@ -104,7 +119,10 @@ export function useUpdateFacts(id: string) {
         json: { revision: current?.revision ?? 1, facts },
       })
     },
-    onSuccess: (a) => queryClient.setQueryData(achievementKey(id), a),
+    onSuccess: (a) => {
+      queryClient.setQueryData(achievementKey(id), a)
+      void queryClient.invalidateQueries({ queryKey: ["achievements"] })
+    },
     onError: (error) => onConflictOrError(queryClient, achievementKey(id), error),
   })
 }
@@ -133,6 +151,7 @@ export function useApproveAndDraft(id: string, sessionId: string | undefined) {
         ids[d.platform] = d.id
       }
       if (sessionId) achievementsIndex.setDrafts(sessionId, id, ids)
+      void queryClient.invalidateQueries({ queryKey: listKey(sessionId) })
     },
     onError: (error) => {
       if (error instanceof ApiRequestError && error.status === 502) {

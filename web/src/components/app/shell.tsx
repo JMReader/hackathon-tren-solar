@@ -14,7 +14,7 @@ type NavItem = { href: string; label: string; short: string; icon: LucideIcon; m
 const NAV: NavItem[] = [
   { href: "/app", label: "Inicio", short: "Inicio", icon: House, match: (p) => p === "/app" },
   { href: "/app/crear", label: "Crear post", short: "Crear", icon: Mic, match: (p) => p.startsWith("/app/crear") },
-  { href: "/portfolio", label: "Portfolio", short: "Portfolio", icon: LayoutTemplate, match: (p) => p.startsWith("/portfolio") },
+  { href: "/app/portfolio", label: "Portfolio", short: "Portfolio", icon: LayoutTemplate, match: (p) => p.startsWith("/app/portfolio") },
   { href: "/onboarding", label: "Mi perfil", short: "Perfil", icon: UserRound, match: (p) => p.startsWith("/onboarding") },
 ]
 

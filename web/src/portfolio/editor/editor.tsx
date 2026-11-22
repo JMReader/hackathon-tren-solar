@@ -142,6 +142,10 @@ type PortfolioEditorProps = {
   onPaletteChange?: (paletteId: string) => Promise<void>
   onCvDownloadableChange?: (value: boolean) => Promise<void>
   onPublish?: () => Promise<void>
+  /** Rendered inside the /app shell: no brand header, action bar above the bottom nav. */
+  embedded?: boolean
+  /** Published page exists but is behind the draft (e.g. new approved achievements). */
+  outdatedSlug?: string | null
 }
 
 export function PortfolioEditor({
@@ -153,6 +157,8 @@ export function PortfolioEditor({
   onPaletteChange,
   onCvDownloadableChange,
   onPublish,
+  embedded = false,
+  outdatedSlug = null,
 }: PortfolioEditorProps) {
   const [templateId, setTemplateId] = useState(portfolio.template_id)
   const [paletteId, setPaletteId] = useState(portfolio.palette.id)
@@ -253,7 +259,7 @@ export function PortfolioEditor({
     <div className="flex flex-1 flex-col lg:grid lg:h-dvh lg:flex-none lg:grid-cols-[380px_1fr] lg:grid-rows-[minmax(0,1fr)]">
       <aside className="hidden bg-night px-10 py-12 [scrollbar-color:var(--color-slate-hover)_transparent] [scrollbar-width:thin] lg:flex lg:flex-col lg:gap-10 lg:overflow-y-auto">
         <header className="flex flex-col gap-2">
-          <p className="font-display text-3xl tracking-display text-inverse">Tren Solar</p>
+          <p className="font-display text-3xl tracking-display text-inverse">{embedded ? "Diseño" : "Tren Solar"}</p>
           <p className="text-sm leading-relaxed text-on-dark-muted">Elegí plantilla y colores. Lo que dice ya lo aprobaste vos.</p>
         </header>
         <section className="-mx-2 flex flex-col gap-3">
@@ -272,7 +278,7 @@ export function PortfolioEditor({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col lg:min-h-0 lg:bg-cream">
-        <div className="flex flex-col gap-1 px-4 pt-8 lg:hidden">
+        <div className={cn("flex flex-col gap-1 px-4 pt-8 lg:hidden", embedded && "hidden")}>
           <p className="font-display text-2xl tracking-display text-inverse">Tren Solar</p>
           <p className="text-[13px] text-on-dark-muted">Lo que dice ya lo aprobaste vos.</p>
         </div>
@@ -327,7 +333,12 @@ export function PortfolioEditor({
             </div>
           </div>
 
-          <div className="sticky bottom-0 -mx-4 mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-hairline bg-night/90 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:static lg:mx-0 lg:mt-6 lg:bg-transparent lg:px-0 lg:pt-6 lg:pb-0 lg:backdrop-blur-none">
+          <div
+            className={cn(
+              "sticky -mx-4 mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-hairline bg-night/90 px-4 py-3 backdrop-blur lg:static lg:mx-0 lg:mt-6 lg:bg-transparent lg:px-0 lg:pt-6 lg:pb-0 lg:backdrop-blur-none",
+              embedded ? "bottom-[calc(4.5rem+env(safe-area-inset-bottom))]" : "bottom-0 pb-[calc(0.75rem+env(safe-area-inset-bottom))]",
+            )}
+          >
             <label className="flex cursor-pointer items-center gap-3 text-sm text-inverse lg:text-ink">
               <Switch checked={cvDownloadable} onCheckedChange={(next) => void applyCvDownloadable(next)} />
               CV descargable
@@ -343,9 +354,20 @@ export function PortfolioEditor({
             ) : (
               !isDemo &&
               onPublish && (
-                <Button className="ml-auto" disabled={publishing || saving} onClick={() => void handlePublish()}>
-                  Publicar
-                </Button>
+                <span className="ml-auto flex flex-wrap items-center gap-2">
+                  {outdatedSlug && (
+                    <Link
+                      href={`/p/${outdatedSlug}`}
+                      target="_blank"
+                      className={cn(buttonStyles({ variant: "ghost" }), "text-inverse hover:bg-slate lg:text-ink lg:hover:bg-fill-soft")}
+                    >
+                      Ver versión publicada
+                    </Link>
+                  )}
+                  <Button disabled={publishing || saving} onClick={() => void handlePublish()}>
+                    {outdatedSlug ? "Actualizar página" : "Publicar"}
+                  </Button>
+                </span>
               )
             )}
           </div>
