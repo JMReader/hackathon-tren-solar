@@ -1,0 +1,32 @@
+{
+  "achievement_id": "ach_01J9X8K2M4",
+  "achievement_revision": 2,
+  "drafts": [
+    {
+      "id": "drf_li_01J9X9001",
+      "achievement_id": "ach_01J9X8K2M4",
+      "achievement_revision": 2,
+      "platform": "linkedin",
+      "revision": 1,
+      "status": "ready_to_publish",
+      "photo_id": "med_01J9X8A7B6",
+      "char_count": 435,
+      "max_chars": 3000,
+      "used_fact_ids": ["fact_1", "fact_2"],
+      "body": "Este finde en Jujuy trabajamos en equipo de 3 en una app de turnos médicos en React para una clínica local.\n\nMe tocó diseñar todas las pantallas en Figma, bajar el flujo de reserva a 3 pasos claros y maquetar los componentes base en React. Todavía no medimos uso en calle, pero el foco estuvo en que sacar un turno no se sienta como llenar un trámite.\n\n¿Qué miran primero cuando diseñan un flujo de reservas para gente con poco tiempo?"
+    },
+    {
+      "id": "drf_x_01J9X9002",
+      "achievement_id": "ach_01J9X8K2M4",
+      "achievement_revision": 2,
+      "platform": "x",
+      "revision": 1,
+      "status": "ready_to_publish",
+      "photo_id": "med_01J9X8A7B6",
+      "char_count": 218,
+      "max_chars": 280,
+      "used_fact_ids": ["fact_1", "fact_2"],
+      "body": "este finde en jujuy armamos entre 3 una app de turnos médicos para una clínica local. diseñé las pantallas en figma, bajé la reserva a 3 pasos y maqueté la base en react. menos vuelta para sacar un turno, más claridad."
+    }
+  ]
+}

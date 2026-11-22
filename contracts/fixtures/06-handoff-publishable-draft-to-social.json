@@ -1,0 +1,21 @@
+{
+  "with_photo_example": {
+    "draft_id": "drf_x_01J9X9002",
+    "draft_revision": 1,
+    "platform": "x",
+    "body": "este finde en jujuy armamos entre 3 una app de turnos médicos para una clínica local. diseñé las pantallas en figma, bajé la reserva a 3 pasos y maqueté la base en react. menos vuelta para sacar un turno, más claridad.",
+    "media": {
+      "photo_id": "med_01J9X8A7B6",
+      "mime_type": "image/jpeg",
+      "local_path": "/private-storage/media/med_01J9X8A7B6.jpg",
+      "alt_text": "Vista previa del flujo de reserva de turnos en 3 pasos"
+    }
+  },
+  "text_only_example": {
+    "draft_id": "drf_li_01J9X9001",
+    "draft_revision": 1,
+    "platform": "linkedin",
+    "body": "Este finde en Jujuy trabajamos en equipo de 3 en una app de turnos médicos en React para una clínica local.\n\nMe tocó diseñar todas las pantallas en Figma, bajar el flujo de reserva a 3 pasos claros y maquetar los componentes base en React. Todavía no medimos uso en calle, pero el foco estuvo en que sacar un turno no se sienta como llenar un trámite.\n\n¿Qué miran primero cuando diseñan un flujo de reservas para gente con poco tiempo?",
+    "media": null
+  }
+}

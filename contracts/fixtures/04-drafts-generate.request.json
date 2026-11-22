@@ -1,0 +1,20 @@
+{
+  "achievement_revision": 2,
+  "platforms": ["linkedin", "x"],
+  "voice_context": {
+    "language": "es-AR",
+    "author_hint": "Diseñadora UX/UI junior en Jujuy",
+    "sample_posts": {
+      "linkedin": [
+        "La semana pasada rediseñé el checkout de un proyecto de la facu.\n\nSacamos 4 campos que nadie entendía y pasamos todo a una sola pantalla. Menos decoración, más claridad.\n\n¿Qué es lo primero que miran cuando auditan un formulario?"
+      ],
+      "x": [
+        "diseñar formularios cortos parece fácil hasta que te toca pelear cada campo que sobra. hoy bajamos un flujo de 7 pasos a 3 en figma."
+      ]
+    },
+    "preferences": {
+      "use_emojis": false,
+      "use_hashtags": false
+    }
+  }
+}
