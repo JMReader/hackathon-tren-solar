@@ -61,7 +61,7 @@ def test_callback_stores_connection_and_redirects_to_front(flow, env):
     flow.start(OWNER, Platform.LINKEDIN, "/crear/abc/publicar")
     url = flow.complete(Platform.LINKEDIN, "state-1", "code-1", None)
     assert url.startswith("http://web.test/crear/abc/publicar?")
-    assert query(url) == {"social": "linkedin", "result": "connected"}
+    assert query(url) == {"social": "linkedin", "result": "connected", "connected": "linkedin"}
     status = env.service.connection_status(OWNER, Platform.LINKEDIN)
     assert (status.status, status.account_handle) == (ConnectionState.CONNECTED, "Mayko")
 
@@ -93,6 +93,7 @@ def test_provider_denial_redirects_with_reason(flow, env):
     flow.start(OWNER, Platform.LINKEDIN, None)
     url = flow.complete(Platform.LINKEDIN, "state-1", None, "user_cancelled_authorize")
     assert query(url) == {"social": "linkedin", "result": "error", "reason": "user_cancelled_authorize"}
+    assert "connected" not in query(url)
     assert urlsplit(url).path == "/crear"
     assert env.service.connection_status(OWNER, Platform.LINKEDIN).status is ConnectionState.DISCONNECTED
 

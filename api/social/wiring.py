@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import httpx2
 
 from .adapters import default_adapters
+from .apify import ApifyLinkedInPosts
 from .linkedin import LinkedInAdapter
 from .models import Platform
 from .oauth import RefreshingConnectionStore
@@ -21,7 +22,8 @@ class Providers:
 
 
 def build_providers(settings: Settings, store: ConnectionStore, http: httpx2.Client) -> Providers:
-    linkedin = LinkedInAdapter(settings.linkedin, http) if settings.linkedin else None
+    posts = ApifyLinkedInPosts(settings.apify, http) if settings.apify else None
+    linkedin = LinkedInAdapter(settings.linkedin, http, posts=posts) if settings.linkedin else None
     x = XAdapter(settings.x, http) if settings.x else None
     return Providers(
         adapters=default_adapters(linkedin, x),

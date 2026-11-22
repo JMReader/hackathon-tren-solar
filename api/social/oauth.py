@@ -143,7 +143,11 @@ class ConnectionFlow:
         return self._redirect(pending, "connected")
 
     def _redirect(self, pending: PendingAuthorization, result: str, reason: str | None = None) -> str:
-        query = {"social": pending.platform.value, "result": result} | ({"reason": reason} if reason else {})
+        query = {"social": pending.platform.value, "result": result}
+        if reason:
+            query["reason"] = reason
+        if result == "connected":
+            query["connected"] = pending.platform.value
         separator = "&" if "?" in pending.return_to else "?"
         return f"{self._web_base_url}{pending.return_to}{separator}{urlencode(query)}"
 

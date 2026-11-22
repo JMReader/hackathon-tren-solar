@@ -6,7 +6,7 @@ from pathlib import Path
 import httpx2
 
 from social.crypto import TokenCipher
-from social.models import ConnectionState, Platform, PublishableDraft
+from social.models import Platform, PublishableDraft
 from social.oauth import ConnectionFlow
 from social.pg_store import PgConnectionStore, PgDatabase, PgOAuthStateStore, PgPublicationStore
 from social.service import SocialService
@@ -37,17 +37,11 @@ class SocialStyleReader:
     def __init__(self, social: SocialService) -> None:
         self._social = social
 
-    def fetch_recent_posts(self, session_id: str, platform: str, max_posts: int) -> StyleOutcome:
-        network = Platform(platform)
-        status = self._social.connection_status(session_id, network)
-        if status.status is not ConnectionState.CONNECTED:
-            return StyleOutcome(status="skipped", message=status.reason)
-        if not status.can_read_posts:
-            return StyleOutcome(
-                status="unavailable",
-                message=f"{network.label} no permite leer tus posts desde la app. Usá la muestra de escritura.",
-            )
-        return StyleOutcome(status="unavailable", message="La lectura de posts todavía no está implementada.")
+    def fetch_recent_posts(
+        self, session_id: str, platform: str, max_posts: int, profile_url: str | None = None
+    ) -> StyleOutcome:
+        result = self._social.recent_posts(session_id, Platform(platform), max_posts, profile_url)
+        return StyleOutcome(status=result.status.value, posts=list(result.posts), message=result.message)
 
 
 @dataclass(frozen=True)

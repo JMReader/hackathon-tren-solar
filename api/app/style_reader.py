@@ -20,7 +20,8 @@ class StyleReaderPort(Protocol):
     vive en `api/social` (Issue #5, Mayko) usando OAuth + can_read_posts."""
 
     def fetch_recent_posts(self, session_id: str, platform: Platform,
-                           max_posts: int) -> StyleOutcome:
+                           max_posts: int,
+                           profile_url: str | None = None) -> StyleOutcome:
         ...
 
 
@@ -35,7 +36,8 @@ class FakeStyleReader:
         self.posts = posts or {}
 
     def fetch_recent_posts(self, session_id: str, platform: Platform,
-                           max_posts: int) -> StyleOutcome:
+                           max_posts: int,
+                           profile_url: str | None = None) -> StyleOutcome:
         available = self.posts.get(platform, [])
         if not available:
             return StyleOutcome(status="unavailable",

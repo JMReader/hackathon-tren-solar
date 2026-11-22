@@ -164,7 +164,8 @@ class SessionService:
         any_success = False
         for platform in dict.fromkeys(req.platforms):
             outcome = self.style_reader.fetch_recent_posts(
-                session_id, platform, req.max_posts_per_platform)
+                session_id, platform, req.max_posts_per_platform,
+                req.linkedin_profile_url if platform == "linkedin" else None)
             result = StyleSyncResult(
                 status=outcome.status, posts_imported=len(outcome.posts),
                 message=outcome.message)

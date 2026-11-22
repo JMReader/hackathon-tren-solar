@@ -69,6 +69,7 @@ export interface SetAuthorProfilePhotoRequest {
 export interface SyncStyleRequest {
   platforms?: Platform[]
   max_posts_per_platform?: number
+  linkedin_profile_url?: string | null
 }
 
 export interface CompleteOnboardingRequest {
