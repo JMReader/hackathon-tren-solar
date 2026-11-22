@@ -4,6 +4,7 @@ import { House, LayoutTemplate, Mic, UserRound, type LucideIcon } from "lucide-r
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Suspense, type ReactNode } from "react"
+import { SocialSync } from "@/components/social-sync"
 import { useProfile, useSessionId } from "@/lib/api/hooks"
 import { getPhotoPreview } from "@/lib/photo-preview"
 import { useIsClient } from "@/lib/use-is-client"
@@ -107,6 +108,9 @@ function BottomNav({ pathname }: { pathname: string }) {
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-1 flex-col bg-night lg:grid lg:grid-cols-[264px_1fr]">
+      <Suspense fallback={null}>
+        <SocialSync />
+      </Suspense>
       <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:justify-between lg:px-6 lg:py-10">
         <div className="flex flex-col gap-10">
           <Link href="/" className="focus-ring rounded-md px-2 font-display text-[28px] tracking-display text-inverse">

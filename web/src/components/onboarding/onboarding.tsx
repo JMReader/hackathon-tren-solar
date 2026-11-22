@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { SocialSync } from "@/components/social-sync"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { DiscoveryConsent } from "./discovery-consent"
 import { ArrowRight, Camera, Check, ChevronLeft, FileCheck, FileText, ImagePlus } from "lucide-react"
@@ -363,6 +364,7 @@ function Wizard({
         </>
       }
     >
+      <SocialSync />
       <div
         key={isDone ? "done" : step}
         className="animate-step-in rounded-[22px] bg-paper p-5 shadow-raised motion-reduce:animate-none sm:p-6 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none"
@@ -673,7 +675,6 @@ function StepVoice({
 
   return (
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:gap-12">
-      <SocialSync />
       <VoiceSample
         value={sample}
         onChange={setSample}
@@ -701,24 +702,7 @@ function StepVoice({
   )
 }
 
-function SocialSync() {
-  const router = useRouter()
-  const { mutate } = useSyncStyle(useSessionId().data)
-  const handled = useRef(false)
-  useEffect(() => {
-    if (handled.current) return
-    const params = new URLSearchParams(window.location.search)
-    const connected = params.get("connected")
-    if (connected === "linkedin" || connected === "x") {
-      handled.current = true
-      if (connected === "x") mutate({ platforms: ["x"] })
-      params.delete("connected")
-      const qs = params.toString()
-      router.replace(qs ? `/onboarding?${qs}` : "/onboarding", { scroll: false })
-    }
-  }, [mutate, router])
-  return null
-}
+
 
 function SocialCard({
   platform,
