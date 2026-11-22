@@ -22,9 +22,10 @@ class BlockedAdapter:
         return None
 
 
-def default_adapters() -> dict[Platform, SocialAdapter]:
+def default_adapters(linkedin: SocialAdapter | None = None) -> dict[Platform, SocialAdapter]:
     return {
-        Platform.LINKEDIN: BlockedAdapter(
+        Platform.LINKEDIN: linkedin
+        or BlockedAdapter(
             Platform.LINKEDIN,
             "La publicación directa en LinkedIn no está disponible: la app de desarrollador requiere una "
             "página de empresa. Abrí LinkedIn con el texto listo o copialo.",

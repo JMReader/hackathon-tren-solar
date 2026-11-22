@@ -6,6 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from social.crypto import TokenCipher
 from social.memory import InMemoryConnectionStore, InMemoryPublicationStore
 from social.models import Connection, Platform, ProviderOutcome, Publication, PublishableDraft, PublishableMedia
 from social.service import SocialService
@@ -82,7 +83,7 @@ class Env:
 @pytest.fixture
 def env() -> Env:
     adapters = {platform: FakeAdapter(platform) for platform in Platform}
-    connections = InMemoryConnectionStore()
+    connections = InMemoryConnectionStore(TokenCipher(TokenCipher.generate_key()))
     drafts = DraftsByOwner()
     clock = [NOW]
     ids = iter(f"pub-{n}" for n in range(1, 1000))

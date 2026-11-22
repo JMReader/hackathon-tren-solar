@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlsplit
 import pytest
 from conftest import KEY, NOW, OWNER
 from social.adapters import default_adapters
+from social.crypto import TokenCipher
 from social.memory import InMemoryConnectionStore, InMemoryPublicationStore
 from social.models import ConnectionState, Platform, ProviderOutcome, PublicationStatus
 from social.service import Conflict, InvalidRequest, NotFound, SocialService
@@ -64,7 +65,12 @@ class TestConnectionStatus:
         )
 
     def test_default_adapters_never_pretend_to_publish(self):
-        service = SocialService(default_adapters(), InMemoryConnectionStore(), InMemoryPublicationStore(), {})
+        service = SocialService(
+            default_adapters(),
+            InMemoryConnectionStore(TokenCipher(TokenCipher.generate_key())),
+            InMemoryPublicationStore(),
+            {},
+        )
         rows = [service.connection_status(OWNER, p) for p in Platform]
         assert all(r.status is ConnectionState.ACCESS_UNAVAILABLE and r.reason for r in rows)
         assert not any(r.can_publish_text or r.can_publish_image for r in rows)

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
+from .crypto import TokenCipher
 from .models import Connection, Platform, PublicationRecord
 
 
@@ -30,11 +33,17 @@ class InMemoryPublicationStore:
 
 
 class InMemoryConnectionStore:
-    def __init__(self) -> None:
-        self._connections: dict[tuple[str, Platform], Connection] = {}
+    def __init__(self, cipher: TokenCipher) -> None:
+        self._cipher = cipher
+        self._connections: dict[tuple[str, Platform], tuple[Connection, bytes]] = {}
 
     def get(self, owner_id: str, platform: Platform) -> Connection | None:
-        return self._connections.get((owner_id, platform))
+        stored = self._connections.get((owner_id, platform))
+        if stored is None:
+            return None
+        connection, encrypted_token = stored
+        return replace(connection, access_token=self._cipher.decrypt(encrypted_token))
 
     def put(self, owner_id: str, connection: Connection) -> None:
-        self._connections[(owner_id, connection.platform)] = connection
+        encrypted_token = self._cipher.encrypt(connection.access_token)
+        self._connections[(owner_id, connection.platform)] = (replace(connection, access_token=""), encrypted_token)

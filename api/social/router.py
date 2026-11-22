@@ -1,11 +1,20 @@
 from collections.abc import Callable
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, Header, Response
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Body, Depends, Header, Response
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
-from .models import AssistedShare, ConnectionState, Platform, Publication, PublicationStatus, SocialConnectionStatus
+from .models import (
+    AssistedShare,
+    Platform,
+    Publication,
+    PublicationStatus,
+    SocialConnectionStatus,
+    StartSocialConnectionRequest,
+    StartSocialConnectionResponse,
+)
+from .oauth import ConnectionFlow, ProviderUnavailable
 from .service import SocialError, SocialService
 
 PENDING = (PublicationStatus.PUBLISHING, PublicationStatus.UNKNOWN)
@@ -27,7 +36,7 @@ def _error(error: SocialError) -> JSONResponse:
     )
 
 
-def create_router(service: SocialService, current_owner: Callable[..., str]) -> APIRouter:
+def create_router(service: SocialService, flow: ConnectionFlow, current_owner: Callable[..., str]) -> APIRouter:
     router = APIRouter(tags=["social"])
     Owner = Annotated[str, Depends(current_owner)]
 
@@ -35,21 +44,27 @@ def create_router(service: SocialService, current_owner: Callable[..., str]) -> 
     def get_connection(platform: Platform, owner_id: Owner) -> SocialConnectionStatus:
         return service.connection_status(owner_id, platform)
 
-    @router.post("/social/{platform}/connection", response_model=SocialConnectionStatus)
-    def start_connection(platform: Platform, owner_id: Owner) -> JSONResponse:
-        status = service.connection_status(owner_id, platform)
-        if status.status is ConnectionState.ACCESS_UNAVAILABLE:
-            return JSONResponse(status_code=503, content=status.model_dump(mode="json"))
-        return JSONResponse(
-            status_code=501,
-            content={
-                "error": {
-                    "code": "OAUTH_NOT_IMPLEMENTED",
-                    "message": f"La conexión con {platform.label} todavía no está implementada.",
-                    "retryable": False,
-                }
-            },
-        )
+    @router.post("/social/{platform}/connection", response_model=StartSocialConnectionResponse)
+    def start_connection(
+        platform: Platform,
+        owner_id: Owner,
+        request: Annotated[StartSocialConnectionRequest | None, Body()] = None,
+    ) -> StartSocialConnectionResponse | JSONResponse:
+        try:
+            return flow.start(owner_id, platform, request.return_to if request else None)
+        except ProviderUnavailable as unavailable:
+            return JSONResponse(status_code=503, content=unavailable.status.model_dump(mode="json"))
+        except SocialError as error:
+            return _error(error)
+
+    @router.get("/social/{platform}/callback", response_model=None, status_code=302)
+    def oauth_callback(
+        platform: Platform, state: str, code: str | None = None, error: str | None = None
+    ) -> RedirectResponse | JSONResponse:
+        try:
+            return RedirectResponse(flow.complete(platform, state, code, error), status_code=302)
+        except SocialError as failure:
+            return _error(failure)
 
     @router.get("/drafts/{draft_id}/assisted-share", response_model=AssistedShare)
     def get_assisted_share(draft_id: str, owner_id: Owner) -> AssistedShare | JSONResponse:

@@ -5,6 +5,12 @@ from typing import Protocol
 from .models import Connection, Platform, ProviderOutcome, Publication, PublicationRecord, PublishableDraft
 
 
+class OAuthError(Exception):
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+        self.code = code
+
+
 class SocialAdapter(Protocol):
     platform: Platform
     required_scopes: frozenset[str]
@@ -21,8 +27,18 @@ class DraftSource(Protocol):
     def get(self, owner_id: str, draft_id: str) -> PublishableDraft | None: ...
 
 
+class OAuthProvider(Protocol):
+    platform: Platform
+
+    def authorization_url(self, state: str) -> str: ...
+
+    def complete(self, code: str) -> Connection: ...
+
+
 class ConnectionStore(Protocol):
     def get(self, owner_id: str, platform: Platform) -> Connection | None: ...
+
+    def put(self, owner_id: str, connection: Connection) -> None: ...
 
 
 class PublicationStore(Protocol):

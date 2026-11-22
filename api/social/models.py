@@ -66,6 +66,16 @@ class Publication(BaseModel):
     error: ErrorDetail | None = None
 
 
+class StartSocialConnectionRequest(BaseModel):
+    return_to: str | None = None
+
+
+class StartSocialConnectionResponse(BaseModel):
+    platform: Platform
+    authorization_url: str
+    state: str
+
+
 class AssistedShare(BaseModel):
     draft_id: str
     draft_revision: int
@@ -119,6 +129,7 @@ class Connection:
     access_token: str = field(repr=False)
     scopes: frozenset[str] = frozenset()
     expires_at: datetime | None = None
+    account_id: str | None = None
     account_handle: str | None = None
 
 
