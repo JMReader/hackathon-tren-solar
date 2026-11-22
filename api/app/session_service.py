@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import mimetypes
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -80,8 +81,9 @@ class SessionService:
         return session_id
 
     def demo_login(self, email: str, password: str) -> LoginResponse:
-        """Login de pitch (docs/spec-login-demo.md): cuenta fija → sesión real
-        con el nombre visible en el perfil. Mismo 401 para cualquier fallo."""
+        """Login de pitch (docs/spec-login-demo.md): cuenta fija → sesión
+        estable por cuenta (find-or-create), así cada integrante vuelve
+        siempre a su espacio. Mismo 401 para cualquier fallo."""
         normalized = email.strip().lower()
         account = next(
             (a for a in self.demo_accounts
@@ -91,11 +93,31 @@ class SessionService:
             raise ApiError(401, "invalid_credentials",
                            "Correo o contraseña incorrectos.")
         display_name = str(account.get("display_name") or normalized)
-        created = self.create_session()
-        self.update_profile(created.session_id, UpdateAuthorProfileRequest(
-            revision=1, profession=display_name))
-        return LoginResponse(session_id=created.session_id,
+        session_id = self._demo_session(normalized)
+        profile, _ = self._load(session_id)
+        if profile.profession != display_name:
+            self.update_profile(session_id, UpdateAuthorProfileRequest(
+                revision=profile.revision, profession=display_name))
+        return LoginResponse(session_id=session_id,
                              display_name=display_name)
+
+    def _demo_session(self, account_key: str) -> str:
+        """Sesión determinística por cuenta: reusa la existente (y refresca
+        su TTL vía save_session idempotente) o crea una nueva con perfil."""
+        digest = hashlib.sha256(account_key.encode()).hexdigest()[:12]
+        session_id = f"ses_demo_{digest}"
+        now = _now()
+        self.store.save_session(
+            session_id, now.isoformat(),
+            (now + timedelta(hours=self.ttl_hours)).isoformat())
+        if self.store.get_profile(session_id) is None:
+            profile = AuthorProfile(
+                session_id=session_id, onboarding_status="not_started",
+                revision=1, ready_for_achievement=False,
+                style_sync=_skipped_sync())
+            self.store.save_profile(
+                profile, {"linkedin": [], "x": []}, now.isoformat())
+        return session_id
 
     # --- perfil ---
 

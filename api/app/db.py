@@ -201,7 +201,7 @@ class Store:
 
     def save_session(self, session_id: str, created_at: str, expires_at: str) -> None:
         with self._lock, self._conn() as conn:
-            conn.execute("INSERT INTO sessions VALUES (?,?,?)",
+            conn.execute("INSERT OR REPLACE INTO sessions VALUES (?,?,?)",
                          (session_id, created_at, expires_at))
 
     def get_session(self, session_id: str) -> sqlite3.Row | None:

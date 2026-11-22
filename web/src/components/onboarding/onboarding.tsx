@@ -283,9 +283,10 @@ function Wizard({
 
   function canGoTo(n: number) {
     if (isDone) return false
+    if (n < step) return true
     if (!(visited.has(n) || n === step + 1)) return false
-    if (n > step && n >= 2 && !step1Done) return false
-    if (n > step && n >= 3 && !step2Done) return false
+    if (n >= 2 && !step1Done) return false
+    if (n >= 3 && !step2Done) return false
     return true
   }
 
@@ -315,6 +316,8 @@ function Wizard({
         goTo(3)
       } else {
         await complete.mutateAsync()
+        router.push("/app/crear")
+        return
       }
     } catch {
       // el toast del hook ya avisa; no avanzamos si el guardado falló
@@ -329,13 +332,13 @@ function Wizard({
   }
   if (step === 2 && !step2Done)
     missing.push(`contarnos algo (al menos ${MIN_SAMPLE} caracteres) o conectar una red`)
-  if (step === 3 && !profile.ready_for_achievement)
+  if (step === 3 && !(step1Done && step2Done))
     missing.push("completar los pasos anteriores")
 
   const canContinue =
     (step === 1 && step1Done) ||
     (step === 2 && step2Done) ||
-    (step === 3 && profile.ready_for_achievement)
+    (step === 3 && step1Done && step2Done)
 
   const current = STEPS[step - 1]
 
@@ -414,7 +417,7 @@ function Wizard({
             </p>
           )}
           <div className="flex items-center gap-2">
-            {step > 1 && (
+            {step > 1 ? (
               <Button
                 variant="ghost"
                 className="text-inverse hover:bg-slate lg:text-ink lg:hover:bg-fill-soft"
@@ -423,6 +426,14 @@ function Wizard({
                 <ChevronLeft aria-hidden />
                 Atrás
               </Button>
+            ) : (
+              <Link
+                href="/app"
+                className={buttonStyles({ variant: "ghost" }) + " text-inverse hover:bg-slate lg:text-ink lg:hover:bg-fill-soft"}
+              >
+                <ChevronLeft aria-hidden />
+                Salir
+              </Link>
             )}
             <Button className="ml-auto" disabled={!canContinue} onClick={() => next()}>
               {step === LAST_STEP ? "Terminar" : "Continuar"}

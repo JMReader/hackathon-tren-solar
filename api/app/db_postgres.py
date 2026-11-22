@@ -43,7 +43,7 @@ class PostgresStore:
         with self._lock, self._conn() as conn:
             conn.execute(
                 """INSERT INTO sessions (id, created_at, expires_at) VALUES (%s, %s, %s)
-                   ON CONFLICT (id) DO NOTHING""",
+                   ON CONFLICT (id) DO UPDATE SET expires_at = EXCLUDED.expires_at""",
                 (session_id, created_at, expires_at),
             )
 
