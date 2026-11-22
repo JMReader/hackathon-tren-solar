@@ -25,3 +25,7 @@ El PDF original está conservado en `extras/assets/inspiracion-original.pdf` den
 ## Próxima decisión
 
 Juan y el equipo deben elegir el usuario inicial, el recorrido mínimo y el nombre antes de abrir implementación. Las propuestas del PDF no son requisitos aprobados ni evidencia de demanda.
+
+## Cerebro compartido del equipo
+
+La memoria del equipo vive en otro repositorio privado: [hackathon-tren-solar-brain](https://github.com/JMReader/hackathon-tren-solar-brain). Ver [prompt de incorporación](https://github.com/JMReader/hackathon-tren-solar-brain/blob/main/ONBOARDING.md). Cada compañero usa su propia cuenta y espacio; el vault personal de Juan no es necesario para participar.

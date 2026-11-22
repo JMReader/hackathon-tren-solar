@@ -1,0 +1,5 @@
+brain_repo: https://github.com/JMReader/hackathon-tren-solar-brain.git
+brain_root_env: BRAIN_ROOT
+participant_env: PARTICIPANT_ID
+project: hackathon-tren-solar
+worklog_config: .brain/worklogs/hackathon-tren-solar.json
