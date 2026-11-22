@@ -1,6 +1,11 @@
 "use client";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import {
+  SegmentedControl,
+  SegmentedControlItem,
+} from "@/components/ui/segmented-control";
+import { Label } from "@/components/ui/label";
+import { Button, buttonStyles } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
@@ -96,26 +101,27 @@ export default function EmpresasPage() {
             3　Selección
           </li>
         </ol>
-        <label htmlFor="plan" className="mt-10 block text-xs text-white/60">
-          Plan de demostración
-        </label>
-        <select
-          disabled={busy}
-          id="plan"
+        <p id="demo-plan" className="mt-10 mb-2 text-sm text-on-dark">
+          Empresa de demostración
+        </p>
+        <SegmentedControl
+          aria-labelledby="demo-plan"
           value={plan}
-          onChange={(e) => {
-            setPlan(e.target.value as "free" | "paid");
+          onValueChange={(value) => {
+            if (value !== "free" && value !== "paid") return;
+            setPlan(value);
             setMatches(null);
+            setError("");
+            if (value === "paid") setSkills([normalizeSkill(skill)]);
           }}
-          className="mt-2 w-full rounded-xl bg-white/10 p-3 text-white"
         >
-          <option className="text-ink" value="free">
-            Free · conteo
-          </option>
-          <option className="text-ink" value="paid">
-            Pro · candidatos
-          </option>
-        </select>
+          <SegmentedControlItem disabled={busy} value="free">
+            Free
+          </SegmentedControlItem>
+          <SegmentedControlItem disabled={busy} value="paid">
+            Pro
+          </SegmentedControlItem>
+        </SegmentedControl>
       </aside>
       <section className="mx-auto w-full max-w-5xl px-6 py-10 md:px-16 md:py-14">
         <p className="text-sm text-ink-muted">
@@ -128,22 +134,22 @@ export default function EmpresasPage() {
           Conocé cuántos perfiles coinciden con tu búsqueda.
         </p>
         <div className="mt-8 grid gap-4 md:grid-cols-[1fr_1fr_auto]">
-          <label className="text-sm">
+          <Label className="text-sm">
             Rol o habilidad
             <Input
               value={skill}
               onChange={(e) => setSkill(e.target.value)}
-              className="mt-2 block w-full rounded-xl border border-[#e4d9d6] bg-white p-3"
+              className="mt-2"
             />
-          </label>
-          <label className="text-sm">
+          </Label>
+          <Label className="text-sm">
             Ubicación
             <Input
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="mt-2 block w-full rounded-xl border border-[#e4d9d6] bg-white p-3"
+              className="mt-2"
             />
-          </label>
+          </Label>
           <Button
             onClick={search}
             disabled={
@@ -152,7 +158,7 @@ export default function EmpresasPage() {
               !location.trim() ||
               (plan === "paid" && (!proposal.trim() || skills.length === 0))
             }
-            className="self-end rounded-full bg-[#cc4600] px-6 py-3 font-medium text-white disabled:opacity-60"
+            className="self-end"
           >
             {busy
               ? "Buscando…"
@@ -163,30 +169,32 @@ export default function EmpresasPage() {
         </div>
         {plan === "paid" && (
           <div className="mt-6">
-            <label htmlFor="proposal" className="text-sm font-medium">
+            <Label htmlFor="proposal" className="text-sm font-medium">
               Propuesta laboral
-            </label>
+            </Label>
             <Textarea
               id="proposal"
               value={proposal}
               onChange={(e) => setProposal(e.target.value)}
               rows={4}
-              className="mt-2 w-full rounded-xl border border-[#e4d9d6] bg-white p-4"
+              className="mt-2"
             />
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium">Habilidades:</span>
               {skills.map((s) => (
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
                   key={s}
                   onClick={() => setSkills(skills.filter((x) => x !== s))}
-                  className="rounded-full bg-white px-3 py-1 text-sm"
+                  aria-label={`Quitar ${s}`}
                 >
                   {s} ×
-                </button>
+                </Button>
               ))}
-              <label className="sr-only" htmlFor="new-skill">
+              <Label className="sr-only" htmlFor="new-skill">
                 Agregar habilidad
-              </label>
+              </Label>
               <Input
                 id="new-skill"
                 value={extra}
@@ -199,7 +207,7 @@ export default function EmpresasPage() {
                   }
                 }}
                 placeholder="Agregar"
-                className="w-28 rounded-full border bg-white px-3 py-1 text-sm"
+                className="w-32"
               />
             </div>
           </div>
@@ -234,13 +242,15 @@ export default function EmpresasPage() {
                 <div className="mt-8 grid gap-6 md:grid-cols-[220px_1fr]">
                   <div role="list" aria-label="Candidatos">
                     {candidates.slice(0, 5).map((c, i) => (
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         key={c.candidate_id ?? i}
                         onClick={() => setSelected(i)}
                         className={`block w-full rounded-lg p-3 text-left ${selected === i ? "bg-[#eadfdb]" : "hover:bg-white/70"}`}
                       >
                         {c.display_name || "Perfil compartido"}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                   {candidate && (
@@ -290,7 +300,7 @@ export default function EmpresasPage() {
                       )}
                       {candidate.portfolio_slug && (
                         <a
-                          className="mt-6 inline-block rounded-full bg-[#cc4600] px-5 py-3 text-white"
+                          className={buttonStyles({ className: "mt-6" })}
                           href={`/p/${candidate.portfolio_slug}`}
                           target="_blank"
                           rel="noreferrer"

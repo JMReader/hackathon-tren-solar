@@ -1,5 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { apiFetch } from "@/lib/api/client";
 type Consent = {
   active: boolean;
@@ -110,88 +114,83 @@ export function DiscoveryConsent() {
       <p className="mt-2 text-sm text-ink-muted">
         Vos elegís qué compartir. Podés cambiarlo o revocarlo cuando quieras.
       </p>
-      <label className="mt-4 flex items-start gap-3 text-sm">
-        <input
-          type="checkbox"
+      <Label className="mt-4 flex items-start gap-3 text-sm">
+        <Checkbox
           checked={active}
-          onChange={(e) => setActive(e.target.checked)}
+          onCheckedChange={(checked) => setActive(checked === true)}
         />
         <span>
           Compartir mi nombre, rol, habilidades y logros aprobados con empresas
         </span>
-      </label>
+      </Label>
       <div className="mt-3 grid gap-3 pl-7 text-sm">
-        <label className="flex gap-3">
-          <input
-            type="checkbox"
+        <Label className="flex gap-3">
+          <Checkbox
             checked={portfolio}
-            onChange={(e) => setPortfolio(e.target.checked)}
+            onCheckedChange={(checked) => setPortfolio(checked === true)}
           />
           Compartir portfolio
-        </label>
-        <label className="flex gap-3">
-          <input
-            type="checkbox"
+        </Label>
+        <Label className="flex gap-3">
+          <Checkbox
             checked={linkedin}
-            onChange={(e) => setLinkedin(e.target.checked)}
+            onCheckedChange={(checked) => setLinkedin(checked === true)}
           />
           Compartir LinkedIn
-        </label>
+        </Label>
         {linkedin && (
-          <label className="text-xs">
+          <Label className="text-xs">
             Enlace de LinkedIn
-            <input
+            <Input
               value={linkedinUrl}
               onChange={(e) => setLinkedinUrl(e.target.value)}
               type="url"
-              className="mt-1 block w-full rounded-lg border border-hairline p-2 text-sm"
+              className="mt-1"
               placeholder="https://www.linkedin.com/in/…"
             />
-          </label>
+          </Label>
         )}
-        <label className="flex gap-3">
-          <input
-            type="checkbox"
+        <Label className="flex gap-3">
+          <Checkbox
             checked={x}
-            onChange={(e) => setX(e.target.checked)}
+            onCheckedChange={(checked) => setX(checked === true)}
           />
           Compartir X
-        </label>
+        </Label>
         {x && (
-          <label className="text-xs">
+          <Label className="text-xs">
             Enlace de X
-            <input
+            <Input
               value={xUrl}
               onChange={(e) => setXUrl(e.target.value)}
               type="url"
-              className="mt-1 block w-full rounded-lg border border-hairline p-2 text-sm"
+              className="mt-1"
               placeholder="https://x.com/…"
             />
-          </label>
+          </Label>
         )}
-        <label className="flex gap-3">
-          <input
-            type="checkbox"
+        <Label className="flex gap-3">
+          <Checkbox
             checked={activity}
-            onChange={(e) => setActivity(e.target.checked)}
+            onCheckedChange={(checked) => setActivity(checked === true)}
           />
           Compartir cantidad de publicaciones de los últimos 7 días
-        </label>
+        </Label>
         {activity && (
-          <label>
+          <Label>
             Publicaciones declaradas{" "}
-            <input
+            <Input
               type="number"
               min="0"
               step="1"
               value={count}
               onChange={(e) => setCount(e.target.value)}
             />
-          </label>
+          </Label>
         )}
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        <button
+        <Button
           type="button"
           disabled={
             busy ||
@@ -199,19 +198,18 @@ export function DiscoveryConsent() {
             (active && activity && !/^\d+$/.test(count))
           }
           onClick={() => void save()}
-          className="rounded-full bg-accent-strong px-4 py-2 text-sm text-white disabled:opacity-50"
         >
           {busy ? "Guardando…" : "Guardar preferencias"}
-        </button>
+        </Button>
         {saved && active && (
-          <button
+          <Button
             type="button"
             disabled={busy}
             onClick={() => void revoke()}
-            className="rounded-full border border-hairline px-4 py-2 text-sm"
+            variant="outline"
           >
             Revocar consentimiento
-          </button>
+          </Button>
         )}
       </div>
       {message && (
