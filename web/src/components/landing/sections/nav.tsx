@@ -10,39 +10,34 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.6);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-500",
-        scrolled ? "border-white/[0.06] bg-[#0b0b0b]/80 backdrop-blur-xl" : "border-white/10 bg-white/[0.04] backdrop-blur-md",
-      )}
-    >
-      <div className="mx-auto grid h-12 max-w-[1010px] grid-cols-[1fr_auto] items-center px-5 md:grid-cols-[1fr_auto_1fr]">
-        <Link href="#inicio" aria-label="Inicio">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-3 pt-3 sm:pt-4">
+      <div
+        className={cn(
+          "pointer-events-auto grid h-12 w-full max-w-[880px] grid-cols-[1fr_auto] items-center gap-4 rounded-full pr-1.5 pl-4 ring-1 backdrop-blur-xl transition-[background-color,box-shadow,max-width] duration-500 ease-lp md:grid-cols-[1fr_auto_1fr]",
+          scrolled
+            ? "max-w-[820px] bg-[#0b0b0b]/80 shadow-[0_12px_40px_-12px_rgb(0_0_0/0.65)] ring-white/10"
+            : "bg-black/20 shadow-[0_8px_30px_-14px_rgb(0_0_0/0.35)] ring-white/15",
+        )}
+      >
+        <Link href="#inicio" aria-label="Inicio" className="justify-self-start">
           <Logo />
         </Link>
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Secciones" className="hidden items-center gap-7 md:flex">
           {NAV_LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-sm tracking-[-0.02em] text-lp-body transition-colors hover:text-white"
-            >
+            <Link key={l.href} href={l.href} className="text-sm tracking-[-0.02em] text-white/80 transition-colors hover:text-white">
               {l.label}
             </Link>
           ))}
         </nav>
-        <div className="flex items-center justify-end gap-2">
-          <Button href="#producto" variant="glass" size="sm" className="hidden sm:inline-flex">
-            Cómo funciona
-          </Button>
-          <Button href={START_HREF} variant="solid" size="sm">
+        <div className="flex items-center justify-end">
+          <Button href={START_HREF} variant="light" size="sm" className="h-9 px-4">
             Grabar mi logro
           </Button>
         </div>
