@@ -1,6 +1,7 @@
 // Local mock of /achievements and /drafts, modeled on the backend's FakeTranscriber/FakeLLM.
 // In production /api/* goes to FastAPI (vercel.json), so this only serves `next dev` without NEXT_PUBLIC_API_URL.
 import { apiError, hasMedia, requireSession, saveImage, toProfile } from "./mock-store"
+import { addApprovedToPortfolio } from "./mock-portfolios"
 import type {
   Achievement,
   Draft,
@@ -192,13 +193,14 @@ export async function approveAchievement(request: Request, achievementId: string
   if (s instanceof Response) return s
   const a = owned(store.achievements, achievementId, s, "logro")
   if (a instanceof Response) return a
-  const body = (await request.json().catch(() => null)) as { revision?: number } | null
+  const body = (await request.json().catch(() => null)) as { revision?: number; add_to_portfolio?: boolean } | null
   const conflict = revisionConflict(a.revision, body?.revision)
   if (conflict) return conflict
   if (a.status !== "approved") {
     if (a.status !== "needs_review") return apiError(409, "invalid_state", `El logro está en estado '${a.status}'`)
     a.status = "approved"
   }
+  if (body?.add_to_portfolio !== false) addApprovedToPortfolio(s, a)
   return Response.json(a)
 }
 

@@ -11,7 +11,7 @@ import { CopyButton } from "@/components/ui/copy-button"
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
-import { useAchievement, useAchievementEntries, useApproveAndDraft, useDraft, useUpdateDraft } from "@/lib/api/achievements"
+import { useAchievement, useAchievementEntries, useApproveAndDraft, useDraft, useStoredPortfolio, useUpdateDraft } from "@/lib/api/achievements"
 import type { AuthorProfile, Draft, Platform } from "@/lib/api/types"
 import { getPhotoPreview } from "@/lib/photo-preview"
 import { useIsClient } from "@/lib/use-is-client"
@@ -195,6 +195,9 @@ export function PublishAchievement() {
   const achievement = useAchievement(id, sessionId)
   const entry = useAchievementEntries(sessionId).find((e) => e.id === id)
   const generate = useApproveAndDraft(id, sessionId)
+  const portfolio = useStoredPortfolio(sessionId)
+  const inPortfolio = portfolio.data?.items.some((item) => item.achievement_id === id) ?? false
+  const needsRepublish = portfolio.data?.status === "published" && portfolio.data.published_revision !== portfolio.data.revision
   const photo = isClient ? getPhotoPreview(achievement.data?.photo_id) : null
 
   return (
@@ -231,16 +234,29 @@ export function PublishAchievement() {
         </Card>
       )}
 
+      {achievement.data?.status === "approved" && !portfolio.isPending && (
+        <Card variant="muted" className="mt-6 gap-3 p-5 sm:flex-row sm:items-center">
+          <LayoutTemplate aria-hidden className="size-5 shrink-0 text-ink-muted" />
+          <p className="flex-1 text-[13px] leading-relaxed text-ink">
+            {inPortfolio
+              ? needsRepublish
+                ? "Este logro ya está en tu portfolio. Tu página pública todavía muestra la versión anterior."
+                : "Este logro ya está en tu portfolio."
+              : profile?.cv_document
+                ? "Este logro no está en tu portfolio."
+                : "Este logro no está en tu portfolio: falta tu CV."}
+          </p>
+          <Link href="/app/portfolio" className={buttonStyles({ variant: "outline", size: "sm" })}>
+            {inPortfolio ? (needsRepublish ? "Actualizar página" : "Ver portfolio") : profile?.cv_document ? "Abrir portfolio" : "Subir CV"}
+          </Link>
+        </Card>
+      )}
+
       <div className="mt-8 flex flex-wrap items-center gap-2 border-t border-hairline pt-5 pb-2 lg:mt-auto lg:py-6">
         <Link href={`/app/crear/${id}/revisar`} className={buttonStyles({ variant: "ghost" })}>
           <ChevronLeft aria-hidden /> Volver a revisar
         </Link>
         <span className="ml-auto hidden text-xs text-ink-muted xl:inline">Editar un post no cambia el otro.</span>
-        {achievement.data?.status === "approved" && (
-          <Link href="/app/portfolio" className={buttonStyles({ variant: "ghost" })}>
-            <LayoutTemplate aria-hidden /> Ver en mi portfolio
-          </Link>
-        )}
         <Link href="/app/crear" className={buttonStyles({ variant: "outline" })}>
           <Mic aria-hidden /> Contar otro logro
         </Link>

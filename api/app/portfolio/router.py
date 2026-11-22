@@ -34,6 +34,10 @@ def create_portfolio_router(
     def create_portfolio(session_id: SessionHeader, req: CreatePortfolioRequest) -> Portfolio:
         return service.create(session_id, req)
 
+    @router.get("/portfolios/current", tags=["portfolio"])
+    def get_current_portfolio(session_id: SessionHeader) -> Portfolio:
+        return service.get_current(session_id)
+
     @router.get("/portfolios/{portfolio_id}", tags=["portfolio"])
     def get_portfolio(session_id: SessionHeader, portfolio_id: str) -> Portfolio:
         return service.get(portfolio_id, session_id)
