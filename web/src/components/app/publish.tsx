@@ -11,11 +11,12 @@ import { CopyButton } from "@/components/ui/copy-button"
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
-import { useAchievement, useAchievementEntries, useApproveAndDraft, useDraft, useStoredPortfolio, useUpdateDraft } from "@/lib/api/achievements"
+import { useAchievement, useAchievementEntries, useAddToPortfolio, useApproveAndDraft, useDraft, useStoredPortfolio, useUpdateDraft } from "@/lib/api/achievements"
 import type { AuthorProfile, Draft, Platform } from "@/lib/api/types"
 import { getPhotoPreview } from "@/lib/photo-preview"
 import { useIsClient } from "@/lib/use-is-client"
 import { cn } from "@/lib/utils"
+import { getDeclinedAchievements, setAchievementDeclined } from "@/portfolio/storage"
 import { PageSkeleton, useAppSession } from "./common"
 import { AppPage, CreateSteps, PageTitle } from "./shell"
 
@@ -198,6 +199,13 @@ export function PublishAchievement() {
   const portfolio = useStoredPortfolio(sessionId)
   const inPortfolio = portfolio.data?.items.some((item) => item.achievement_id === id) ?? false
   const needsRepublish = portfolio.data?.status === "published" && portfolio.data.published_revision !== portfolio.data.revision
+  const addToPortfolio = useAddToPortfolio(id, sessionId)
+  const [declinedIds, setDeclinedIds] = useState<string[] | null>(null)
+  const declined = (declinedIds ?? (isClient ? getDeclinedAchievements() : [])).includes(id)
+  const decline = (value: boolean) => {
+    setAchievementDeclined(id, value)
+    setDeclinedIds(getDeclinedAchievements())
+  }
   const photo = isClient ? getPhotoPreview(achievement.data?.photo_id) : null
 
   return (
@@ -234,21 +242,52 @@ export function PublishAchievement() {
         </Card>
       )}
 
-      {achievement.data?.status === "approved" && !portfolio.isPending && (
-        <Card variant="muted" className="mt-6 gap-3 p-5 sm:flex-row sm:items-center">
-          <LayoutTemplate aria-hidden className="size-5 shrink-0 text-ink-muted" />
-          <p className="flex-1 text-[13px] leading-relaxed text-ink">
-            {inPortfolio
-              ? needsRepublish
-                ? "Este logro ya está en tu portfolio. Tu página pública todavía muestra la versión anterior."
-                : "Este logro ya está en tu portfolio."
-              : profile?.cv_document
-                ? "Este logro no está en tu portfolio."
-                : "Este logro no está en tu portfolio: falta tu CV."}
-          </p>
-          <Link href="/app/portfolio" className={buttonStyles({ variant: "outline", size: "sm" })}>
-            {inPortfolio ? (needsRepublish ? "Actualizar página" : "Ver portfolio") : profile?.cv_document ? "Abrir portfolio" : "Subir CV"}
-          </Link>
+      {achievement.data?.status === "approved" && entry?.drafts && !portfolio.isPending && (
+        <Card variant="muted" className="mt-6 gap-4 p-5 sm:flex-row sm:items-center">
+          <LayoutTemplate aria-hidden className="size-5 shrink-0 text-ink-muted max-sm:hidden" />
+          {inPortfolio ? (
+            <>
+              <p className="flex-1 text-[13px] leading-relaxed text-ink">
+                {needsRepublish
+                  ? "Este logro ya está en tu portfolio. Tu página pública todavía muestra la versión anterior."
+                  : "Este logro ya está en tu portfolio."}
+              </p>
+              <Link href="/app/portfolio" className={buttonStyles({ variant: "outline", size: "sm" })}>
+                {needsRepublish ? "Actualizar página" : "Ver portfolio"}
+              </Link>
+            </>
+          ) : !profile?.cv_document ? (
+            <>
+              <p className="flex-1 text-[13px] leading-relaxed text-ink">Para sumar este logro a tu portfolio falta tu CV.</p>
+              <Link href="/app/portfolio" className={buttonStyles({ variant: "outline", size: "sm" })}>
+                Subir CV
+              </Link>
+            </>
+          ) : declined ? (
+            <>
+              <p className="flex-1 text-[13px] leading-relaxed text-ink-muted">No sumaste este logro a tu portfolio.</p>
+              <Button variant="ghost" size="sm" onClick={() => void addToPortfolio.mutateAsync().then(() => decline(false)).catch(() => null)}>
+                Sumarlo
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="flex-1">
+                <p className="text-[15px] font-medium text-ink">¿Lo sumamos también a tu portfolio?</p>
+                <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
+                  Van los mismos hechos que aprobaste. {portfolio.data?.status === "published" ? "Tu página pública no cambia hasta que la actualices." : "Nadie lo ve hasta que publiques tu portfolio."}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="ghost" size="sm" onClick={() => decline(true)}>
+                  No por ahora
+                </Button>
+                <Button variant="dark" size="sm" onClick={() => addToPortfolio.mutateAsync().catch(() => null)}>
+                  Sí, sumarlo
+                </Button>
+              </div>
+            </>
+          )}
         </Card>
       )}
 

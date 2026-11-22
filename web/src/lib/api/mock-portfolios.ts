@@ -96,9 +96,11 @@ export function getCurrentPortfolio(request: Request): Response {
   return row ? Response.json(toRecord(row, s)) : apiError(404, "not_found", "Todavía no tenés portfolio")
 }
 
-/** Mirrors PortfolioService.add_achievement: approving adds the achievement to the draft. */
-export function addApprovedToPortfolio(s: Session, achievement: Achievement) {
-  if (!s.cvDocument) return
+type AddOutcome = "created" | "added" | "already_present" | "cv_required" | "full"
+
+/** Mirrors PortfolioService.add_achievement. */
+export function addApprovedToPortfolio(s: Session, achievement: Achievement): AddOutcome {
+  if (!s.cvDocument) return "cv_required"
   const first = achievement.facts[0]?.text.trim() ?? ""
   const title = first.length < 3 ? "Mi logro" : first.length > 80 ? `${first.slice(0, 77)}...` : first
   const item: PortfolioItem = { achievement_id: achievement.id, title, occurred_on: null, show_photo: true }
@@ -121,11 +123,26 @@ export function addApprovedToPortfolio(s: Session, achievement: Achievement) {
       published_at: null,
     }
     store.portfolios.set(created.id, created)
-    return
+    return "created"
   }
-  if (row.items.length >= 12 || row.items.some((i) => i.achievement_id === achievement.id)) return
+  if (row.items.some((i) => i.achievement_id === achievement.id)) return "already_present"
+  if (row.items.length >= 12) return "full"
   row.items = [...row.items, item]
   row.revision += 1
+  return "added"
+}
+
+export async function addCurrentPortfolioItem(request: Request): Promise<Response> {
+  const s = requireSession(request)
+  if (s instanceof Response) return s
+  const body = (await request.json().catch(() => null)) as { achievement_id?: string } | null
+  const achievement = body?.achievement_id ? findOwnedAchievement(s.id, body.achievement_id) : null
+  if (!achievement) return apiError(404, "not_found", "No existe ese logro")
+  if (achievement.status !== "approved") return apiError(422, "achievement_not_approved", "El logro debe estar aprobado.")
+  const outcome = addApprovedToPortfolio(s, achievement)
+  if (outcome === "cv_required") return apiError(422, "cv_required", "Subí tu CV para tener portfolio.")
+  if (outcome === "full") return apiError(422, "portfolio_full", "El portfolio ya tiene 12 logros.")
+  return Response.json(toRecord(latestOf(s)!, s))
 }
 
 export function getPortfolio(request: Request, id: string): Response {

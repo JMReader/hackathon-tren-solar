@@ -200,7 +200,7 @@ export async function approveAchievement(request: Request, achievementId: string
     if (a.status !== "needs_review") return apiError(409, "invalid_state", `El logro está en estado '${a.status}'`)
     a.status = "approved"
   }
-  if (body?.add_to_portfolio !== false) addApprovedToPortfolio(s, a)
+  if (body?.add_to_portfolio === true) addApprovedToPortfolio(s, a)
   return Response.json(a)
 }
 

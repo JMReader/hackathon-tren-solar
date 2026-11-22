@@ -618,6 +618,45 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
+  /portfolios/current/items:
+    parameters:
+    - $ref: '#/components/parameters/SessionId'
+    post:
+      tags:
+      - portfolio
+      summary: Sumar un logro aprobado al portfolio de la sesión
+      description: |
+        Lo llama el front cuando la persona acepta sumar el logro. Si no hay portfolio, lo crea en borrador. Repetirlo no duplica el logro. No cambia la página publicada.
+      operationId: addCurrentPortfolioItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - achievement_id
+              properties:
+                achievement_id:
+                  type: string
+      responses:
+        '200':
+          description: Portfolio con el logro incluido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: |
+            `cv_required` si la sesión no tiene CV; `achievement_not_approved`; `portfolio_full` con 12 logros.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /portfolios/{id}:
     parameters:
     - $ref: '#/components/parameters/SessionId'
@@ -1287,9 +1326,9 @@ components:
           minimum: 1
         add_to_portfolio:
           type: boolean
-          default: true
+          default: false
           description: |
-            Suma el logro al borrador del portfolio de la sesión; si no existe y hay CV, lo crea. Sin CV no hace nada. No cambia la página publicada: hay que volver a publicar.
+            Atajo para clientes sin pantalla: suma el logro al borrador del portfolio al aprobar. El front no lo usa; pregunta después y llama a POST /portfolios/current/items.
     VoiceContext:
       type: object
       description: |

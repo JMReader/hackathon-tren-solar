@@ -57,6 +57,10 @@ export async function fetchCurrentPortfolio(): Promise<PortfolioRecord | null> {
   }
 }
 
+export function addCurrentPortfolioItem(achievementId: string) {
+  return apiFetch<PortfolioRecord>("/portfolios/current/items", { method: "POST", json: { achievement_id: achievementId } })
+}
+
 export function createPortfolio(body: CreatePortfolioBody) {
   return apiFetch<PortfolioRecord>("/portfolios", { method: "POST", json: body })
 }
