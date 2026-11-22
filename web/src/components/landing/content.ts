@@ -4,7 +4,7 @@ export const BRAND = {
   tagline: "Tu talento puede llegar más lejos sin que tengas que irte.",
 };
 
-export const START_HREF = "/";
+export const START_HREF = "/onboarding";
 
 export const NAV_LINKS = [
   { label: "Producto", href: "#producto" },

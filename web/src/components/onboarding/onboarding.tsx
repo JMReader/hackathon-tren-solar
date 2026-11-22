@@ -163,7 +163,7 @@ function Wizard({
     if (!canGoTo(n)) return
     setVisited((v) => new Set(v).add(n))
     setStep(n)
-    router.replace(`/?step=${n}`, { scroll: false })
+    router.replace(`/onboarding?step=${n}`, { scroll: false })
   }
 
   async function next() {
@@ -603,7 +603,7 @@ function SocialSync() {
       mutate({})
       params.delete("connected")
       const qs = params.toString()
-      router.replace(qs ? `/?${qs}` : "/", { scroll: false })
+      router.replace(qs ? `/onboarding?${qs}` : "/onboarding", { scroll: false })
     }
   }, [mutate, router])
   return null
@@ -662,7 +662,7 @@ function SocialCard({
             state === "access_unavailable" ||
             connect.isPending
           }
-          onClick={() => connect.mutate("/?step=2")}
+          onClick={() => connect.mutate("/onboarding?step=2")}
         >
           {state === "connected" ? "Conectado" : "Conectar"}
         </Button>
