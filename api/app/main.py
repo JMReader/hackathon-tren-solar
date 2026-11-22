@@ -105,7 +105,10 @@ def create_app(services: Services | None = None,
             ErrorDetail(code=code, message=str(exc.detail), retryable=False)))
 
     svc = app.state.services
-    app.include_router(create_router(svc.core, svc.sessions), prefix="/api/v1")
+    app.include_router(
+        create_router(svc.core, svc.sessions, on_approved=svc.portfolio.add_achievement),
+        prefix="/api/v1",
+    )
 
     app.include_router(
         create_portfolio_router(svc.portfolio, svc.sessions),

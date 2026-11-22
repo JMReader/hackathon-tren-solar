@@ -327,6 +327,12 @@ class PostgresStore:
             return conn.execute(
                 "SELECT * FROM portfolios WHERE id=%s", (portfolio_id,)).fetchone()
 
+    def get_portfolio_by_session(self, session_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            return conn.execute(
+                "SELECT * FROM portfolios WHERE session_id=%s ORDER BY updated_at DESC LIMIT 1",
+                (session_id,)).fetchone()
+
     def get_portfolio_by_slug(self, slug: str) -> dict[str, Any] | None:
         with self._conn() as conn:
             return conn.execute(

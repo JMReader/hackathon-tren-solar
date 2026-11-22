@@ -622,6 +622,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
+  /portfolios/current:
+    parameters:
+    - $ref: '#/components/parameters/SessionId'
+    get:
+      tags:
+      - portfolio
+      summary: Portfolio de la sesión (el más reciente), sin conocer su id
+      operationId: getCurrentPortfolio
+      responses:
+        '200':
+          description: Portfolio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /portfolios/{id}:
     parameters:
     - $ref: '#/components/parameters/SessionId'
@@ -1469,6 +1488,11 @@ components:
         revision:
           type: integer
           minimum: 1
+        add_to_portfolio:
+          type: boolean
+          default: true
+          description: |
+            Suma el logro al borrador del portfolio de la sesión; si no existe y hay CV, lo crea. Sin CV no hace nada. No cambia la página publicada: hay que volver a publicar.
     VoiceContext:
       type: object
       description: |

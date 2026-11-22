@@ -436,6 +436,12 @@ class Store:
             return conn.execute(
                 "SELECT * FROM portfolios WHERE id=?", (portfolio_id,)).fetchone()
 
+    def get_portfolio_by_session(self, session_id: str) -> sqlite3.Row | None:
+        with self._conn() as conn:
+            return conn.execute(
+                "SELECT * FROM portfolios WHERE session_id=? ORDER BY updated_at DESC LIMIT 1",
+                (session_id,)).fetchone()
+
     def get_portfolio_by_slug(self, slug: str) -> sqlite3.Row | None:
         with self._conn() as conn:
             return conn.execute(

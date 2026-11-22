@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api/client"
+import { ApiRequestError, apiFetch } from "@/lib/api/client"
 
 export type PortfolioItem = {
   achievement_id: string
@@ -45,6 +45,16 @@ export type UpdatePortfolioBody = {
 
 export function fetchPortfolio(id: string) {
   return apiFetch<PortfolioRecord>(`/portfolios/${id}`)
+}
+
+/** Portfolio de la sesión, o null si todavía no tiene. */
+export async function fetchCurrentPortfolio(): Promise<PortfolioRecord | null> {
+  try {
+    return await apiFetch<PortfolioRecord>("/portfolios/current")
+  } catch (error) {
+    if (error instanceof ApiRequestError && error.status === 404) return null
+    throw error
+  }
 }
 
 export function createPortfolio(body: CreatePortfolioBody) {
