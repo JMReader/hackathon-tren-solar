@@ -1,0 +1,15 @@
+{
+  "description": "Tras POST /session/profile/complete, POST /achievements usa el mismo X-Session-Id. voice_context en POST /achievements/{id}/drafts puede omitirse.",
+  "headers": {
+    "X-Session-Id": "ses_01J9ONBOARD01"
+  },
+  "create_achievement_request": {
+    "input_type": "text",
+    "text": "Rediseñé el checkout de un proyecto de la facultad: pasamos de siete pasos a tres y el equipo de pruebas tardó la mitad en completarlo.",
+    "photo_id": "med_photo_01"
+  },
+  "generate_drafts_request_minimal": {
+    "achievement_revision": 2,
+    "platforms": ["linkedin", "x"]
+  }
+}
