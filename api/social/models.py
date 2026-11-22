@@ -135,6 +135,20 @@ class Connection:
     refresh_token: str | None = field(default=None, repr=False)
 
 
+class ReadStatus(StrEnum):
+    SUCCEEDED = "succeeded"
+    SKIPPED = "skipped"
+    UNAVAILABLE = "unavailable"
+    FAILED = "failed"
+
+
+@dataclass(frozen=True)
+class RecentPosts:
+    status: ReadStatus
+    posts: tuple[str, ...] = ()
+    message: str | None = None
+
+
 class OutcomeKind(StrEnum):
     SUCCEEDED = "succeeded"
     REJECTED = "rejected"

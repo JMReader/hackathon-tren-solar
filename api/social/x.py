@@ -14,7 +14,7 @@ from urllib.parse import quote, urlencode
 import httpx2
 
 from .models import Connection, OutcomeKind, Platform, ProviderOutcome, Publication, PublishableDraft, PublishableMedia
-from .ports import OAuthError
+from .ports import OAuthError, ProviderReadError
 
 AUTHORIZATION_URL = "https://x.com/i/oauth2/authorize"
 API_URL = "https://api.x.com"
@@ -26,6 +26,8 @@ URL_PATTERN = re.compile(
     r"(?i)\b(?:https?://|www\.)\S+"
     r"|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|dev|app|ar|co|ai|me|ly|gg|xyz|info|edu|gov)\b"
 )
+TCO_LINK = re.compile(r"\s*https://t\.co/\w+")
+MAX_READ_POSTS = 20
 IMAGE_UPLOAD_FAILED = ProviderOutcome.rejected(
     "IMAGE_UPLOAD_FAILED", "No pudimos subir la foto a X. No se publicó nada; podés reintentar.", True
 )
@@ -55,7 +57,7 @@ class XAdapter:
     platform = Platform.X
     required_scopes = frozenset({"tweet.read", "tweet.write", "users.read", "media.write"})
     supports_image = True
-    supports_read_posts = False
+    supports_read_posts = True
 
     def __init__(
         self,
@@ -124,6 +126,31 @@ class XAdapter:
             expires_at=self._expires_at(payload),
             refresh_token=payload.get("refresh_token") or connection.refresh_token,
         )
+
+    def read_recent_posts(self, connection: Connection, limit: int) -> list[str]:
+        limit = max(1, min(limit, MAX_READ_POSTS))
+        try:
+            response = self._http.get(
+                f"{API_URL}/2/users/{connection.account_id}/tweets",
+                params={
+                    "max_results": max(5, min(100, limit * 2)),
+                    "exclude": "replies,retweets",
+                    "tweet.fields": "note_tweet",
+                },
+                headers=_bearer(connection),
+            )
+        except httpx2.HTTPError as error:
+            raise ProviderReadError(
+                "PROVIDER_UNREACHABLE", "No pudimos conectar con X para leer tus posts.", True
+            ) from error
+        if response.status_code != 200:
+            raise _read_error(response)
+        posts = []
+        for item in _json(response).get("data") or []:
+            text = TCO_LINK.sub("", (item.get("note_tweet") or {}).get("text") or item.get("text") or "").strip()
+            if text:
+                posts.append(text)
+        return posts[:limit]
 
     def publish(self, connection: Connection, draft: PublishableDraft) -> ProviderOutcome:
         if not self._config.allow_links and URL_PATTERN.search(draft.body):
@@ -272,3 +299,18 @@ def _rejection(response: httpx2.Response) -> ProviderOutcome:
         "PROVIDER_ERROR_AFTER_SEND",
         f"X respondió con un error ({status}). Verificá en tu perfil antes de reintentar para no duplicar.",
     )
+
+
+def _read_error(response: httpx2.Response) -> ProviderReadError:
+    status = response.status_code
+    if status == 401:
+        return ProviderReadError("OAUTH_TOKEN_EXPIRED", "La sesión de X venció. Reconectá tu cuenta.", True)
+    if status in (402, 403):
+        return ProviderReadError(
+            "READ_UNAVAILABLE",
+            f"X no habilitó la lectura de posts para esta app (créditos o permisos). {_problem(response)}".strip(),
+            False,
+        )
+    if status == 429:
+        return ProviderReadError("RATE_LIMITED", "X pidió esperar antes de leer más posts.", True)
+    return ProviderReadError("PROVIDER_ERROR", f"X respondió con un error ({status}) al leer tus posts.", True)

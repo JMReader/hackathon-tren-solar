@@ -16,9 +16,11 @@ from .models import (
     Publication,
     PublicationRecord,
     PublicationStatus,
+    ReadStatus,
+    RecentPosts,
     SocialConnectionStatus,
 )
-from .ports import ConnectionStore, DraftSource, PublicationStore, SocialAdapter
+from .ports import ConnectionStore, DraftSource, PostReader, ProviderReadError, PublicationStore, SocialAdapter
 
 MIN_IDEMPOTENCY_KEY_LENGTH = 8
 MAX_IDEMPOTENCY_KEY_LENGTH = 255
@@ -103,6 +105,28 @@ class SocialService:
             can_read_posts=adapter.supports_read_posts,
             account_handle=connection.account_handle,
         )
+
+    def recent_posts(self, owner_id: str, platform: Platform, limit: int) -> RecentPosts:
+        status = self.connection_status(owner_id, platform)
+        if status.status is not ConnectionState.CONNECTED:
+            return RecentPosts(ReadStatus.SKIPPED, message=status.reason)
+        if not status.can_read_posts:
+            return RecentPosts(
+                ReadStatus.UNAVAILABLE,
+                message=f"{platform.label} no permite leer tus posts desde la app. Usá la muestra de escritura.",
+            )
+        reader: PostReader = self._adapters[platform]
+        try:
+            posts = reader.read_recent_posts(self._connections.get(owner_id, platform), limit)
+        except ProviderReadError as error:
+            return RecentPosts(ReadStatus.FAILED if error.retryable else ReadStatus.UNAVAILABLE, message=error.message)
+        except Exception:
+            return RecentPosts(ReadStatus.FAILED, message=f"No pudimos leer tus posts de {platform.label}.")
+        if not posts:
+            return RecentPosts(
+                ReadStatus.UNAVAILABLE, message=f"No encontramos posts propios recientes en {platform.label}."
+            )
+        return RecentPosts(ReadStatus.SUCCEEDED, posts=tuple(posts))
 
     def assisted_share(self, owner_id: str, draft_id: str) -> AssistedShare:
         draft = self._drafts.get(owner_id, draft_id)

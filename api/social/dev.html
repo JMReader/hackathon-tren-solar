@@ -22,6 +22,7 @@
   <button id="refresh">Actualizar estado</button>
   <button id="connect-linkedin">Conectar LinkedIn</button>
   <button id="connect-x">Conectar X</button>
+  <button id="read-x">Leer mis posts de X (5)</button>
   <pre id="status">…</pre>
 </fieldset>
 
@@ -67,6 +68,11 @@ const connect = (platform) => async () => {
 };
 document.getElementById("connect-linkedin").onclick = connect("linkedin");
 document.getElementById("connect-x").onclick = connect("x");
+
+document.getElementById("read-x").onclick = async () => {
+  const r = await fetch("/dev/recent-posts/x?limit=5");
+  show("status", { http: r.status, body: await r.json() });
+};
 
 document.getElementById("draft-form").onsubmit = async (event) => {
   event.preventDefault();

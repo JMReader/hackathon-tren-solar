@@ -11,6 +11,18 @@ class OAuthError(Exception):
         self.code = code
 
 
+class ProviderReadError(Exception):
+    def __init__(self, code: str, message: str, retryable: bool) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.retryable = retryable
+
+
+class PostReader(Protocol):
+    def read_recent_posts(self, connection: Connection, limit: int) -> list[str]: ...
+
+
 class SocialAdapter(Protocol):
     platform: Platform
     required_scopes: frozenset[str]

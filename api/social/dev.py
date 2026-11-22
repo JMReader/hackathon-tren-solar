@@ -63,6 +63,11 @@ def create_app(settings: Settings, http: httpx2.Client | None = None) -> FastAPI
     def dev_page() -> str:
         return PAGE
 
+    @app.get("/dev/recent-posts/{platform}")
+    def recent_posts(platform: Platform, limit: int = 5) -> dict:
+        result = service.recent_posts(DEV_OWNER, platform, limit)
+        return {"status": result.status.value, "posts": list(result.posts), "message": result.message}
+
     @app.post("/dev/drafts")
     async def create_draft(
         platform: Annotated[Platform, Form()],
