@@ -123,7 +123,8 @@ class CoreService:
                                     retryable=True)
             else:
                 try:
-                    transcript = self.transcriber.transcribe(audio_path, audio[2])
+                    transcript = self.transcriber.transcribe(
+                        self.media.audio_local_path(audio_path), audio[2])
                     if text:
                         transcript = f"{transcript.strip()} {text.strip()}"
                 except STTError as e:

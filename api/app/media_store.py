@@ -76,6 +76,10 @@ class MediaStore:
         key = f"{audio_id}{ext or '.bin'}"
         return self._write(key, data)
 
+    def audio_local_path(self, audio_path: str) -> str:
+        """Ruta local legible del audio; en filesystem local es la misma."""
+        return audio_path
+
     def resolve_photo(self, photo_id: str, session_id: str | None = None) -> MediaAsset:
         asset = self.store.get_media(photo_id)
         owner = self.store.media_session(photo_id)
@@ -119,6 +123,13 @@ class SupabaseMediaStore(MediaStore):
 
     def cv_path(self, cv_id: str, ext: str) -> str:
         return f"cv/{cv_id}{ext or '.bin'}"
+
+    def audio_local_path(self, audio_path: str) -> str:
+        """Materializa la referencia `storage://` en el cache local para el STT."""
+        p = self.backend.local_path(audio_path)
+        if p is None:
+            raise bad_request("No pudimos leer el audio guardado.", code="media_unreadable")
+        return str(p)
 
     def materialize_cv(self, ref: str) -> Path | None:
         return self.backend.local_path(ref)
