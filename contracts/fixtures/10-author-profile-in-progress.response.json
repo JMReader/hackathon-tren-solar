@@ -1,0 +1,16 @@
+{
+  "session_id": "ses_01J9ONBOARD01",
+  "onboarding_status": "in_progress",
+  "revision": 2,
+  "ready_for_achievement": false,
+  "profession": "Diseñadora UX/UI",
+  "photo_id": "med_photo_01",
+  "writing_sample": null,
+  "cv_document": null,
+  "voice_context": null,
+  "style_sync": {
+    "last_attempt_at": null,
+    "linkedin": { "status": "skipped", "posts_imported": 0, "message": null },
+    "x": { "status": "skipped", "posts_imported": 0, "message": null }
+  }
+}

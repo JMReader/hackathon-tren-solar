@@ -4,6 +4,7 @@
 
 ## Recorrido principal
 
+0. **Onboarding (pantalla previa):** la persona indica profesión, sube foto, puede conectar redes y/o escribir una muestra de estilo y opcionalmente CV. El servidor marca el perfil completo antes de continuar (ver `docs/features/onboarding/` — SDD solo de esa feature).
 1. La persona graba o sube un audio sobre un proyecto o logro y adjunta una foto. Puede sustituir ambos antes de generar contenido.
 2. El sistema transcribe el audio y muestra los hechos que usará. La persona corrige, elimina o completa información y aprueba la versión revisada. Las afirmaciones sin respaldo quedan como pendientes, no se inventan.
 3. El sistema genera borradores separados para LinkedIn y X usando sólo la información aprobada y la foto elegida. La persona puede editar cada texto y ver la vista previa antes de confirmar.
