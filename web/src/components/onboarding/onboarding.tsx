@@ -291,7 +291,7 @@ function Wizard({
     if (!canGoTo(n)) return
     setVisited((v) => new Set(v).add(n))
     setStep(n)
-    router.replace(`/?step=${n}`, { scroll: false })
+    router.replace(`/onboarding?step=${n}`, { scroll: false })
   }
 
   async function saveSample(value = sample) {
@@ -701,7 +701,7 @@ function SocialSync() {
       mutate({})
       params.delete("connected")
       const qs = params.toString()
-      router.replace(qs ? `/?${qs}` : "/", { scroll: false })
+      router.replace(qs ? `/onboarding?${qs}` : "/onboarding", { scroll: false })
     }
   }, [mutate, router])
   return null
@@ -766,7 +766,7 @@ function SocialCard({
             disabled={connect.isPending}
             onClick={async () => {
               await beforeConnect()
-              connect.mutate("/?step=2")
+              connect.mutate("/onboarding?step=2")
             }}
           >
             {connect.isPending

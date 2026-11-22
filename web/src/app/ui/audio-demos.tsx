@@ -11,16 +11,18 @@ import {
   AudioPlayerSpeed,
   AudioPlayerTime,
 } from "@/components/audio/audio-player"
-import { LiveWaveform } from "@/components/audio/live-waveform"
 import { MicSelector } from "@/components/audio/mic-selector"
+import { Orb, type OrbState } from "@/components/audio/orb"
 import { ShimmeringText } from "@/components/audio/shimmering-text"
 import { formatDuration, useRecorder } from "@/components/audio/use-recorder"
+import { useStreamVolume } from "@/components/audio/use-stream-volume"
 import { VoiceButton, type VoiceButtonState } from "@/components/audio/voice-button"
 import { seededPeaks, useAudioPeaks } from "@/components/audio/waveform"
 import { Badge, StatusDot } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control"
+import { cn } from "@/lib/utils"
 
 const DEMO_SRC = "/audio/demo-logro.m4a"
 const DEMO_TRANSCRIPT =
@@ -32,6 +34,9 @@ function RecorderDemo() {
   const { peaks } = useAudioPeaks(recorder.blob)
   const [transcribing, setTranscribing] = useState(false)
   const recording = recorder.status === "recording"
+  const getVolume = useStreamVolume(recorder.stream)
+  const showPlayer = recorder.status === "stopped" && recorder.url && !transcribing
+  const orbState: OrbState = recording ? "listening" : transcribing ? "thinking" : "idle"
 
   useEffect(() => {
     if (recorder.status !== "stopped") return
@@ -50,7 +55,7 @@ function RecorderDemo() {
       </div>
 
       <div className="px-5 py-6">
-        {recorder.status === "stopped" && recorder.url ? (
+        {showPlayer ? (
           <AudioPlayerProvider src={recorder.url} duration={recorder.elapsed}>
             <div className="flex items-center gap-4">
               <AudioPlayerButton variant="primary" size="lg" className="size-12 shrink-0 px-0" />
@@ -64,16 +69,24 @@ function RecorderDemo() {
             </div>
           </AudioPlayerProvider>
         ) : (
-          <LiveWaveform
-            active={recording}
-            stream={recorder.stream}
-            mode="scrolling"
-            height={72}
-            barWidth={3}
-            barGap={2}
-            sensitivity={1.6}
-            className={recording ? "text-accent" : "text-ink-faint"}
-          />
+          <div className="flex flex-col items-center gap-3">
+            <div className={cn("transition-[scale] duration-500 ease-out", recording ? "scale-105" : "scale-100")}>
+              <Orb
+                state={orbState}
+                getVolume={recording ? getVolume : undefined}
+                className="size-44"
+                label={recording ? "Grabando: el orbe reacciona a tu voz" : transcribing ? "Transcribiendo" : "Listo para grabar"}
+              />
+            </div>
+            <p
+              className={cn(
+                "font-display text-3xl font-light tracking-display tabular-nums transition-colors duration-200",
+                recording ? "text-ink" : "text-ink-faint",
+              )}
+            >
+              {formatDuration(recorder.elapsed)}
+            </p>
+          </div>
         )}
       </div>
 
@@ -109,6 +122,46 @@ function RecorderDemo() {
             "Se graba solo en tu navegador."
           )}
         </p>
+      </div>
+    </Card>
+  )
+}
+
+const ORB_PALETTES: Record<string, [string, string]> = {
+  naranja: ["#ff5c0a", "#ffc4a3"],
+  atardecer: ["#cc4600", "#ffd166"],
+  slate: ["#3e3f52", "#c9c4c8"],
+}
+
+function OrbDemo() {
+  const [state, setState] = useState<OrbState>("listening")
+  const [palette, setPalette] = useState("naranja")
+  return (
+    <Card variant="dark" className="items-center gap-5 px-6 py-8">
+      <Orb state={state} colors={ORB_PALETTES[palette]} inverted className="size-52" label={`Orbe en estado ${state}`} />
+      <SegmentedControl
+        value={state}
+        onValueChange={(value) => setState((value as OrbState) ?? "idle")}
+        aria-label="Estado del orbe"
+        className="bg-white/10 [&_[data-slot=segmented-control-item]]:text-on-dark-muted [&_[data-slot=segmented-control-item][data-checked]]:text-ink"
+      >
+        <SegmentedControlItem value="idle">Reposo</SegmentedControlItem>
+        <SegmentedControlItem value="listening">Escucha</SegmentedControlItem>
+        <SegmentedControlItem value="thinking">Piensa</SegmentedControlItem>
+        <SegmentedControlItem value="talking">Habla</SegmentedControlItem>
+      </SegmentedControl>
+      <div className="flex gap-2" role="group" aria-label="Paleta">
+        {Object.entries(ORB_PALETTES).map(([name, [a, b]]) => (
+          <button
+            key={name}
+            type="button"
+            aria-label={`Paleta ${name}`}
+            aria-pressed={palette === name}
+            onClick={() => setPalette(name)}
+            className="pressable focus-ring size-7 cursor-pointer rounded-full ring-2 ring-transparent ring-offset-2 ring-offset-slate aria-pressed:ring-inverse"
+            style={{ background: `linear-gradient(135deg, ${a}, ${b})` }}
+          />
+        ))}
       </div>
     </Card>
   )
@@ -173,4 +226,4 @@ function VoiceButtonDemo() {
   )
 }
 
-export { RecorderDemo, PlayerDemo, CompactPlayerDemo, VoiceButtonDemo }
+export { RecorderDemo, PlayerDemo, CompactPlayerDemo, VoiceButtonDemo, OrbDemo }

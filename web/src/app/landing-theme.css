@@ -1,0 +1,123 @@
+/* Landing kit (Pulse-inspired dark theme). Independent from the Granola UI kit. */
+@theme {
+  --color-lp-bg: #070707;
+  --color-lp-surface: #0e0e0e;
+  --color-lp-raised: #141414;
+  --color-lp-line: rgb(255 255 255 / 0.08);
+  --color-lp-line-strong: rgb(255 255 255 / 0.14);
+  --color-lp-glass: rgb(255 255 255 / 0.06);
+  --color-lp-fg: #ffffff;
+  --color-lp-body: #e8e8e8;
+  --color-lp-muted: rgb(255 255 255 / 0.4);
+  --color-lp-faint: rgb(255 255 255 / 0.22);
+  --color-lp-accent: #ff6600;
+  --color-lp-accent-soft: rgb(255 102 0 / 0.12);
+  --color-lp-ok: #3ecf8e;
+  --color-lp-info: #5aa9ff;
+
+  --shadow-lp-card: 0 0 0 1px rgb(255 255 255 / 0.06), 0 30px 80px -20px rgb(0 0 0 / 0.8);
+  --ease-lp: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-lp-marquee: lp-marquee 32s linear infinite;
+  --animate-lp-float: lp-float 7s ease-in-out infinite;
+  --animate-lp-wave: lp-wave 1.2s ease-in-out infinite;
+
+  @keyframes lp-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes lp-float {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -10px, 0);
+    }
+  }
+  @keyframes lp-wave {
+    0%,
+    100% {
+      transform: scaleY(0.35);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+}
+
+/* inline: font variables are set by next/font on .lp-root, not on :root */
+@theme inline {
+  --font-lp-sans: var(--font-lp-inter), system-ui, sans-serif;
+  --font-lp-mono: var(--font-lp-intel-mono), ui-monospace, monospace;
+}
+
+.lp-root {
+  background: var(--color-lp-bg);
+  color: var(--color-lp-body);
+  font-family: var(--font-lp-inter), system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+.lp-root a {
+  text-decoration: none;
+}
+
+.lp-root ::selection {
+  background: var(--color-lp-accent);
+  color: #fff;
+}
+
+/* Heading with trailing words fading to grey, as in Pulse. */
+.lp-fade {
+  background: linear-gradient(90deg, #ffffff 0%, rgb(255 255 255 / 0.35) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lp-reveal {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  filter: blur(6px);
+  transition:
+    opacity 0.9s var(--ease-lp),
+    transform 0.9s var(--ease-lp),
+    filter 0.9s var(--ease-lp);
+}
+.lp-reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.lp-no-scrollbar {
+  scrollbar-width: none;
+}
+.lp-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.lp-faq summary::-webkit-details-marker {
+  display: none;
+}
+.lp-faq[open] .lp-faq-icon {
+  transform: rotate(45deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-root *,
+  .lp-root *::before,
+  .lp-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .lp-reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
