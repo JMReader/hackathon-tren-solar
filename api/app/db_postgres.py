@@ -279,6 +279,75 @@ class PostgresStore:
                 "SELECT session_id FROM drafts WHERE id=%s", (draft_id,)).fetchone()
         return row["session_id"] if row else None
 
+    # --- portfolios (Issue #6) ---
+
+    def save_portfolio(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT INTO portfolios
+                   (id,session_id,status,revision,display_name,headline,items,
+                    template_id,palette_id,cv_downloadable,slug,published_revision,
+                    published_snapshot,published_at,created_at,updated_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                   ON CONFLICT (id) DO UPDATE SET
+                    session_id=EXCLUDED.session_id,
+                    status=EXCLUDED.status,
+                    revision=EXCLUDED.revision,
+                    display_name=EXCLUDED.display_name,
+                    headline=EXCLUDED.headline,
+                    items=EXCLUDED.items,
+                    template_id=EXCLUDED.template_id,
+                    palette_id=EXCLUDED.palette_id,
+                    cv_downloadable=EXCLUDED.cv_downloadable,
+                    slug=EXCLUDED.slug,
+                    published_revision=EXCLUDED.published_revision,
+                    published_snapshot=EXCLUDED.published_snapshot,
+                    published_at=EXCLUDED.published_at,
+                    updated_at=EXCLUDED.updated_at""",
+                (
+                    row["id"], row["session_id"], row["status"], row["revision"],
+                    row["display_name"], row["headline"], row["items"],
+                    row["template_id"], row["palette_id"], row["cv_downloadable"],
+                    row["slug"], row["published_revision"], row["published_snapshot"],
+                    row["published_at"], row["created_at"], row["updated_at"],
+                ),
+            )
+
+    def get_portfolio(self, portfolio_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            return conn.execute(
+                "SELECT * FROM portfolios WHERE id=%s", (portfolio_id,)).fetchone()
+
+    def get_portfolio_by_slug(self, slug: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            return conn.execute(
+                "SELECT * FROM portfolios WHERE slug=%s", (slug,)).fetchone()
+
+    def portfolio_slug_taken(self, slug: str, exclude_id: str | None = None) -> bool:
+        with self._conn() as conn:
+            if exclude_id:
+                row = conn.execute(
+                    "SELECT 1 FROM portfolios WHERE slug=%s AND id<>%s",
+                    (slug, exclude_id),
+                ).fetchone()
+            else:
+                row = conn.execute(
+                    "SELECT 1 FROM portfolios WHERE slug=%s", (slug,),
+                ).fetchone()
+        return row is not None
+
+    def save_pro_interest_event(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT INTO pro_interest_events
+                   (id,session_id,response,trigger,item_id,price_band_ars_month,created_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                (
+                    row["id"], row["session_id"], row["response"], row["trigger"],
+                    row["item_id"], row["price_band_ars_month"], row["created_at"],
+                ),
+            )
+
 
 def _ready(
     onboarding_status: str,

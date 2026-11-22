@@ -2,60 +2,59 @@ openapi: 3.1.0
 info:
   title: Hackathon Tren Solar API
   version: 0.1.0
-  description: >
-    Contrato compartido entre Issue #3 (ingesta modular texto/audio/MCP, extracción,
-    revisión y borradores LinkedIn/X), Issue #4 (frontend Next.js) e Issue #5
-    (conexiones OAuth y publicación idempotente en LinkedIn y X).
-    Sesión anónima (sin contraseña) con onboarding persistido de autor antes del logro.
-    Ver tag `session` y decisión de equipo en el cerebro (onboarding UI aprobado).
+  description: |-
+    Contrato compartido entre Issue #3 (ingesta modular texto/audio/MCP, extracción, revisión y borradores LinkedIn/X), Issue #4 (frontend Next.js) e Issue #5 (conexiones OAuth y publicación idempotente en LinkedIn y X). Sesión anónima (sin contraseña) con onboarding persistido de autor antes del logro. Ver tag `session` y decisión de equipo en el cerebro (onboarding UI aprobado).
+        Issue #6 — Portfolio público con plantillas y paletas.
 servers:
-  - url: http://localhost:8000/api/v1
-    description: Desarrollo local FastAPI
-
+- url: http://localhost:8000/api/v1
+  description: Desarrollo local FastAPI
 tags:
-  - name: session
-    description: Sesión anónima y perfil de autor / onboarding (Issue #3, UI Issue #4)
-  - name: media
-    description: Carga privada de imagen adjunta (Issue #3)
-  - name: achievements
-    description: Ingesta modular (texto/audio/MCP), revisión y aprobación (Issue #3)
-  - name: drafts
-    description: Generación y edición independiente de borradores LinkedIn y X (Issue #3)
-  - name: social
-    description: Estado de conexión OAuth y publicación por red (Issue #5 - Mayko)
-
+- name: session
+  description: Sesión anónima y perfil de autor / onboarding (Issue
+- name: media
+  description: Carga privada de imagen adjunta (Issue
+- name: achievements
+  description: Ingesta modular (texto/audio/MCP), revisión y aprobación (Issue
+- name: drafts
+  description: Generación y edición independiente de borradores LinkedIn y X (Issue
+- name: social
+  description: Estado de conexión OAuth y publicación por red (Issue
+- name: portfolio
+  description: Portfolio opcional con logros aprobados, plantilla y paleta (Issue
 paths:
   /session:
     post:
-      tags: [session]
+      tags:
+      - session
       summary: Crear sesión anónima del autor (sin registro con contraseña)
       operationId: createSession
       responses:
-        "201":
+        '201':
           description: Sesión creada; el cliente debe enviar `X-Session-Id` en llamadas siguientes
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SessionCreated"
-
+                $ref: '#/components/schemas/SessionCreated'
   /session/profile:
     parameters:
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/SessionId'
     get:
-      tags: [session]
+      tags:
+      - session
       summary: Consultar perfil de onboarding y si puede iniciar el logro
       operationId: getAuthorProfile
       responses:
-        "200":
+        '200':
           description: Perfil actual
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthorProfile"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                $ref: '#/components/schemas/AuthorProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     patch:
-      tags: [session]
+      tags:
+      - session
       summary: Actualizar profesión y/o muestra de escritura (estilo)
       operationId: updateAuthorProfile
       requestBody:
@@ -63,26 +62,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateAuthorProfileRequest"
+              $ref: '#/components/schemas/UpdateAuthorProfileRequest'
       responses:
-        "200":
+        '200':
           description: Perfil actualizado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthorProfile"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "409":
-          $ref: "#/components/responses/RevisionConflict"
-
+                $ref: '#/components/schemas/AuthorProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
   /session/profile/photo:
     parameters:
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/SessionId'
     put:
-      tags: [session]
+      tags:
+      - session
       summary: Asociar foto de perfil ya subida vía POST /media
       operationId: setAuthorProfilePhoto
       requestBody:
@@ -90,27 +89,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SetAuthorProfilePhotoRequest"
+              $ref: '#/components/schemas/SetAuthorProfilePhotoRequest'
       responses:
-        "200":
+        '200':
           description: Foto asociada al perfil
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthorProfile"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/RevisionConflict"
-
+                $ref: '#/components/schemas/AuthorProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
   /session/cv:
     parameters:
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/SessionId'
     post:
-      tags: [session]
-      summary: Subir CV privado (opcional; reservado para portfolio #6)
+      tags:
+      - session
+      summary: Subir CV privado (opcional; reservado para portfolio
       operationId: uploadCv
       requestBody:
         required: true
@@ -118,57 +117,58 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              required: [file]
+              required:
+              - file
               properties:
                 file:
                   type: string
                   format: binary
       responses:
-        "201":
+        '201':
           description: CV almacenado y asociado al perfil
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthorProfile"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
+                $ref: '#/components/schemas/AuthorProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /session/profile/sync-style:
     parameters:
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/SessionId'
     post:
-      tags: [session]
-      summary: Refrescar muestras de estilo desde redes conectadas (delega en Issue #5)
+      tags:
+      - session
+      summary: Refrescar muestras de estilo desde redes conectadas (delega en Issue
       operationId: syncAuthorStyleFromSocial
       requestBody:
         required: false
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SyncStyleRequest"
+              $ref: '#/components/schemas/SyncStyleRequest'
       responses:
-        "200":
+        '200':
           description: Perfil con voice_context actualizado o parcial si alguna red falló
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthorProfile"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "503":
+                $ref: '#/components/schemas/AuthorProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
           description: Ninguna red pudo aportar lectura de posts; el cliente debe usar writing_sample
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthorProfile"
-
+                $ref: '#/components/schemas/AuthorProfile'
   /session/profile/complete:
     parameters:
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/SessionId'
     post:
-      tags: [session]
+      tags:
+      - session
       summary: Marcar onboarding completo y congelar snapshot voice_context
       operationId: completeAuthorOnboarding
       requestBody:
@@ -176,114 +176,118 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CompleteOnboardingRequest"
+              $ref: '#/components/schemas/CompleteOnboardingRequest'
       responses:
-        "200":
+        '200':
           description: Onboarding completo
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthorProfile"
-        "400":
+                $ref: '#/components/schemas/AuthorProfile'
+        '400':
           description: Faltan campos obligatorios (profesión, foto o fuente de estilo)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "409":
-          $ref: "#/components/responses/RevisionConflict"
-
+                $ref: '#/components/schemas/ApiError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
   /media:
     post:
-      tags: [media]
+      tags:
+      - media
       summary: Subir foto privada para asociar a un logro o publicación
       operationId: uploadMedia
       parameters:
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
               type: object
-              required: [file]
+              required:
+              - file
               properties:
                 file:
                   type: string
                   format: binary
                 alt_text:
-                  type: [string, "null"]
+                  type:
+                  - string
+                  - 'null'
       responses:
-        "201":
+        '201':
           description: Imagen almacenada de forma privada
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MediaAsset"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
+                $ref: '#/components/schemas/MediaAsset'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /achievements:
     post:
-      tags: [achievements]
+      tags:
+      - achievements
       summary: Crear logro e iniciar extracción de hechos (texto, audio o MCP)
       operationId: createAchievement
       parameters:
-        - $ref: "#/components/parameters/SessionId"
+      - $ref: '#/components/parameters/SessionId'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateAchievementTextRequest"
+              $ref: '#/components/schemas/CreateAchievementTextRequest'
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/CreateAchievementMultipartRequest"
+              $ref: '#/components/schemas/CreateAchievementMultipartRequest'
       responses:
-        "201":
+        '201':
           description: Logro creado y extraído (o en procesamiento)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Achievement"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
+                $ref: '#/components/schemas/Achievement'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
           description: Onboarding incompleto (`ready_for_achievement` es false)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
-        "422":
-          $ref: "#/components/responses/UnprocessableEntity"
-
+                $ref: '#/components/schemas/ApiError'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
   /achievements/{id}:
     parameters:
-      - $ref: "#/components/parameters/AchievementId"
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/AchievementId'
+    - $ref: '#/components/parameters/SessionId'
     get:
-      tags: [achievements]
+      tags:
+      - achievements
       summary: Consultar estado, texto/transcripción, hechos y preguntas abiertas
       operationId: getAchievement
       responses:
-        "200":
+        '200':
           description: Estado actual del logro
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Achievement"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/Achievement'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [achievements]
+      tags:
+      - achievements
       summary: Corregir, eliminar o agregar hechos con control de revisión
       operationId: updateAchievement
       requestBody:
@@ -291,27 +295,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateAchievementRequest"
+              $ref: '#/components/schemas/UpdateAchievementRequest'
       responses:
-        "200":
+        '200':
           description: Revisión actualizada
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Achievement"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/RevisionConflict"
-
+                $ref: '#/components/schemas/Achievement'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
   /achievements/{id}/approve:
     parameters:
-      - $ref: "#/components/parameters/AchievementId"
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/AchievementId'
+    - $ref: '#/components/parameters/SessionId'
     post:
-      tags: [achievements]
+      tags:
+      - achievements
       summary: Aprobar explícitamente una revisión concreta del logro
       operationId: approveAchievement
       requestBody:
@@ -319,27 +323,27 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ApproveAchievementRequest"
+              $ref: '#/components/schemas/ApproveAchievementRequest'
       responses:
-        "200":
+        '200':
           description: Revisión aprobada y congelada para generar borradores
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Achievement"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/RevisionConflict"
-
+                $ref: '#/components/schemas/Achievement'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
   /achievements/{id}/drafts:
     parameters:
-      - $ref: "#/components/parameters/AchievementId"
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/AchievementId'
+    - $ref: '#/components/parameters/SessionId'
     post:
-      tags: [drafts]
+      tags:
+      - drafts
       summary: Generar borradores independientes para LinkedIn y X desde una revisión aprobada
       operationId: generateDrafts
       requestBody:
@@ -347,44 +351,45 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/GenerateDraftsRequest"
+              $ref: '#/components/schemas/GenerateDraftsRequest'
       responses:
-        "201":
+        '201':
           description: Borradores generados por plataforma
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GenerateDraftsResponse"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/RevisionConflict"
-
+                $ref: '#/components/schemas/GenerateDraftsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
   /drafts/{id}:
     parameters:
-      - $ref: "#/components/parameters/DraftId"
-      - $ref: "#/components/parameters/SessionId"
+    - $ref: '#/components/parameters/DraftId'
+    - $ref: '#/components/parameters/SessionId'
     get:
-      tags: [drafts]
+      tags:
+      - drafts
       summary: Obtener un borrador individual (LinkedIn o X)
       operationId: getDraft
       responses:
-        "200":
+        '200':
           description: Borrador encontrado
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Draft"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
+                $ref: '#/components/schemas/Draft'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
-      tags: [drafts]
+      tags:
+      - drafts
       summary: Editar texto o foto de un borrador sin afectar la otra red
       operationId: updateDraft
       requestBody:
@@ -392,145 +397,372 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateDraftRequest"
+              $ref: '#/components/schemas/UpdateDraftRequest'
       responses:
-        "200":
+        '200':
           description: Borrador actualizado con nueva revisión
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Draft"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          $ref: "#/components/responses/RevisionConflict"
-
+                $ref: '#/components/schemas/Draft'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
   /social/{platform}/connection:
     parameters:
-      - $ref: "#/components/parameters/SocialPlatform"
+    - $ref: '#/components/parameters/SocialPlatform'
     get:
-      tags: [social]
-      summary: Consultar estado de conexión y capacidades reales de publicación por red (Issue #5)
+      tags:
+      - social
+      summary: Consultar estado de conexión y capacidades reales de publicación por red (Issue
       operationId: getSocialConnection
       responses:
-        "200":
+        '200':
           description: Estado de conexión de la plataforma
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SocialConnectionStatus"
+                $ref: '#/components/schemas/SocialConnectionStatus'
     post:
-      tags: [social]
-      summary: Iniciar flujo OAuth para conectar cuenta propia de LinkedIn o X (Issue #5)
+      tags:
+      - social
+      summary: Iniciar flujo OAuth para conectar cuenta propia de LinkedIn o X (Issue
       operationId: startSocialConnection
       requestBody:
         required: false
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StartSocialConnectionRequest"
+              $ref: '#/components/schemas/StartSocialConnectionRequest'
       responses:
-        "200":
+        '200':
           description: URL de autorización OAuth generada con state ligado a sesión
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StartSocialConnectionResponse"
-        "503":
+                $ref: '#/components/schemas/StartSocialConnectionResponse'
+        '503':
           description: Proveedor sin acceso/scopes habilitados para publicación directa
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SocialConnectionStatus"
-
+                $ref: '#/components/schemas/SocialConnectionStatus'
   /social/{platform}/callback:
     parameters:
-      - $ref: "#/components/parameters/SocialPlatform"
+    - $ref: '#/components/parameters/SocialPlatform'
     get:
-      tags: [social]
-      summary: Callback OAuth del proveedor (Issue #5)
+      tags:
+      - social
+      summary: Callback OAuth del proveedor (Issue
       operationId: handleSocialCallback
       parameters:
-        - name: code
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: state
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: error
-          in: query
-          required: false
-          schema:
-            type: string
+      - name: code
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: state
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: error
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
-        "302":
+        '302':
           description: Redirección al frontend tras guardar token cifrado o registrar error
-        "400":
-          $ref: "#/components/responses/BadRequest"
-
+        '400':
+          $ref: '#/components/responses/BadRequest'
   /drafts/{id}/publications:
     parameters:
-      - $ref: "#/components/parameters/DraftId"
-      - $ref: "#/components/parameters/IdempotencyKey"
+    - $ref: '#/components/parameters/DraftId'
+    - $ref: '#/components/parameters/IdempotencyKey'
     post:
-      tags: [social]
-      summary: Publicar un borrador confirmado en su red correspondiente (Issue #5)
+      tags:
+      - social
+      summary: Publicar un borrador confirmado en su red correspondiente (Issue
       operationId: publishDraft
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreatePublicationRequest"
+              $ref: '#/components/schemas/CreatePublicationRequest'
       responses:
-        "200":
+        '200':
           description: Resultado confirmado (o respuesta idempotente previa para la misma clave)
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Publication"
-        "202":
+                $ref: '#/components/schemas/Publication'
+        '202':
           description: Publicación en curso o pendiente de conciliación
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Publication"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "409":
-          description: >
-            Revisión de borrador desactualizada, o existe un intento en estado `unknown`
-            pendiente de verificación antes de permitir otro envío.
+                $ref: '#/components/schemas/Publication'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: |
+            Revisión de borrador desactualizada, o existe un intento en estado `unknown` pendiente de verificación antes de permitir otro envío.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiError"
-
+                $ref: '#/components/schemas/ApiError'
   /publications/{id}:
     parameters:
-      - $ref: "#/components/parameters/PublicationId"
+    - $ref: '#/components/parameters/PublicationId'
     get:
-      tags: [social]
-      summary: Consultar estado y enlace externo confirmado de una publicación (Issue #5)
+      tags:
+      - social
+      summary: Consultar estado y enlace externo confirmado de una publicación (Issue
       operationId: getPublication
       responses:
-        "200":
+        '200':
           description: Estado actual de la publicación
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Publication"
-        "404":
-          $ref: "#/components/responses/NotFound"
-
+                $ref: '#/components/schemas/Publication'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /portfolio/catalog:
+    get:
+      tags:
+      - portfolio
+      summary: Plantillas y paletas disponibles, con su tier (free | pro)
+      operationId: getPortfolioCatalog
+      responses:
+        '200':
+          description: Catálogo. El backend es la fuente de verdad del tier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioCatalog'
+  /portfolios:
+    parameters:
+    - $ref: '#/components/parameters/SessionId'
+    post:
+      tags:
+      - portfolio
+      summary: Crear portfolio en borrador con logros aprobados de la sesión
+      operationId: createPortfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePortfolioRequest'
+      responses:
+        '201':
+          description: Portfolio en borrador
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: |
+            `achievement_not_approved` si algún logro no está approved; `pro_required` si template_id o palette_id son tier pro.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /portfolios/{id}:
+    parameters:
+    - $ref: '#/components/parameters/SessionId'
+    - $ref: '#/components/parameters/PortfolioId'
+    get:
+      tags:
+      - portfolio
+      summary: Leer portfolio propio (borrador o publicado)
+      operationId: getPortfolio
+      responses:
+        '200':
+          description: Portfolio
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+      - portfolio
+      summary: Cambiar plantilla, paleta, logros, títulos u orden
+      description: |
+        Si el portfolio está publicado, los cambios quedan en borrador hasta volver a llamar a /publish. La página pública muestra la última versión publicada.
+      operationId: updatePortfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePortfolioRequest'
+      responses:
+        '200':
+          description: Portfolio actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
+        '422':
+          description: '`achievement_not_approved` o `pro_required`'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /portfolios/{id}/publish:
+    parameters:
+    - $ref: '#/components/parameters/SessionId'
+    - $ref: '#/components/parameters/PortfolioId'
+    post:
+      tags:
+      - portfolio
+      summary: Publicar una revisión (consentimiento separado de LinkedIn/X)
+      operationId: publishPortfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublishPortfolioRequest'
+      responses:
+        '200':
+          description: Publicado; congela un snapshot de los hechos aprobados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/RevisionConflict'
+        '422':
+          description: |
+            `cv_required` si la sesión no tiene cv_document (spec funcional: CV obligatorio para completar portfolio); `confirm_public_required` si confirm_public != true.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    delete:
+      tags:
+      - portfolio
+      summary: Revocar la URL pública (el borrador se conserva)
+      operationId: unpublishPortfolio
+      responses:
+        '200':
+          description: Portfolio revocado; GET /p/{slug} pasa a 404
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Portfolio'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /p/{slug}:
+    parameters:
+    - $ref: '#/components/parameters/PortfolioSlug'
+    get:
+      tags:
+      - portfolio
+      summary: Vista pública del portfolio (sin sesión)
+      description: |
+        Sólo devuelve el snapshot publicado. Nunca incluye transcript, source_quote, audio, fotos no elegidas ni datos de la sesión.
+      operationId: getPublicPortfolio
+      responses:
+        '200':
+          description: Portfolio público
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicPortfolio'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /p/{slug}/media/{media_id}:
+    parameters:
+    - $ref: '#/components/parameters/PortfolioSlug'
+    - name: media_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - portfolio
+      summary: Imagen pública (sólo foto de perfil y fotos de logros incluidas en el snapshot)
+      operationId: getPublicPortfolioMedia
+      responses:
+        '200':
+          description: Binario de la imagen
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /p/{slug}/cv:
+    parameters:
+    - $ref: '#/components/parameters/PortfolioSlug'
+    get:
+      tags:
+      - portfolio
+      summary: Descargar CV sólo si la persona activó cv_downloadable
+      operationId: getPublicPortfolioCv
+      responses:
+        '200':
+          description: PDF del CV
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /pro-interest:
+    parameters:
+    - $ref: '#/components/parameters/SessionId'
+    post:
+      tags:
+      - portfolio
+      summary: Registrar interés en Pro (fake door; no cobra ni crea suscripción)
+      description: Evidencia para
+      operationId: registerProInterest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProInterestRequest'
+      responses:
+        '202':
+          description: Registrado
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 components:
   parameters:
     SessionId:
@@ -540,34 +772,38 @@ components:
       description: Identificador de sesión anónima devuelto por POST /session.
       schema:
         type: string
-        examples: [ses_01J9PROFILE1]
+        examples:
+        - ses_01J9PROFILE1
     AchievementId:
       name: id
       in: path
       required: true
       schema:
         type: string
-        examples: [ach_01J9X8K2M4]
+        examples:
+        - ach_01J9X8K2M4
     DraftId:
       name: id
       in: path
       required: true
       schema:
         type: string
-        examples: [drf_x_01J9X9002]
+        examples:
+        - drf_x_01J9X9002
     PublicationId:
       name: id
       in: path
       required: true
       schema:
         type: string
-        examples: [pub_01J9XA550]
+        examples:
+        - pub_01J9XA550
     SocialPlatform:
       name: platform
       in: path
       required: true
       schema:
-        $ref: "#/components/schemas/Platform"
+        $ref: '#/components/schemas/Platform'
     IdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -576,249 +812,337 @@ components:
       schema:
         type: string
         minLength: 8
-        examples: [9f8c2b10-44a1-4e7d-9b31-0a12bc34de56]
-
+        examples:
+        - 9f8c2b10-44a1-4e7d-9b31-0a12bc34de56
+    PortfolioId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        examples:
+        - pf_01J9PORT01
+    PortfolioSlug:
+      name: slug
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[a-z0-9-]{3,60}$
+        examples:
+        - lucia-tolaba-ux
   responses:
     BadRequest:
       description: Solicitud inválida
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ApiError"
+            $ref: '#/components/schemas/ApiError'
     NotFound:
       description: Recurso no encontrado
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ApiError"
+            $ref: '#/components/schemas/ApiError'
     RevisionConflict:
       description: La revisión enviada no coincide con la revisión actual del recurso
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ApiError"
+            $ref: '#/components/schemas/ApiError'
     UnprocessableEntity:
       description: Error de validación de payload o archivo
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ApiError"
+            $ref: '#/components/schemas/ApiError'
     Unauthorized:
       description: Falta o es inválido el header X-Session-Id
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ApiError"
-
+            $ref: '#/components/schemas/ApiError'
   schemas:
     OnboardingStatus:
       type: string
-      enum: [not_started, in_progress, complete]
-
+      enum:
+      - not_started
+      - in_progress
+      - complete
     SessionCreated:
       type: object
-      required: [session_id, expires_at]
+      required:
+      - session_id
+      - expires_at
       properties:
         session_id:
           type: string
         expires_at:
           type: string
           format: date-time
-
     CvDocument:
       type: object
-      required: [cv_id, mime_type]
+      required:
+      - cv_id
+      - mime_type
       properties:
         cv_id:
           type: string
         mime_type:
           type: string
-          examples: [application/pdf]
+          examples:
+          - application/pdf
         size_bytes:
-          type: [integer, "null"]
-
+          type:
+          - integer
+          - 'null'
     AuthorProfile:
       type: object
       required:
-        - session_id
-        - onboarding_status
-        - revision
-        - ready_for_achievement
-        - profession
-        - photo_id
-        - writing_sample
-        - cv_document
-        - voice_context
-        - style_sync
+      - session_id
+      - onboarding_status
+      - revision
+      - ready_for_achievement
+      - profession
+      - photo_id
+      - writing_sample
+      - cv_document
+      - voice_context
+      - style_sync
       properties:
         session_id:
           type: string
         onboarding_status:
-          $ref: "#/components/schemas/OnboardingStatus"
+          $ref: '#/components/schemas/OnboardingStatus'
         revision:
           type: integer
           minimum: 1
         ready_for_achievement:
           type: boolean
-          description: >
-            true cuando hay profession, photo_id y al menos una fuente de estilo
-            (writing_sample o sample_posts en voice_context).
+          description: |
+            true cuando hay profession, photo_id y al menos una fuente de estilo (writing_sample o sample_posts en voice_context).
         profession:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         photo_id:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         writing_sample:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
           description: Texto libre para imitar tono cuando no hay posts de red.
         cv_document:
           oneOf:
-            - $ref: "#/components/schemas/CvDocument"
-            - type: "null"
+          - $ref: '#/components/schemas/CvDocument'
+          - type: 'null'
         voice_context:
           oneOf:
-            - $ref: "#/components/schemas/VoiceContext"
-            - type: "null"
+          - $ref: '#/components/schemas/VoiceContext'
+          - type: 'null'
         style_sync:
           type: object
-          required: [last_attempt_at, linkedin, x]
+          required:
+          - last_attempt_at
+          - linkedin
+          - x
           properties:
             last_attempt_at:
-              type: [string, "null"]
+              type:
+              - string
+              - 'null'
               format: date-time
             linkedin:
-              $ref: "#/components/schemas/StyleSyncResult"
+              $ref: '#/components/schemas/StyleSyncResult'
             x:
-              $ref: "#/components/schemas/StyleSyncResult"
-
+              $ref: '#/components/schemas/StyleSyncResult'
     StyleSyncResult:
       type: object
-      required: [status, posts_imported]
+      required:
+      - status
+      - posts_imported
       properties:
         status:
           type: string
-          enum: [skipped, succeeded, unavailable, failed]
+          enum:
+          - skipped
+          - succeeded
+          - unavailable
+          - failed
         posts_imported:
           type: integer
           minimum: 0
         message:
-          type: [string, "null"]
-
+          type:
+          - string
+          - 'null'
     UpdateAuthorProfileRequest:
       type: object
-      required: [revision]
+      required:
+      - revision
       properties:
         revision:
           type: integer
           minimum: 1
         profession:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
           minLength: 2
         writing_sample:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
           description: Mínimo 20 caracteres si se envía y no hay posts de red.
-
     SetAuthorProfilePhotoRequest:
       type: object
-      required: [revision, photo_id]
+      required:
+      - revision
+      - photo_id
       properties:
         revision:
           type: integer
           minimum: 1
         photo_id:
           type: string
-
     SyncStyleRequest:
       type: object
       properties:
         platforms:
           type: array
           items:
-            $ref: "#/components/schemas/Platform"
-          default: [linkedin, x]
+            $ref: '#/components/schemas/Platform'
+          default:
+          - linkedin
+          - x
         max_posts_per_platform:
           type: integer
           minimum: 1
           maximum: 20
           default: 5
-
     CompleteOnboardingRequest:
       type: object
-      required: [revision]
+      required:
+      - revision
       properties:
         revision:
           type: integer
           minimum: 1
     Platform:
       type: string
-      enum: [linkedin, x]
-
+      enum:
+      - linkedin
+      - x
     InputType:
       type: string
-      enum: [text, audio, mcp]
-
+      enum:
+      - text
+      - audio
+      - mcp
     AchievementStatus:
       type: string
-      enum: [processing, needs_review, approved, failed]
-
+      enum:
+      - processing
+      - needs_review
+      - approved
+      - failed
     FactCategory:
       type: string
-      enum: [project, role, tech, impact, date, learning, context]
-
+      enum:
+      - project
+      - role
+      - tech
+      - impact
+      - date
+      - learning
+      - context
     FactSource:
       type: string
-      enum: [transcript, user, mcp]
-
+      enum:
+      - transcript
+      - user
+      - mcp
     DraftStatus:
       type: string
-      enum: [draft, ready_to_publish, publishing, succeeded, failed, unknown]
-
+      enum:
+      - draft
+      - ready_to_publish
+      - publishing
+      - succeeded
+      - failed
+      - unknown
     ConnectionState:
       type: string
-      enum: [connected, disconnected, expired, access_unavailable]
-
+      enum:
+      - connected
+      - disconnected
+      - expired
+      - access_unavailable
     PublicationStatus:
       type: string
-      enum: [publishing, succeeded, failed, unknown]
-
+      enum:
+      - publishing
+      - succeeded
+      - failed
+      - unknown
     MediaAsset:
       type: object
-      required: [photo_id, mime_type]
+      required:
+      - photo_id
+      - mime_type
       properties:
         photo_id:
           type: string
         mime_type:
           type: string
-          examples: [image/jpeg, image/png, image/webp]
+          examples:
+          - image/jpeg
+          - image/png
+          - image/webp
         alt_text:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         size_bytes:
-          type: [integer, "null"]
-
+          type:
+          - integer
+          - 'null'
     CreateAchievementTextRequest:
       type: object
-      required: [input_type, text]
+      required:
+      - input_type
+      - text
       properties:
         input_type:
           type: string
-          enum: [text, mcp]
+          enum:
+          - text
+          - mcp
           default: text
         text:
           type: string
           minLength: 10
         photo_id:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
           default: null
         source_metadata:
-          type: [object, "null"]
+          type:
+          - object
+          - 'null'
           additionalProperties: true
           description: Metadatos opcionales cuando la ingesta proviene de MCP (ej. repo, PR, URI).
-
     CreateAchievementMultipartRequest:
       type: object
       properties:
         input_type:
           type: string
-          enum: [audio, text]
+          enum:
+          - audio
+          - text
           default: audio
         audio:
           type: string
@@ -828,25 +1152,31 @@ components:
         photo:
           type: string
           format: binary
-
     Fact:
       type: object
-      required: [id, text, source]
+      required:
+      - id
+      - text
+      - source
       properties:
         id:
           type: string
         category:
-          $ref: "#/components/schemas/FactCategory"
+          $ref: '#/components/schemas/FactCategory'
         text:
           type: string
         source_quote:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         source:
-          $ref: "#/components/schemas/FactSource"
-
+          $ref: '#/components/schemas/FactSource'
     OpenQuestion:
       type: object
-      required: [id, field, question]
+      required:
+      - id
+      - field
+      - question
       properties:
         id:
           type: string
@@ -854,70 +1184,81 @@ components:
           type: string
         question:
           type: string
-
     Achievement:
       type: object
-      required: [id, input_type, status, revision, transcript, facts, open_questions]
+      required:
+      - id
+      - input_type
+      - status
+      - revision
+      - transcript
+      - facts
+      - open_questions
       properties:
         id:
           type: string
         input_type:
-          $ref: "#/components/schemas/InputType"
+          $ref: '#/components/schemas/InputType'
         status:
-          $ref: "#/components/schemas/AchievementStatus"
+          $ref: '#/components/schemas/AchievementStatus'
         revision:
           type: integer
           minimum: 1
         photo_id:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         transcript:
           type: string
         facts:
           type: array
           items:
-            $ref: "#/components/schemas/Fact"
+            $ref: '#/components/schemas/Fact'
         open_questions:
           type: array
           items:
-            $ref: "#/components/schemas/OpenQuestion"
+            $ref: '#/components/schemas/OpenQuestion'
         error:
           oneOf:
-            - $ref: "#/components/schemas/ErrorDetail"
-            - type: "null"
-
+          - $ref: '#/components/schemas/ErrorDetail'
+          - type: 'null'
     UpdateAchievementRequest:
       type: object
-      required: [revision, facts]
+      required:
+      - revision
+      - facts
       properties:
         revision:
           type: integer
           minimum: 1
         photo_id:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         facts:
           type: array
           items:
-            $ref: "#/components/schemas/Fact"
-
+            $ref: '#/components/schemas/Fact'
     ApproveAchievementRequest:
       type: object
-      required: [revision]
+      required:
+      - revision
       properties:
         revision:
           type: integer
           minimum: 1
-
     VoiceContext:
       type: object
-      description: >
-        Datos de estilo/tono del autor para imitar su forma de escribir en cada red.
-        Usado exclusivamente para estilo; nunca como fuente de hechos nuevos.
+      description: |
+        Datos de estilo/tono del autor para imitar su forma de escribir en cada red. Usado exclusivamente para estilo; nunca como fuente de hechos nuevos.
       properties:
         language:
           type: string
           default: es-AR
         author_hint:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
           description: Profesión u otro contexto de rol declarado en onboarding; sólo estilo.
         sample_posts:
           type: object
@@ -939,10 +1280,10 @@ components:
             use_hashtags:
               type: boolean
               default: false
-
     GenerateDraftsRequest:
       type: object
-      required: [achievement_revision]
+      required:
+      - achievement_revision
       properties:
         achievement_revision:
           type: integer
@@ -950,28 +1291,28 @@ components:
         platforms:
           type: array
           items:
-            $ref: "#/components/schemas/Platform"
-          default: [linkedin, x]
+            $ref: '#/components/schemas/Platform'
+          default:
+          - linkedin
+          - x
         voice_context:
           oneOf:
-            - $ref: "#/components/schemas/VoiceContext"
-            - type: "null"
-          description: >
-            Si se omite en el request, el servidor usa el snapshot del perfil de sesión
-            cuando onboarding_status es complete.
-
+          - $ref: '#/components/schemas/VoiceContext'
+          - type: 'null'
+          description: |
+            Si se omite en el request, el servidor usa el snapshot del perfil de sesión cuando onboarding_status es complete.
     Draft:
       type: object
       required:
-        - id
-        - achievement_id
-        - achievement_revision
-        - platform
-        - revision
-        - status
-        - body
-        - char_count
-        - max_chars
+      - id
+      - achievement_id
+      - achievement_revision
+      - platform
+      - revision
+      - status
+      - body
+      - char_count
+      - max_chars
       properties:
         id:
           type: string
@@ -980,14 +1321,16 @@ components:
         achievement_revision:
           type: integer
         platform:
-          $ref: "#/components/schemas/Platform"
+          $ref: '#/components/schemas/Platform'
         revision:
           type: integer
           minimum: 1
         status:
-          $ref: "#/components/schemas/DraftStatus"
+          $ref: '#/components/schemas/DraftStatus'
         photo_id:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         body:
           type: string
         char_count:
@@ -998,10 +1341,12 @@ components:
           type: array
           items:
             type: string
-
     GenerateDraftsResponse:
       type: object
-      required: [achievement_id, achievement_revision, drafts]
+      required:
+      - achievement_id
+      - achievement_revision
+      - drafts
       properties:
         achievement_id:
           type: string
@@ -1010,11 +1355,12 @@ components:
         drafts:
           type: array
           items:
-            $ref: "#/components/schemas/Draft"
-
+            $ref: '#/components/schemas/Draft'
     UpdateDraftRequest:
       type: object
-      required: [revision, body]
+      required:
+      - revision
+      - body
       properties:
         revision:
           type: integer
@@ -1023,11 +1369,15 @@ components:
           type: string
           minLength: 1
         photo_id:
-          type: [string, "null"]
-
+          type:
+          - string
+          - 'null'
     PublishableMedia:
       type: object
-      required: [photo_id, mime_type, local_path]
+      required:
+      - photo_id
+      - mime_type
+      - local_path
       properties:
         photo_id:
           type: string
@@ -1037,14 +1387,18 @@ components:
           type: string
           description: Ruta privada local en servidor para subir el binario al proveedor social.
         alt_text:
-          type: [string, "null"]
-
+          type:
+          - string
+          - 'null'
     PublishableDraft:
       type: object
-      description: >
-        Contrato interno de handoff #3 -> #5. Esto es lo que recibe el módulo
-        `api/social` de Mayko al publicar un borrador confirmado.
-      required: [draft_id, draft_revision, platform, body]
+      description: |
+        Contrato interno de handoff #3 -> #5. Esto es lo que recibe el módulo `api/social` de Mayko al publicar un borrador confirmado.
+      required:
+      - draft_id
+      - draft_revision
+      - platform
+      - body
       properties:
         draft_id:
           type: string
@@ -1052,59 +1406,70 @@ components:
           type: integer
           minimum: 1
         platform:
-          $ref: "#/components/schemas/Platform"
+          $ref: '#/components/schemas/Platform'
         body:
           type: string
         media:
           oneOf:
-            - $ref: "#/components/schemas/PublishableMedia"
-            - type: "null"
-
+          - $ref: '#/components/schemas/PublishableMedia'
+          - type: 'null'
     SocialConnectionStatus:
       type: object
-      required: [platform, status, can_publish_text, can_publish_image, can_read_posts]
+      required:
+      - platform
+      - status
+      - can_publish_text
+      - can_publish_image
+      - can_read_posts
       properties:
         platform:
-          $ref: "#/components/schemas/Platform"
+          $ref: '#/components/schemas/Platform'
         status:
-          $ref: "#/components/schemas/ConnectionState"
+          $ref: '#/components/schemas/ConnectionState'
         can_publish_text:
           type: boolean
         can_publish_image:
           type: boolean
         can_read_posts:
           type: boolean
-          description: >
-            Si true, Issue #5 puede listar posts recientes propios para voice_context.
-            Independiente de can_publish_text.
+          description: |
+            Si true, Issue #5 puede listar posts recientes propios para voice_context. Independiente de can_publish_text.
         account_handle:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         reason:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
           description: Motivo concreto si `status` es `access_unavailable`, `expired` o `disconnected`.
-
     StartSocialConnectionRequest:
       type: object
       properties:
         return_to:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
           description: Ruta relativa del frontend a la que volver luego del callback OAuth.
-
     StartSocialConnectionResponse:
       type: object
-      required: [platform, authorization_url, state]
+      required:
+      - platform
+      - authorization_url
+      - state
       properties:
         platform:
-          $ref: "#/components/schemas/Platform"
+          $ref: '#/components/schemas/Platform'
         authorization_url:
           type: string
           format: uri
         state:
           type: string
-
     CreatePublicationRequest:
       type: object
-      required: [draft_revision, confirm_publish]
+      required:
+      - draft_revision
+      - confirm_publish
       properties:
         draft_revision:
           type: integer
@@ -1112,10 +1477,15 @@ components:
         confirm_publish:
           type: boolean
           const: true
-
     Publication:
       type: object
-      required: [id, draft_id, draft_revision, platform, idempotency_key, status]
+      required:
+      - id
+      - draft_id
+      - draft_revision
+      - platform
+      - idempotency_key
+      - status
       properties:
         id:
           type: string
@@ -1124,26 +1494,34 @@ components:
         draft_revision:
           type: integer
         platform:
-          $ref: "#/components/schemas/Platform"
+          $ref: '#/components/schemas/Platform'
         idempotency_key:
           type: string
         status:
-          $ref: "#/components/schemas/PublicationStatus"
+          $ref: '#/components/schemas/PublicationStatus'
         external_post_id:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         external_url:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
         published_at:
-          type: [string, "null"]
+          type:
+          - string
+          - 'null'
           format: date-time
         error:
           oneOf:
-            - $ref: "#/components/schemas/ErrorDetail"
-            - type: "null"
-
+          - $ref: '#/components/schemas/ErrorDetail'
+          - type: 'null'
     ErrorDetail:
       type: object
-      required: [code, message, retryable]
+      required:
+      - code
+      - message
+      - retryable
       properties:
         code:
           type: string
@@ -1151,10 +1529,369 @@ components:
           type: string
         retryable:
           type: boolean
-
     ApiError:
       type: object
-      required: [error]
+      required:
+      - error
       properties:
         error:
-          $ref: "#/components/schemas/ErrorDetail"
+          $ref: '#/components/schemas/ErrorDetail'
+    Tier:
+      type: string
+      enum:
+      - free
+      - pro
+    PortfolioStatus:
+      type: string
+      enum:
+      - draft
+      - published
+      - revoked
+    PortfolioTemplate:
+      type: object
+      required:
+      - id
+      - name
+      - tier
+      - description
+      properties:
+        id:
+          type: string
+          examples:
+          - esencial
+        name:
+          type: string
+        tier:
+          $ref: '#/components/schemas/Tier'
+        description:
+          type: string
+    PaletteTokens:
+      type: object
+      description: Variables CSS que consume cualquier plantilla. Hex sRGB.
+      required:
+      - bg
+      - surface
+      - ink
+      - muted
+      - accent
+      - on_accent
+      properties:
+        bg:
+          type: string
+          examples:
+          - '#F4F7F9'
+        surface:
+          type: string
+        ink:
+          type: string
+        muted:
+          type: string
+        accent:
+          type: string
+        on_accent:
+          type: string
+    Palette:
+      type: object
+      required:
+      - id
+      - name
+      - tier
+      - scheme
+      - tokens
+      properties:
+        id:
+          type: string
+          examples:
+          - azul-salina
+        name:
+          type: string
+        tier:
+          $ref: '#/components/schemas/Tier'
+        scheme:
+          type: string
+          enum:
+          - light
+          - dark
+        tokens:
+          $ref: '#/components/schemas/PaletteTokens'
+    PortfolioCatalog:
+      type: object
+      required:
+      - templates
+      - palettes
+      properties:
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/PortfolioTemplate'
+        palettes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Palette'
+    PortfolioItemInput:
+      type: object
+      required:
+      - achievement_id
+      - title
+      properties:
+        achievement_id:
+          type: string
+        title:
+          type: string
+          minLength: 3
+          maxLength: 80
+          description: El Achievement no tiene título; lo escribe la persona.
+        occurred_on:
+          type:
+          - string
+          - 'null'
+          description: YYYY-MM o YYYY-MM-DD. Opcional; lo usa la plantilla Recorrido.
+        show_photo:
+          type: boolean
+          default: true
+    CreatePortfolioRequest:
+      type: object
+      required:
+      - display_name
+      - items
+      - template_id
+      - palette_id
+      properties:
+        display_name:
+          type: string
+          minLength: 2
+          maxLength: 60
+          description: AuthorProfile no tiene nombre; el portfolio lo pide.
+        headline:
+          type:
+          - string
+          - 'null'
+          maxLength: 120
+          description: Si es null se usa AuthorProfile.profession.
+        items:
+          type: array
+          minItems: 1
+          maxItems: 12
+          items:
+            $ref: '#/components/schemas/PortfolioItemInput'
+        template_id:
+          type: string
+        palette_id:
+          type: string
+        cv_downloadable:
+          type: boolean
+          default: false
+          description: El CV es obligatorio para publicar pero sigue privado salvo opt-in.
+    UpdatePortfolioRequest:
+      type: object
+      required:
+      - revision
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+        display_name:
+          type: string
+        headline:
+          type:
+          - string
+          - 'null'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PortfolioItemInput'
+        template_id:
+          type: string
+        palette_id:
+          type: string
+        cv_downloadable:
+          type: boolean
+    PublishPortfolioRequest:
+      type: object
+      required:
+      - revision
+      - confirm_public
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+        confirm_public:
+          type: boolean
+          const: true
+        slug:
+          type:
+          - string
+          - 'null'
+          pattern: ^[a-z0-9-]{3,60}$
+          description: Si es null el backend genera uno desde display_name. 409 si ya existe.
+    Portfolio:
+      type: object
+      required:
+      - id
+      - status
+      - revision
+      - display_name
+      - headline
+      - items
+      - template_id
+      - palette_id
+      - cv_downloadable
+      - has_cv
+      - slug
+      - public_url
+      - published_revision
+      - published_at
+      properties:
+        id:
+          type: string
+        status:
+          $ref: '#/components/schemas/PortfolioStatus'
+        revision:
+          type: integer
+          minimum: 1
+        display_name:
+          type: string
+        headline:
+          type:
+          - string
+          - 'null'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PortfolioItemInput'
+        template_id:
+          type: string
+        palette_id:
+          type: string
+        cv_downloadable:
+          type: boolean
+        has_cv:
+          type: boolean
+          description: Refleja AuthorProfile.cv_document != null; el front avisa antes de publicar.
+        slug:
+          type:
+          - string
+          - 'null'
+        public_url:
+          type:
+          - string
+          - 'null'
+        published_revision:
+          type:
+          - integer
+          - 'null'
+        published_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    PublicFact:
+      type: object
+      required:
+      - text
+      - source
+      properties:
+        category:
+          $ref: '#/components/schemas/FactCategory'
+        text:
+          type: string
+        source:
+          $ref: '#/components/schemas/FactSource'
+          description: transcript = lo contó en el audio; user = lo agregó al revisar. Lo muestra la marca de evidencia.
+    PublicPortfolioItem:
+      type: object
+      required:
+      - title
+      - occurred_on
+      - photo_url
+      - facts
+      properties:
+        title:
+          type: string
+        occurred_on:
+          type:
+          - string
+          - 'null'
+        photo_url:
+          type:
+          - string
+          - 'null'
+          description: Ruta /p/{slug}/media/{media_id}
+        facts:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicFact'
+    PublicPortfolio:
+      type: object
+      required:
+      - slug
+      - display_name
+      - headline
+      - photo_url
+      - template_id
+      - palette
+      - items
+      - cv_url
+      - published_at
+      properties:
+        slug:
+          type: string
+        display_name:
+          type: string
+        headline:
+          type:
+          - string
+          - 'null'
+        photo_url:
+          type:
+          - string
+          - 'null'
+        template_id:
+          type: string
+        palette:
+          $ref: '#/components/schemas/Palette'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicPortfolioItem'
+        cv_url:
+          type:
+          - string
+          - 'null'
+          description: Sólo si cv_downloadable; ruta /p/{slug}/cv
+        published_at:
+          type: string
+          format: date-time
+    ProInterestRequest:
+      type: object
+      required:
+      - response
+      properties:
+        response:
+          type: string
+          enum:
+          - interested
+          - not_now
+        trigger:
+          type: string
+          enum:
+          - template
+          - palette
+          - customize
+        item_id:
+          type:
+          - string
+          - 'null'
+          description: id de la plantilla o paleta pro que disparó el aviso
+        price_band_ars_month:
+          type:
+          - string
+          - 'null'
+          enum:
+          - none
+          - up_to_2000
+          - 20005000
+          - 500010000
+          - over_10000
+          - null
+          description: Respuesta opcional; no es disposición a pagar validada.

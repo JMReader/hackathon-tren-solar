@@ -1,5 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Portfolio y API
+
+Para servir `/p/[slug]` desde el backend FastAPI (en lugar del demo), definí en `.env.local`:
+
+```bash
+PORTFOLIO_API_URL=http://localhost:8000/api/v1
+```
+
+Sin esa variable, las páginas públicas usan los datos de `src/portfolio/demo.ts`.
+
 ## Getting Started
 
 First, run the development server:
