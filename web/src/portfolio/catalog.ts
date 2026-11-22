@@ -1,15 +1,15 @@
 import type { Palette, PortfolioTemplate } from "./types"
 
 export const templates: PortfolioTemplate[] = [
-  { id: "esencial", name: "Esencial", tier: "free", description: "Una columna con tus logros y sus hechos. La que se lee más rápido." },
-  { id: "galeria", name: "Galería", tier: "free", description: "Tus fotos al frente. Cada una abre los hechos del logro." },
-  { id: "recorrido", name: "Recorrido", tier: "free", description: "Tus logros en orden, del más reciente al primero." },
-  { id: "credencial", name: "Credencial", tier: "free", description: "Todo en una pantalla de celular, para mandar por WhatsApp." },
-  { id: "caso", name: "Caso", tier: "free", description: "Un logro en grande y el resto debajo." },
-  { id: "estratos", name: "Estratos", tier: "pro", description: "Cada logro en una banda de color derivada de tu paleta." },
-  { id: "editorial", name: "Editorial", tier: "pro", description: "Tipografía grande. Cada logro se lee como una nota." },
-  { id: "telar", name: "Telar", tier: "pro", description: "Encabezado geométrico generado con tus colores." },
-  { id: "terminal", name: "Terminal", tier: "pro", description: "Tus logros como el historial de un repositorio." },
+  { id: "esencial", name: "Esencial", tier: "free", description: "Tu nombre a un costado y los logros al otro. Se lee de un vistazo." },
+  { id: "galeria", name: "Galería", tier: "free", description: "Cada logro es un bloque grande. Si subiste foto, va la foto." },
+  { id: "recorrido", name: "Recorrido", tier: "free", description: "Tus logros por fecha, del último al primero." },
+  { id: "credencial", name: "Credencial", tier: "free", description: "Entra en una pantalla. Buena para mandar por WhatsApp." },
+  { id: "caso", name: "Caso", tier: "free", description: "Un logro arriba, bien grande, y los demás en lista." },
+  { id: "estratos", name: "Estratos", tier: "pro", description: "Una franja de color por logro." },
+  { id: "editorial", name: "Editorial", tier: "pro", description: "Letra grande, como una revista." },
+  { id: "telar", name: "Telar", tier: "pro", description: "Un encabezado de formas armado con tus colores." },
+  { id: "terminal", name: "Terminal", tier: "pro", description: "Tus logros como commits. Para devs." },
   { id: "presentacion", name: "Presentación", tier: "pro", description: "Un logro por pantalla, para mostrar en una entrevista." },
 ]
 

@@ -5,60 +5,64 @@ const bar = "rounded-full bg-(--pf-ink)/25"
 
 const layouts: Record<string, ReactNode> = {
   esencial: (
-    <div className="flex h-full flex-col gap-1.5 p-3">
-      <div className="flex items-center gap-1.5">
-        <span className="size-3 rounded-full bg-(--pf-accent)" />
-        <span className={cn(bar, "h-1.5 w-12 bg-(--pf-ink)/60")} />
+    <div className="grid h-full grid-cols-[5fr_7fr] gap-2 p-3">
+      <div className="flex flex-col gap-1.5">
+        <span className={cn(bar, "h-2.5 w-full rounded-sm bg-(--pf-ink)/75")} />
+        <span className={cn(bar, "h-1 w-2/3")} />
       </div>
-      <span className={cn(bar, "mt-1.5 h-1 w-16 bg-(--pf-ink)/45")} />
-      <span className={cn(bar, "h-1 w-full")} />
-      <span className={cn(bar, "h-1 w-4/5")} />
-      <span className={cn(bar, "mt-1.5 h-1 w-14 bg-(--pf-ink)/45")} />
-      <span className={cn(bar, "h-1 w-full")} />
+      <div className="flex flex-col gap-1.5">
+        <span className="h-px w-full bg-(--pf-ink)/70" />
+        <span className={cn(bar, "h-1 w-4/5 bg-(--pf-ink)/50")} />
+        <span className={cn(bar, "h-1 w-full")} />
+        <span className="mt-1 h-px w-full bg-(--pf-ink)/70" />
+        <span className={cn(bar, "h-1 w-3/5 bg-(--pf-ink)/50")} />
+        <span className={cn(bar, "h-1 w-full")} />
+      </div>
     </div>
   ),
   galeria: (
-    <div className="grid h-full grid-cols-3 gap-1 p-2.5">
-      <span className="rounded bg-(--pf-accent)" />
-      <span className="rounded bg-(--pf-surface)" />
-      <span className="rounded bg-(--pf-accent)/30" />
-      <span className="rounded bg-(--pf-accent)/30" />
-      <span className="rounded bg-(--pf-accent)" />
-      <span className="rounded bg-(--pf-surface)" />
+    <div className="grid h-full grid-cols-3 grid-rows-2 gap-1 p-2.5">
+      <span className="col-span-2 rounded bg-(--pf-accent)" />
+      <span className="rounded bg-(--pf-ink)" />
+      <span className="col-span-3 rounded bg-(--pf-surface) ring-1 ring-(--pf-ink)/10 ring-inset" />
     </div>
   ),
   recorrido: (
     <div className="flex h-full flex-col gap-1.5 p-3">
-      <span className={cn(bar, "h-2 w-14 rounded-sm bg-(--pf-ink)/70")} />
-      <div className="mt-1 flex flex-1 flex-col justify-around border-l-2 border-(--pf-accent) pl-2">
-        <span className={cn(bar, "h-1 w-12")} />
-        <span className={cn(bar, "h-1 w-16")} />
-        <span className={cn(bar, "h-1 w-10")} />
+      <span className="h-3.5 w-4/5 rounded-[2px] bg-(--pf-ink)/85" />
+      <span className="h-px w-full bg-(--pf-ink)/70" />
+      <div className="grid flex-1 grid-cols-[2fr_5fr] content-around gap-x-2">
+        <span className="h-2 w-full rounded-[2px] bg-(--pf-accent)" />
+        <span className={cn(bar, "h-1 w-full self-center")} />
+        <span className="h-2 w-3/4 rounded-[2px] bg-(--pf-accent)" />
+        <span className={cn(bar, "h-1 w-4/5 self-center")} />
       </div>
     </div>
   ),
   credencial: (
-    <div className="grid h-full place-items-center p-2">
-      <div className="flex h-full w-11 flex-col items-center overflow-hidden rounded-md bg-(--pf-surface)">
-        <span className="h-3 w-full bg-(--pf-accent)" />
-        <span className="-mt-1.5 size-3 rounded-full bg-(--pf-ink)/40 ring-2 ring-(--pf-surface)" />
-        <span className={cn(bar, "mt-1.5 h-1 w-7")} />
-        <span className={cn(bar, "mt-1 h-1 w-5")} />
+    <div className="grid h-full place-items-center p-3">
+      <div className="grid h-full w-full grid-cols-[5fr_6fr] overflow-hidden rounded-md bg-(--pf-surface)">
+        <div className="flex flex-col justify-between bg-(--pf-accent) p-1.5">
+          <span className="mx-auto h-1 w-4 rounded-full bg-(--pf-bg)" />
+          <span className="h-1.5 w-full rounded-[2px] bg-(--pf-on-accent)" />
+        </div>
+        <div className="flex flex-col justify-center gap-1.5 p-2">
+          <span className={cn(bar, "h-1 w-full")} />
+          <span className={cn(bar, "h-1 w-4/5")} />
+          <span className={cn(bar, "h-1 w-full")} />
+        </div>
       </div>
     </div>
   ),
   caso: (
-    <div className="flex h-full flex-col gap-1.5 p-3">
-      <div className="flex flex-1 gap-1.5">
-        <div className="flex flex-1 flex-col justify-end gap-1">
-          <span className={cn(bar, "h-2 w-full rounded-sm bg-(--pf-ink)/70")} />
-          <span className={cn(bar, "h-2 w-3/4 rounded-sm bg-(--pf-ink)/70")} />
-        </div>
-        <span className="w-8 rounded bg-(--pf-accent)" />
+    <div className="flex h-full flex-col">
+      <div className="flex h-3/5 flex-col justify-end gap-1 bg-(--pf-accent) p-3">
+        <span className="h-2 w-3/4 rounded-[2px] bg-(--pf-on-accent)" />
+        <span className="h-2 w-1/2 rounded-[2px] bg-(--pf-on-accent)" />
       </div>
-      <div className="flex gap-1.5">
-        <span className={cn(bar, "h-1 flex-1")} />
-        <span className={cn(bar, "h-1 flex-1")} />
+      <div className="grid flex-1 grid-cols-2 content-center gap-2 px-3">
+        <span className={cn(bar, "h-1")} />
+        <span className={cn(bar, "h-1")} />
       </div>
     </div>
   ),

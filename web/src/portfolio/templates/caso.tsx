@@ -1,71 +1,78 @@
-import { cn } from "@/lib/utils"
-import { CvLink, FactOrigin, MadeWith, OriginLegend, Portrait } from "../parts"
+import { CvLink, FactOrigin, MadeWith, OriginLegend, Portrait, factLabel } from "../parts"
 import { formatOccurredOn } from "../theme"
 import { TemplateShell, type TemplateProps } from "./shell"
+
+const frame = "mx-auto w-full max-w-[80rem] px-6 @2xl:px-10"
 
 export function Caso({ portfolio }: TemplateProps) {
   const [lead, ...rest] = portfolio.items
   return (
     <TemplateShell portfolio={portfolio}>
-      <div className="mx-auto flex max-w-6xl flex-col px-6 py-10 @2xl:px-10 @2xl:py-14">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Portrait portfolio={portfolio} className="size-10 shrink-0 rounded-full text-sm" />
-            <p className="leading-tight">
-              <span className="block font-semibold">{portfolio.display_name}</span>
-              {portfolio.headline && <span className="block text-sm text-(--pf-muted)">{portfolio.headline}</span>}
-            </p>
-          </div>
-          <CvLink portfolio={portfolio} />
-        </header>
+      <header className={`${frame} flex flex-wrap items-center justify-between gap-4 py-5`}>
+        <div className="flex items-center gap-3.5">
+          <Portrait portfolio={portfolio} className="size-11 rounded-full" />
+          <p className="leading-tight">
+            <span className="block font-(family-name:--font-bricolage) text-lg font-semibold tracking-[-0.01em]">{portfolio.display_name}</span>
+            {portfolio.headline && <span className="block text-sm text-(--pf-muted)">{portfolio.headline}</span>}
+          </p>
+        </div>
+        <CvLink portfolio={portfolio} />
+      </header>
 
-        {lead && (
-          <section className={cn("mt-14 grid gap-10", lead.photo_url && "@5xl:grid-cols-[1.1fr_1fr] @5xl:items-end")}>
-            <div>
-              {lead.occurred_on && <p className="text-sm text-(--pf-muted)">{formatOccurredOn(lead.occurred_on)}</p>}
-              <h2 className="mt-3 font-display text-[clamp(2.5rem,6.5cqi,4.75rem)] leading-[0.98] font-light tracking-[-0.04em] text-balance @5xl:max-w-[14ch]">
+      {lead && (
+        <>
+          <section className="bg-(--pf-accent) text-(--pf-on-accent)">
+            <div className={`${frame} grid gap-8 pt-16 pb-10 @5xl:grid-cols-[8fr_4fr] @5xl:items-end @5xl:pt-28 @5xl:pb-14`}>
+              <h1 className="pf-rise font-display text-[clamp(2.75rem,9cqi,6rem)] leading-[0.95] font-light tracking-[-0.035em] text-balance">
                 {lead.title}
-              </h2>
+              </h1>
+              {lead.photo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={lead.photo_url} alt="" className="aspect-[4/3] w-full rounded-xl object-cover" />
+              ) : (
+                lead.occurred_on && <p className="text-lg text-(--pf-on-accent)/85 tabular-nums @5xl:text-right">{formatOccurredOn(lead.occurred_on)}</p>
+              )}
             </div>
-            {lead.photo_url && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={lead.photo_url} alt="" className="aspect-[4/3] w-full rounded-3xl object-cover" />
-            )}
-            <ul className={cn("flex flex-col gap-5 @5xl:grid @5xl:grid-cols-2 @5xl:gap-x-10", lead.photo_url && "@5xl:col-span-2")}>
-              {lead.facts.map((fact) => (
-                <li key={fact.text} className="flex gap-3 text-xl leading-relaxed text-pretty">
+          </section>
+
+          <dl className={`${frame} grid gap-x-16 gap-y-10 py-12 @4xl:grid-cols-2 @5xl:py-16`}>
+            {lead.facts.map((fact) => (
+              <div key={fact.text}>
+                <dt className="flex items-center gap-2 text-sm text-(--pf-muted)">
                   <FactOrigin source={fact.source} />
-                  {fact.text}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+                  {factLabel(fact.category) ?? "Hecho"}
+                </dt>
+                <dd className="mt-2.5 max-w-[46ch] text-[1.375rem] leading-[1.45] text-pretty">{fact.text}</dd>
+              </div>
+            ))}
+          </dl>
+        </>
+      )}
 
-        {rest.length > 0 && (
-          <section className="mt-16 border-t border-(--pf-ink)/12 pt-8">
-            <h2 className="text-sm font-semibold text-(--pf-muted)">Otros logros</h2>
-            <ul className="mt-4 grid gap-x-10 gap-y-6 @2xl:grid-cols-2">
-              {rest.map((item) => (
-                <li key={item.title}>
-                  <h3 className="text-lg leading-snug font-semibold tracking-[-0.01em] text-balance">{item.title}</h3>
-                  {item.facts[0] && (
-                    <p className="mt-1.5 flex gap-2.5 leading-relaxed text-pretty text-(--pf-muted)">
-                      <FactOrigin source={item.facts[0].source} />
-                      {item.facts[0].text}
-                    </p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+      {rest.length > 0 && (
+        <section className={`${frame} pb-6`}>
+          <h2 className="border-b border-(--pf-ink) pb-4 font-display text-[2rem] leading-none font-light tracking-[-0.03em]">Otros logros</h2>
+          <ul>
+            {rest.map((item) => (
+              <li key={item.title} className="grid gap-x-10 gap-y-2 border-b border-(--pf-ink)/15 py-6 @4xl:grid-cols-[4fr_6fr_auto]">
+                <h3 className="text-xl leading-snug font-semibold tracking-[-0.015em] text-balance">{item.title}</h3>
+                {item.facts[0] && (
+                  <p className="flex gap-2.5 leading-relaxed text-pretty text-(--pf-muted)">
+                    <FactOrigin source={item.facts[0].source} />
+                    {item.facts[0].text}
+                  </p>
+                )}
+                {item.occurred_on && <p className="text-sm leading-[1.75rem] text-(--pf-muted) tabular-nums @4xl:text-right">{formatOccurredOn(item.occurred_on)}</p>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-        <footer className="mt-14 flex flex-wrap items-start justify-between gap-6">
-          <OriginLegend portfolio={portfolio} />
-          <MadeWith />
-        </footer>
-      </div>
+      <footer className={`${frame} flex flex-wrap items-start justify-between gap-6 py-8`}>
+        <OriginLegend portfolio={portfolio} />
+        <MadeWith />
+      </footer>
     </TemplateShell>
   )
 }

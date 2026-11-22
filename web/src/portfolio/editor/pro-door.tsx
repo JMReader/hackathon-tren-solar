@@ -1,14 +1,22 @@
 "use client"
 
+import { Check } from "lucide-react"
 import { useState } from "react"
 import { apiFetch } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogBackdrop, DialogContent, DialogDescription, DialogDismiss, DialogFooter, DialogTitle } from "@/components/ui/dialog"
 import { Radio, RadioGroup } from "@/components/ui/radio"
 import { toast } from "@/components/ui/toast"
+import { registerProInterest } from "../actions"
 import type { ProInterest } from "../types"
 
 export type ProDoorRequest = { trigger: ProInterest["trigger"]; itemId: string | null; itemName: string | null }
+
+export const proBenefits = [
+  "Cinco plantillas más, pensadas para destacar",
+  "Tus colores, tu tipografía y el orden que quieras",
+  "Tu propio dominio en lugar del link de Tren Solar",
+]
 
 const priceBands: { value: NonNullable<ProInterest["price_band_ars_month"]>; label: string }[] = [
   { value: "none", label: "No pagaría" },
@@ -19,7 +27,12 @@ const priceBands: { value: NonNullable<ProInterest["price_band_ars_month"]>; lab
 ]
 
 async function sendInterest(body: ProInterest) {
-  await apiFetch<void>("/pro-interest", { method: "POST", json: body })
+  try {
+    await apiFetch<void>("/pro-interest", { method: "POST", json: body })
+    return { ok: true as const }
+  } catch {
+    return registerProInterest(body).catch(() => ({ ok: false as const }))
+  }
 }
 
 export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; onClose: () => void }) {
@@ -27,19 +40,18 @@ export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; 
 
   const subject =
     request?.trigger === "customize"
-      ? "elegir tus propios colores y tipografía"
-      : `usar la plantilla ${request?.itemName ?? ""}`
+      ? "cambiar colores, tipografía y el orden de las secciones"
+      : request?.trigger === "domain"
+        ? "poner tu portfolio en tu propio dominio, tipo tunombre.com"
+        : `usar la plantilla ${request?.itemName ?? ""}`
 
   async function answer(response: ProInterest["response"]) {
     if (!request) return
-    try {
-      await sendInterest({ response, trigger: request.trigger, item_id: request.itemId, price_band_ars_month: priceBand })
-      if (response === "interested") toast("Anotamos tu interés", { description: "No te cobramos nada.", type: "success" })
-      onClose()
-      setPriceBand(null)
-    } catch {
-      toast("No pudimos guardar tu respuesta", { description: "Probá de nuevo en un momento.", type: "error" })
-    }
+    const result = await sendInterest({ response, trigger: request.trigger, item_id: request.itemId, price_band_ars_month: priceBand })
+    onClose()
+    setPriceBand(null)
+    if (!result.ok) toast("No pudimos guardar tu respuesta", { description: "Probá de nuevo en un momento.", type: "error" })
+    else if (response === "interested") toast("Anotamos tu interés", { description: "No te cobramos nada.", type: "success" })
   }
 
   return (
@@ -47,13 +59,22 @@ export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; 
       <DialogBackdrop />
       <DialogContent>
         <DialogDismiss />
-        <DialogTitle>Pro todavía no existe</DialogTitle>
+        <DialogTitle>Todavía no hay versión Pro</DialogTitle>
         <DialogDescription>
-          Estamos viendo si sumar una versión paga para {subject}. Si te interesa, contanos y lo tenemos en cuenta.
+          Queremos saber si vale la pena armarla. Con Pro podrías {subject}. Hoy no se cobra nada.
         </DialogDescription>
 
+        <ul className="mt-4 flex flex-col gap-2 text-sm text-ink">
+          {proBenefits.map((benefit) => (
+            <li key={benefit} className="flex items-start gap-2.5">
+              <Check aria-hidden className="mt-0.5 size-4 shrink-0 text-ink-muted" />
+              {benefit}
+            </li>
+          ))}
+        </ul>
+
         <fieldset className="mt-5 flex flex-col gap-3">
-          <legend className="mb-3 text-sm font-medium text-ink">¿Cuánto pagarías por mes? (opcional)</legend>
+          <legend className="mb-3 text-sm font-medium text-ink">¿Cuánto pagarías por mes? Si no querés, no contestes.</legend>
           <RadioGroup value={priceBand} onValueChange={(next) => setPriceBand(next as ProInterest["price_band_ars_month"])}>
             {priceBands.map((band) => (
               <label key={band.value} className="flex cursor-pointer items-center gap-3 text-sm text-ink">

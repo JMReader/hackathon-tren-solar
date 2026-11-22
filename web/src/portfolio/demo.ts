@@ -18,12 +18,12 @@ export const demoPortfolio: PublicPortfolio = {
       facts: [
         {
           category: "project",
-          text: "Equipo de 3 personas construyó una app de turnos médicos en React para una clínica local en Jujuy.",
+          text: "Hicimos entre tres una app de turnos en React para una clínica de Jujuy.",
           source: "transcript",
         },
         {
           category: "role",
-          text: "Diseñó todas las pantallas en Figma, el flujo de reserva en 3 pasos y maquetó los componentes base en React.",
+          text: "Diseñé las pantallas en Figma y el flujo para reservar en tres pasos. También maqueté los componentes base.",
           source: "user",
         },
       ],
@@ -35,12 +35,12 @@ export const demoPortfolio: PublicPortfolio = {
       facts: [
         {
           category: "project",
-          text: "Rediseñó el checkout de un proyecto de la facultad y dejó sólo los campos que el pago necesitaba.",
+          text: "Rediseñé el checkout y saqué los campos que el pago no necesitaba.",
           source: "transcript",
         },
         {
           category: "learning",
-          text: "Justificó frente al equipo cada campo que quedó en el formulario.",
+          text: "Tuve que defender frente al equipo cada campo que quedó.",
           source: "user",
         },
       ],
@@ -52,7 +52,7 @@ export const demoPortfolio: PublicPortfolio = {
       facts: [
         {
           category: "project",
-          text: "Dio un taller de Figma de dos encuentros para estudiantes de primer año.",
+          text: "Di un taller de Figma de dos encuentros para los chicos de primer año.",
           source: "transcript",
         },
       ],
