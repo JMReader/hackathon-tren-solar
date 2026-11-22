@@ -129,6 +129,21 @@ export function createSession(): SessionCreated {
   return { session_id: id, expires_at: expiresAt }
 }
 
+/** Demo login: stamp display name onto the session profile (mock API). */
+export function stampDemoDisplayName(sessionId: string, displayName: string): boolean {
+  const session = store.sessions.get(sessionId)
+  if (!session) return false
+  session.profession = displayName
+  session.voiceContext = {
+    language: "es-AR",
+    author_hint: displayName,
+    ...(session.voiceContext ?? {}),
+  }
+  session.revision += 1
+  if (session.onboardingStatus === "not_started") session.onboardingStatus = "in_progress"
+  return true
+}
+
 function hasSamplePosts(s: StoredSession): boolean {
   const posts = s.voiceContext?.sample_posts
   return Boolean(posts && [...(posts.linkedin ?? []), ...(posts.x ?? [])].length)
