@@ -49,6 +49,8 @@ class DevDrafts:
 
 
 def create_app(settings: Settings, http: httpx2.Client | None = None) -> FastAPI:
+    if not settings.token_key:
+        raise RuntimeError("Falta SOCIAL_TOKEN_KEY para cifrar los tokens de redes.")
     http = http or httpx2.Client(timeout=httpx2.Timeout(20.0, connect=5.0))
     connections = InMemoryConnectionStore(TokenCipher(settings.token_key))
     drafts = DevDrafts()

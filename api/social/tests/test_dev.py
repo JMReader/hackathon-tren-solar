@@ -36,9 +36,14 @@ def client():
     return TestClient(create_app(settings, http), follow_redirects=False)
 
 
-def test_settings_require_encryption_key_and_full_linkedin_config():
-    with pytest.raises(RuntimeError):
-        Settings.from_env({})
+def test_linkedin_requires_encryption_key_and_full_config():
+    assert Settings.from_env({}).token_key is None
+    assert (
+        Settings.from_env(
+            {"LINKEDIN_CLIENT_ID": "x", "LINKEDIN_CLIENT_SECRET": "y", "LINKEDIN_REDIRECT_URI": "z"}
+        ).linkedin
+        is None
+    )
     assert Settings.from_env({"SOCIAL_TOKEN_KEY": KEY, "LINKEDIN_CLIENT_ID": "x"}).linkedin is None
     settings = Settings.from_env(
         {
@@ -49,6 +54,11 @@ def test_settings_require_encryption_key_and_full_linkedin_config():
         }
     )
     assert (settings.linkedin.api_version, settings.web_base_url) == ("202610", "http://localhost:3000")
+
+
+def test_dev_app_refuses_to_start_without_encryption_key():
+    with pytest.raises(RuntimeError):
+        create_app(Settings(token_key=None, web_base_url="http://localhost:8000"))
 
 
 def test_dev_page_and_blocked_x(client):

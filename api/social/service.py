@@ -189,7 +189,8 @@ class SocialService:
         except TimeoutError:
             outcome = ProviderOutcome.unknown(
                 "PROVIDER_TIMEOUT_AFTER_SEND",
-                f"{draft.platform.label} no confirmó a tiempo. Verificá en la red antes de reintentar para no duplicar.",
+                f"{draft.platform.label} no confirmó a tiempo. "
+                "Verificá en la red antes de reintentar para no duplicar.",
             )
         except Exception:
             outcome = ProviderOutcome.unknown(

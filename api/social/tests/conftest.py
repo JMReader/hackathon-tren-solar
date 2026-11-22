@@ -10,6 +10,7 @@ from social.crypto import TokenCipher
 from social.memory import InMemoryConnectionStore, InMemoryPublicationStore
 from social.models import Connection, Platform, ProviderOutcome, Publication, PublishableDraft, PublishableMedia
 from social.service import SocialService
+from social.sqlite import SqliteConnectionStore, SqliteDatabase, SqlitePublicationStore
 
 OWNER = "owner-1"
 NOW = datetime(2026, 11, 22, 15, 0, tzinfo=UTC)
@@ -81,17 +82,22 @@ class Env:
         )
 
 
-@pytest.fixture
-def env() -> Env:
+@pytest.fixture(params=["memory", "sqlite"])
+def env(request, tmp_path) -> Env:
     adapters = {platform: FakeAdapter(platform) for platform in Platform}
-    connections = InMemoryConnectionStore(TokenCipher(TokenCipher.generate_key()))
+    cipher = TokenCipher(TokenCipher.generate_key())
+    if request.param == "sqlite":
+        db = SqliteDatabase(tmp_path / "social.db")
+        connections, publications = SqliteConnectionStore(db, cipher), SqlitePublicationStore(db)
+    else:
+        connections, publications = InMemoryConnectionStore(cipher), InMemoryPublicationStore()
     drafts = DraftsByOwner()
     clock = [NOW]
     ids = iter(f"pub-{n}" for n in range(1, 1000))
     service = SocialService(
         adapters,
         connections,
-        InMemoryPublicationStore(),
+        publications,
         drafts,
         clock=lambda: clock[0],
         new_id=lambda: next(ids),

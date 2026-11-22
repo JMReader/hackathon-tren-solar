@@ -9,15 +9,13 @@ from .linkedin import DEFAULT_API_VERSION, LinkedInConfig
 
 @dataclass(frozen=True)
 class Settings:
-    token_key: str
+    token_key: str | None
     web_base_url: str
     linkedin: LinkedInConfig | None = None
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] = os.environ) -> Settings:
-        token_key = env.get("SOCIAL_TOKEN_KEY", "").strip()
-        if not token_key:
-            raise RuntimeError("Falta SOCIAL_TOKEN_KEY para cifrar los tokens de redes.")
+        token_key = env.get("SOCIAL_TOKEN_KEY", "").strip() or None
         client_id = env.get("LINKEDIN_CLIENT_ID", "").strip()
         client_secret = env.get("LINKEDIN_CLIENT_SECRET", "").strip()
         redirect_uri = env.get("LINKEDIN_REDIRECT_URI", "").strip()
@@ -28,7 +26,7 @@ class Settings:
                 redirect_uri=redirect_uri,
                 api_version=env.get("LINKEDIN_API_VERSION", "").strip() or DEFAULT_API_VERSION,
             )
-            if client_id and client_secret and redirect_uri
+            if token_key and client_id and client_secret and redirect_uri
             else None
         )
         return cls(
