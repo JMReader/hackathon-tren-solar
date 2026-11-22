@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 PortfolioStatus = Literal["draft", "published", "revoked"]
 ProResponse = Literal["interested", "not_now"]
-ProTrigger = Literal["template", "palette", "customize"]
+ProTrigger = Literal["template", "palette", "customize", "domain"]
 PriceBand = Literal["none", "up_to_2000", "2000_5000", "5000_10000", "over_10000"]
 
 
