@@ -18,6 +18,8 @@ from .errors import ApiError, ProfileResponse
 from .llm.providers import build_llm
 from .media_store import MediaStore, SupabaseMediaStore
 from .models import ApiErrorBody, ErrorDetail
+from .portfolio.router import create_portfolio_router
+from .portfolio.service import PortfolioService
 from .router import create_router
 from .service import CoreService
 from .session_service import SessionService
@@ -59,6 +61,7 @@ class Services:
             style_reader = (build_style_reader(fake_posts) if fake_posts
                             else SocialStyleReader(self.social.service))
         self.sessions = SessionService(store, media, style_reader, ttl)
+        self.portfolio = PortfolioService(store, media)
 
 
 def create_app(services: Services | None = None,
@@ -100,6 +103,11 @@ def create_app(services: Services | None = None,
 
     svc = app.state.services
     app.include_router(create_router(svc.core, svc.sessions), prefix="/api/v1")
+
+    app.include_router(
+        create_portfolio_router(svc.portfolio, svc.sessions),
+        prefix="/api/v1",
+    )
 
     def social_owner(x_session_id: str | None = Header(None)) -> str:
         return svc.sessions.require_session(x_session_id)

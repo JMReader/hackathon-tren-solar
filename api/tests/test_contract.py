@@ -84,6 +84,10 @@ def test_fixtures_parse_and_match_schemas(openapi):
     validate_schema(fixture("09-session-create.response.json"), "SessionCreated", openapi)
     validate_schema(fixture("10-author-profile-in-progress.response.json"), "AuthorProfile", openapi)
     validate_schema(fixture("11-author-profile-complete.response.json"), "AuthorProfile", openapi)
+    validate_schema(fixture("13-portfolio-catalog.response.json"), "PortfolioCatalog", openapi)
+    validate_schema(fixture("14-public-portfolio.response.json"), "PublicPortfolio", openapi)
+    validate_schema(fixture("15-portfolio-draft.response.json"), "Portfolio", openapi)
+    validate_schema(fixture("16-portfolio-published.response.json"), "Portfolio", openapi)
 
 
 def test_transcript_fixture_flow(client, ready):

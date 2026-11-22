@@ -8,6 +8,7 @@ import { Button, buttonStyles } from "@/components/ui/button"
 import { Radio, RadioGroup } from "@/components/ui/radio"
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control"
 import { Switch } from "@/components/ui/switch"
+import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 import { findPalette, findTemplate, palettes, templates } from "../catalog"
 import { PortfolioView } from "../templates"
@@ -132,12 +133,34 @@ function ProOptions({ tone, onCustomize, onDomain }: PickerProps) {
   )
 }
 
-export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
+type PortfolioEditorProps = {
+  portfolio: PublicPortfolio
+  isDemo?: boolean
+  publicSlug?: string | null
+  hasCv?: boolean
+  onTemplateChange?: (templateId: string) => Promise<void>
+  onPaletteChange?: (paletteId: string) => Promise<void>
+  onCvDownloadableChange?: (value: boolean) => Promise<void>
+  onPublish?: () => Promise<void>
+}
+
+export function PortfolioEditor({
+  portfolio,
+  isDemo = false,
+  publicSlug = null,
+  hasCv = false,
+  onTemplateChange,
+  onPaletteChange,
+  onCvDownloadableChange,
+  onPublish,
+}: PortfolioEditorProps) {
   const [templateId, setTemplateId] = useState(portfolio.template_id)
   const [paletteId, setPaletteId] = useState(portfolio.palette.id)
-  const [cvDownloadable, setCvDownloadable] = useState(false)
+  const [cvDownloadable, setCvDownloadable] = useState(portfolio.cv_url !== null)
   const [device, setDevice] = useState<Device>("desktop")
   const [proDoor, setProDoor] = useState<ProDoorRequest | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [publishing, setPublishing] = useState(false)
 
   const palette = findPalette(paletteId) ?? portfolio.palette
   const template = findTemplate(templateId)
@@ -148,14 +171,80 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
     palette,
     cv_url: cvDownloadable ? "#cv" : null,
   }
-  const publicHref = `/p/${portfolio.slug}?plantilla=${templateId}&paleta=${paletteId}`
+  const publicHref = publicSlug
+    ? `/p/${publicSlug}`
+    : isDemo
+      ? `/p/${portfolio.slug}?plantilla=${templateId}&paleta=${paletteId}`
+      : null
+
+  async function applyTemplate(id: string) {
+    setTemplateId(id)
+    if (!onTemplateChange) return
+    setSaving(true)
+    try {
+      await onTemplateChange(id)
+    } catch {
+      toast.error("No se pudo guardar la plantilla")
+      setTemplateId(portfolio.template_id)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function applyPalette(id: string) {
+    setPaletteId(id)
+    if (!onPaletteChange) return
+    setSaving(true)
+    try {
+      await onPaletteChange(id)
+    } catch {
+      toast.error("No se pudo guardar la paleta")
+      setPaletteId(portfolio.palette.id)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function applyCvDownloadable(next: boolean) {
+    setCvDownloadable(next)
+    if (!onCvDownloadableChange) return
+    setSaving(true)
+    try {
+      await onCvDownloadableChange(next)
+    } catch {
+      toast.error("No se pudo actualizar el CV")
+      setCvDownloadable(!next)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handlePublish() {
+    if (!onPublish) return
+    if (!hasCv) {
+      toast.error("Subí tu CV en el onboarding", {
+        description: "Es obligatorio para publicar el portfolio.",
+      })
+      return
+    }
+    setPublishing(true)
+    try {
+      await onPublish()
+      toast.success("Portfolio publicado")
+    } catch {
+      toast.error("No se pudo publicar", { description: "Revisá tu CV y volvé a intentar." })
+    } finally {
+      setPublishing(false)
+    }
+  }
 
   const picker = {
     palette,
     templateId,
     paletteId,
-    onTemplate: (template: PortfolioTemplate) => setTemplateId(template.id),
-    onPalette: setPaletteId,
+    onTemplate: (template: PortfolioTemplate) =>
+      template.tier === "pro" ? setTemplateId(template.id) : void applyTemplate(template.id),
+    onPalette: (id: string) => void applyPalette(id),
     onCustomize: () => setProDoor({ trigger: "customize", itemId: null, itemName: null }),
     onDomain: () => setProDoor({ trigger: "domain", itemId: null, itemName: null }),
   }
@@ -198,7 +287,7 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <Badge variant="neutral">Datos de ejemplo</Badge>
+                {isDemo && <Badge variant="neutral">Datos de ejemplo</Badge>}
                 <SegmentedControl aria-label="Vista previa" value={device} onValueChange={(next) => next && setDevice(next as Device)} className="hidden lg:inline-flex">
                   <SegmentedControlItem value="desktop">
                     <Monitor aria-hidden /> Escritorio
@@ -240,17 +329,24 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
 
           <div className="sticky bottom-0 -mx-4 mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-hairline bg-night/90 px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:static lg:mx-0 lg:mt-6 lg:bg-transparent lg:px-0 lg:pt-6 lg:pb-0 lg:backdrop-blur-none">
             <label className="flex cursor-pointer items-center gap-3 text-sm text-inverse lg:text-ink">
-              <Switch checked={cvDownloadable} onCheckedChange={(next) => setCvDownloadable(next)} />
+              <Switch checked={cvDownloadable} onCheckedChange={(next) => void applyCvDownloadable(next)} />
               CV descargable
             </label>
             {isPro ? (
               <Button className="ml-auto" onClick={() => setProDoor({ trigger: "template", itemId: template.id, itemName: template.name })}>
                 <Lock aria-hidden /> Quiero esta plantilla
               </Button>
-            ) : (
+            ) : publicHref ? (
               <Link href={publicHref} target="_blank" className={cn(buttonStyles(), "ml-auto")}>
                 Abrir página <ExternalLink aria-hidden />
               </Link>
+            ) : (
+              !isDemo &&
+              onPublish && (
+                <Button className="ml-auto" disabled={publishing || saving} onClick={() => void handlePublish()}>
+                  Publicar
+                </Button>
+              )
             )}
           </div>
         </div>

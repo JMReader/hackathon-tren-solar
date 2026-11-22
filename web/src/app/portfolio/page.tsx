@@ -1,11 +1,10 @@
 import type { Metadata } from "next"
-import { demoPortfolio } from "@/portfolio/demo"
-import { PortfolioEditor } from "@/portfolio/editor/editor"
+import { PortfolioEditorShell } from "@/portfolio/editor/editor-shell"
 
 export const metadata: Metadata = {
   title: "Tu portfolio",
 }
 
 export default function PortfolioEditorPage() {
-  return <PortfolioEditor portfolio={demoPortfolio} />
+  return <PortfolioEditorShell />
 }

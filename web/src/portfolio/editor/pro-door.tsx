@@ -2,11 +2,11 @@
 
 import { Check } from "lucide-react"
 import { useState } from "react"
+import { apiFetch } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogBackdrop, DialogContent, DialogDescription, DialogDismiss, DialogFooter, DialogTitle } from "@/components/ui/dialog"
 import { Radio, RadioGroup } from "@/components/ui/radio"
 import { toast } from "@/components/ui/toast"
-import { getSessionId } from "@/lib/api/client"
 import { registerProInterest } from "../actions"
 import type { ProInterest } from "../types"
 
@@ -27,14 +27,12 @@ const priceBands: { value: NonNullable<ProInterest["price_band_ars_month"]>; lab
 ]
 
 async function sendInterest(body: ProInterest) {
-  const sessionId = getSessionId()
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "/api/v1"}/pro-interest`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...(sessionId ? { "X-Session-Id": sessionId } : {}) },
-    body: JSON.stringify(body),
-  }).catch(() => null)
-  if (response?.ok) return { ok: true as const }
-  return registerProInterest(body).catch(() => ({ ok: false as const }))
+  try {
+    await apiFetch<void>("/pro-interest", { method: "POST", json: body })
+    return { ok: true as const }
+  } catch {
+    return registerProInterest(body).catch(() => ({ ok: false as const }))
+  }
 }
 
 export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; onClose: () => void }) {

@@ -22,7 +22,7 @@ def build_transcriber(settings: Settings):
         elif settings.openai_api_key:
             provider = "whisper"
         else:
-            provider = "fake"
+            return FakeTranscriber(settings.fake_transcript)
     if provider == "elevenlabs":
         if not settings.elevenlabs_api_key:
             raise STTError("STT_PROVIDER=elevenlabs requiere ELEVENLABS_API_KEY.", code="missing_api_key")

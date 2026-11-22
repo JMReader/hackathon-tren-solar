@@ -17,11 +17,22 @@ SDD onboarding (no es el backend entero): `docs/features/onboarding/`. Motor y p
 ### Issue #3 — Juan (Ingesta modular `text`/`audio`/`mcp` + Revisión + Borradores)
 - `POST /media` — sube imagen privada opcional y devuelve `photo_id`.
 - `POST /achievements` — crea logro desde texto (`input_type: "text"`), MCP (`"mcp"`) o multipart (`audio` + `photo`).
+- `GET /achievements` — lista los logros de la sesión (array de `Achievement`, sin envelope).
 - `GET /achievements/{id}` — devuelve `transcript`, `facts[]`, `open_questions[]`, `revision` y `status`.
 - `PATCH /achievements/{id}` — corrige hechos verificando `revision` (`409` si quedó desactualizada).
 - `POST /achievements/{id}/approve` — congela una revisión aprobada.
 - `POST /achievements/{id}/drafts` — genera dos `Draft` independientes (`linkedin` y `x`) usando sólo hechos aprobados + `voice_context` opcional (para imitar estilo del autor sin inventar hechos).
 - `GET /drafts/{id}` y `PATCH /drafts/{id}` — lee y edita cada borrador por separado con su propio `revision`.
+
+### Issue #6 — Portfolio (plantillas, paletas y URL pública)
+- `GET /portfolio/catalog` — plantillas y paletas con `tier` (`free` | `pro`); sin sesión.
+- `POST /portfolios` — crea borrador con logros `approved` de la sesión (`422` si `pro_required` o `achievement_not_approved`).
+- `GET/PATCH /portfolios/{id}` — edición con `revision` (`409` si quedó vieja).
+- `POST /portfolios/{id}/publish` — congela snapshot y publica (`422` si `cv_required` o falta `confirm_public`).
+- `DELETE /portfolios/{id}/publish` — revoca la URL pública; conserva el borrador.
+- `GET /p/{slug}` — vista pública sin transcript ni datos de sesión.
+- `GET /p/{slug}/media/{id}` y `GET /p/{slug}/cv` — sólo recursos del snapshot publicado.
+- `POST /pro-interest` — fake door Pro (`202`).
 
 ### Issue #5 — Mayko (OAuth LinkedIn/X + Publicación idempotente)
 - `GET /social/{platform}/connection` — devuelve estado real y capacidades (`can_publish_text`, `can_publish_image`, `can_read_posts`).
@@ -67,3 +78,7 @@ Reglas críticas para #5:
 10. `10-author-profile-in-progress.response.json` — Perfil sin listo para logro.
 11. `11-author-profile-complete.response.json` — Onboarding completo con `voice_context`.
 12. `12-onboarding-handoff-to-achievement.json` — Headers y requests tras complete (drafts sin `voice_context` en body).
+13. `13-portfolio-catalog.response.json` — Catálogo de plantillas y paletas.
+14. `14-public-portfolio.response.json` — Snapshot público `GET /p/{slug}`.
+15. `15-portfolio-draft.response.json` — Portfolio en borrador.
+16. `16-portfolio-published.response.json` — Portfolio publicado con `public_url`.

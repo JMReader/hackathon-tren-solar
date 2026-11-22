@@ -176,6 +176,9 @@ class CoreService:
             raise not_found("achievement", achievement_id)
         return a
 
+    def list_achievements(self, session_id: str) -> list[Achievement]:
+        return self.store.list_achievements(session_id)
+
     def update_achievement(self, session_id: str, achievement_id: str,
                            req: UpdateAchievementRequest) -> Achievement:
         a = self.get_achievement(session_id, achievement_id)
