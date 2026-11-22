@@ -1,0 +1,27 @@
+@keyframes pf-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.35em;
+    filter: blur(6px);
+  }
+}
+
+[data-portfolio] ::selection {
+  background: var(--pf-accent);
+  color: var(--pf-on-accent);
+}
+
+[data-portfolio] .pf-rise {
+  animation: pf-rise 700ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+[data-portfolio] :focus-visible {
+  outline: 2px solid var(--pf-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-portfolio] .pf-rise {
+    animation: none;
+  }
+}
