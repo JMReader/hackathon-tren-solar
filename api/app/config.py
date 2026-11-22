@@ -13,7 +13,7 @@ class Settings:
     db_path: Path
     media_dir: Path
     llm_provider: str = "auto"  # auto | fake | openai | gemini | groq | xai
-    stt_provider: str = "auto"  # auto | fake | whisper
+    stt_provider: str = "auto"  # auto | fake | whisper | elevenlabs
     openai_api_key: str | None = None
     gemini_api_key: str | None = None
     groq_api_key: str | None = None
@@ -26,6 +26,9 @@ class Settings:
     groq_model: str = "llama-3.3-70b-versatile"
     xai_model: str = "grok-4.7"
     whisper_model: str = "whisper-1"
+    elevenlabs_api_key: str | None = None
+    elevenlabs_model: str = "scribe_v3"
+    stt_language: str | None = None
     fake_transcript: str | None = None
     max_photo_bytes: int = 10 * 1024 * 1024
     max_audio_bytes: int = 25 * 1024 * 1024
@@ -67,6 +70,9 @@ class Settings:
             groq_model=env.get("GROQ_MODEL", "llama-3.3-70b-versatile"),
             xai_model=env.get("XAI_MODEL", "grok-4.7"),
             whisper_model=env.get("WHISPER_MODEL", "whisper-1"),
+            elevenlabs_api_key=env.get("ELEVENLABS_API_KEY"),
+            elevenlabs_model=env.get("ELEVENLABS_MODEL", "scribe_v3"),
+            stt_language=env.get("STT_LANGUAGE") or "es",
             fake_transcript=env.get("FAKE_TRANSCRIPT"),
             cors_origins=[o.strip() for o in env["CORS_ORIGINS"].split(",")
                           if o.strip()] if env.get("CORS_ORIGINS") else [

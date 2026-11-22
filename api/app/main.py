@@ -22,7 +22,7 @@ from .router import create_router
 from .service import CoreService
 from .session_service import SessionService
 from .social_wiring import SocialStyleReader, build_social
-from .stt.whisper import build_transcriber
+from .stt import build_transcriber
 from .style_reader import build_style_reader
 from .supabase_storage import SupabaseMediaBackend
 
