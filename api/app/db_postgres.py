@@ -21,6 +21,11 @@ def clean_pg_dsn(dsn: str) -> str:
     return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(qs), parts.fragment))
 
 
+def _iso(value):
+    """TIMESTAMPTZ vuelve como datetime; los modelos esperan str ISO."""
+    return value.isoformat() if hasattr(value, "isoformat") else value
+
+
 class PostgresStore:
     """Persistencia Postgres (Supabase) con la misma superficie que Store (SQLite)."""
 
@@ -487,8 +492,8 @@ class PostgresStore:
             "publications_last_7_days": row["publications_last_7_days"],
             "linkedin_url": row["linkedin_url"],
             "x_url": row["x_url"],
-            "revoked_at": row["revoked_at"],
-            "updated_at": row["updated_at"],
+            "revoked_at": _iso(row["revoked_at"]),
+            "updated_at": _iso(row["updated_at"]),
         }
 
     def save_employer(self, row: dict) -> None:
@@ -507,9 +512,12 @@ class PostgresStore:
 
     def get_employer(self, employer_id: str) -> dict[str, Any] | None:
         with self._conn() as conn:
-            return conn.execute(
+            row = conn.execute(
                 "SELECT * FROM employers WHERE id=%s", (employer_id,),
             ).fetchone()
+        if row is None:
+            return None
+        return {**row, "plan_expires_at": _iso(row["plan_expires_at"])}
 
     def save_employer_search(self, row: dict) -> None:
         with self._lock, self._conn() as conn:
@@ -542,7 +550,7 @@ class PostgresStore:
         skills = row["required_skills"]
         if isinstance(skills, str):
             skills = json.loads(skills)
-        return {**row, "required_skills": skills}
+        return {**row, "required_skills": skills, "created_at": _iso(row["created_at"])}
 
     def save_contact_request(self, row: dict) -> None:
         with self._lock, self._conn() as conn:
@@ -562,9 +570,16 @@ class PostgresStore:
 
     def get_contact_request(self, contact_id: str) -> dict[str, Any] | None:
         with self._conn() as conn:
-            return conn.execute(
+            row = conn.execute(
                 "SELECT * FROM contact_requests WHERE id=%s", (contact_id,),
             ).fetchone()
+        if row is None:
+            return None
+        return {
+            **row,
+            "created_at": _iso(row["created_at"]),
+            "updated_at": _iso(row["updated_at"]),
+        }
 
     def get_published_portfolio_for_session(self, session_id: str) -> dict[str, Any] | None:
         with self._conn() as conn:
