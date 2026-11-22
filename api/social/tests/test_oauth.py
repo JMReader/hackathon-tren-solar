@@ -23,7 +23,7 @@ class FakeProvider:
     def authorization_url(self, state: str) -> str:
         return f"https://provider.test/auth?state={state}"
 
-    def complete(self, code: str) -> Connection:
+    def complete(self, code: str, state: str | None = None) -> Connection:
         self.codes.append(code)
         if self.failure:
             raise self.failure
@@ -126,10 +126,12 @@ def test_platform_without_oauth_is_unsupported(flow):
 def test_tokens_are_stored_encrypted():
     cipher = TokenCipher(TokenCipher.generate_key())
     store = InMemoryConnectionStore(cipher)
-    store.put(OWNER, Connection(Platform.LINKEDIN, "very-secret-token"))
-    [(stored, encrypted)] = store._connections.values()
-    assert stored.access_token == "" and b"very-secret-token" not in encrypted
-    assert store.get(OWNER, Platform.LINKEDIN).access_token == "very-secret-token"
+    store.put(OWNER, Connection(Platform.LINKEDIN, "very-secret-token", refresh_token="very-secret-refresh"))
+    [(stored, encrypted, encrypted_refresh)] = store._connections.values()
+    assert (stored.access_token, stored.refresh_token) == ("", None)
+    assert b"very-secret-token" not in encrypted and b"very-secret-refresh" not in encrypted_refresh
+    restored = store.get(OWNER, Platform.LINKEDIN)
+    assert (restored.access_token, restored.refresh_token) == ("very-secret-token", "very-secret-refresh")
 
 
 def test_tokens_cannot_be_read_with_another_key():

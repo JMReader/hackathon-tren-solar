@@ -9,15 +9,14 @@ import httpx2
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from .adapters import default_adapters
 from .crypto import TokenCipher
-from .linkedin import LinkedInAdapter
 from .memory import InMemoryConnectionStore, InMemoryPublicationStore
 from .models import Platform, PublishableDraft, PublishableMedia
 from .oauth import ConnectionFlow
 from .router import create_router
 from .service import SocialService
 from .settings import Settings
+from .wiring import build_providers
 
 DEV_OWNER = "local-dev"
 PHOTO_TYPES = {"image/jpeg": ".jpg", "image/png": ".png"}
@@ -52,13 +51,10 @@ def create_app(settings: Settings, http: httpx2.Client | None = None) -> FastAPI
     if not settings.token_key:
         raise RuntimeError("Falta SOCIAL_TOKEN_KEY para cifrar los tokens de redes.")
     http = http or httpx2.Client(timeout=httpx2.Timeout(20.0, connect=5.0))
-    connections = InMemoryConnectionStore(TokenCipher(settings.token_key))
+    providers = build_providers(settings, InMemoryConnectionStore(TokenCipher(settings.token_key)), http)
     drafts = DevDrafts()
-    linkedin = LinkedInAdapter(settings.linkedin, http) if settings.linkedin else None
-    service = SocialService(default_adapters(linkedin), connections, InMemoryPublicationStore(), drafts)
-    flow = ConnectionFlow(
-        service, {Platform.LINKEDIN: linkedin} if linkedin else {}, connections, settings.web_base_url
-    )
+    service = SocialService(providers.adapters, providers.connections, InMemoryPublicationStore(), drafts)
+    flow = ConnectionFlow(service, providers.oauth, providers.connections, settings.web_base_url)
 
     app = FastAPI(title="Tren Solar · social (dev)")
     app.include_router(create_router(service, flow, lambda: DEV_OWNER), prefix="/api/v1")

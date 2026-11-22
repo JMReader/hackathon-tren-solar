@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS social_connections (
     expires_at TEXT,
     account_id TEXT,
     account_handle TEXT,
+    encrypted_refresh_token BLOB,
     PRIMARY KEY (owner_id, platform)
 );
 CREATE TABLE IF NOT EXISTS social_publications (
@@ -43,6 +44,9 @@ class SqliteDatabase:
         with self.connect() as conn:
             conn.execute("PRAGMA journal_mode=WAL")
             conn.executescript(SCHEMA)
+            columns = {row["name"] for row in conn.execute("PRAGMA table_info(social_connections)")}
+            if "encrypted_refresh_token" not in columns:
+                conn.execute("ALTER TABLE social_connections ADD COLUMN encrypted_refresh_token BLOB")
 
     @contextmanager
     def connect(self) -> Iterator[sqlite3.Connection]:
@@ -71,6 +75,8 @@ class SqliteConnectionStore:
             return None
         try:
             token = self._cipher.decrypt(row["encrypted_token"])
+            refresh = row["encrypted_refresh_token"]
+            refresh_token = self._cipher.decrypt(refresh) if refresh else None
         except ValueError:
             return None
         return Connection(
@@ -80,12 +86,17 @@ class SqliteConnectionStore:
             expires_at=datetime.fromisoformat(row["expires_at"]) if row["expires_at"] else None,
             account_id=row["account_id"],
             account_handle=row["account_handle"],
+            refresh_token=refresh_token,
         )
 
     def put(self, owner_id: str, connection: Connection) -> None:
         with self._db.connect() as conn:
             conn.execute(
-                "INSERT OR REPLACE INTO social_connections VALUES (?, ?, ?, ?, ?, ?, ?)",
+                """
+                INSERT OR REPLACE INTO social_connections (owner_id, platform, encrypted_token, scopes, expires_at,
+                    account_id, account_handle, encrypted_refresh_token)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
                 (
                     owner_id,
                     connection.platform.value,
@@ -94,6 +105,7 @@ class SqliteConnectionStore:
                     connection.expires_at.isoformat() if connection.expires_at else None,
                     connection.account_id,
                     connection.account_handle,
+                    self._cipher.encrypt(connection.refresh_token) if connection.refresh_token else None,
                 ),
             )
 

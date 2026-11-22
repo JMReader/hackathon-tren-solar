@@ -35,15 +35,22 @@ class InMemoryPublicationStore:
 class InMemoryConnectionStore:
     def __init__(self, cipher: TokenCipher) -> None:
         self._cipher = cipher
-        self._connections: dict[tuple[str, Platform], tuple[Connection, bytes]] = {}
+        self._connections: dict[tuple[str, Platform], tuple[Connection, bytes, bytes | None]] = {}
 
     def get(self, owner_id: str, platform: Platform) -> Connection | None:
         stored = self._connections.get((owner_id, platform))
         if stored is None:
             return None
-        connection, encrypted_token = stored
-        return replace(connection, access_token=self._cipher.decrypt(encrypted_token))
+        connection, encrypted_token, encrypted_refresh = stored
+        return replace(
+            connection,
+            access_token=self._cipher.decrypt(encrypted_token),
+            refresh_token=self._cipher.decrypt(encrypted_refresh) if encrypted_refresh else None,
+        )
 
     def put(self, owner_id: str, connection: Connection) -> None:
-        encrypted_token = self._cipher.encrypt(connection.access_token)
-        self._connections[(owner_id, connection.platform)] = (replace(connection, access_token=""), encrypted_token)
+        self._connections[(owner_id, connection.platform)] = (
+            replace(connection, access_token="", refresh_token=None),
+            self._cipher.encrypt(connection.access_token),
+            self._cipher.encrypt(connection.refresh_token) if connection.refresh_token else None,
+        )
