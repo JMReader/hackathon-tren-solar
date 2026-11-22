@@ -106,6 +106,10 @@ def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
             photo_id=req.photo_id, source_metadata=req.source_metadata,
         )
 
+    @router.get("/achievements", tags=["achievements"])
+    def list_achievements(session_id: Session) -> list[Achievement]:
+        return service.list_achievements(session_id)
+
     @router.get("/achievements/{achievement_id}", tags=["achievements"])
     def get_achievement(session_id: Session, achievement_id: str) -> Achievement:
         return service.get_achievement(session_id, achievement_id)

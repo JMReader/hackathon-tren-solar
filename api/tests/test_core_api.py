@@ -9,6 +9,7 @@ from conftest import (
     approve,
     create_text,
     gen_drafts,
+    validate_schema,
 )
 
 
@@ -76,6 +77,17 @@ def test_get_achievement_404(client, ready):
     resp = client.get("/api/v1/achievements/ach_inexistente", headers=ready)
     assert resp.status_code == 404
     assert resp.json()["error"]["code"] == "not_found"
+
+
+def test_list_achievements(client, ready, openapi):
+    ach = approve(client, ready, create_text(client, ready))
+    resp = client.get("/api/v1/achievements", headers=ready)
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert isinstance(body, list)
+    assert any(item["id"] == ach["id"] for item in body)
+    for item in body:
+        validate_schema(item, "Achievement", openapi)
 
 
 def test_cross_session_isolation(client, ready):

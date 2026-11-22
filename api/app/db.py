@@ -85,6 +85,33 @@ class Store:
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS portfolios(
+                    id TEXT PRIMARY KEY,
+                    session_id TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    revision INTEGER NOT NULL,
+                    display_name TEXT NOT NULL,
+                    headline TEXT,
+                    items TEXT NOT NULL,
+                    template_id TEXT NOT NULL,
+                    palette_id TEXT NOT NULL,
+                    cv_downloadable INTEGER NOT NULL DEFAULT 0,
+                    slug TEXT UNIQUE,
+                    published_revision INTEGER,
+                    published_snapshot TEXT,
+                    published_at TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS pro_interest_events(
+                    id TEXT PRIMARY KEY,
+                    session_id TEXT NOT NULL,
+                    response TEXT NOT NULL,
+                    trigger TEXT,
+                    item_id TEXT,
+                    price_band_ars_month TEXT,
+                    created_at TEXT NOT NULL
+                );
                 """
             )
             self._migrate_schema(conn)
@@ -244,6 +271,14 @@ class Store:
                                (achievement_id,)).fetchone()
         return self._row_to_achievement(row) if row else None
 
+    def list_achievements(self, session_id: str) -> list[Achievement]:
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT * FROM achievements WHERE session_id=? ORDER BY updated_at DESC",
+                (session_id,),
+            ).fetchall()
+        return [self._row_to_achievement(row) for row in rows]
+
     def achievement_session(self, achievement_id: str) -> str | None:
         with self._conn() as conn:
             row = conn.execute("SELECT session_id FROM achievements WHERE id=?",
@@ -310,6 +345,60 @@ class Store:
             row = conn.execute("SELECT session_id FROM drafts WHERE id=?",
                                (draft_id,)).fetchone()
         return row["session_id"] if row else None
+
+    # --- portfolios (Issue #6) ---
+
+    def save_portfolio(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT OR REPLACE INTO portfolios
+                   (id,session_id,status,revision,display_name,headline,items,
+                    template_id,palette_id,cv_downloadable,slug,published_revision,
+                    published_snapshot,published_at,created_at,updated_at)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    row["id"], row["session_id"], row["status"], row["revision"],
+                    row["display_name"], row["headline"], row["items"],
+                    row["template_id"], row["palette_id"], row["cv_downloadable"],
+                    row["slug"], row["published_revision"], row["published_snapshot"],
+                    row["published_at"], row["created_at"], row["updated_at"],
+                ),
+            )
+
+    def get_portfolio(self, portfolio_id: str) -> sqlite3.Row | None:
+        with self._conn() as conn:
+            return conn.execute(
+                "SELECT * FROM portfolios WHERE id=?", (portfolio_id,)).fetchone()
+
+    def get_portfolio_by_slug(self, slug: str) -> sqlite3.Row | None:
+        with self._conn() as conn:
+            return conn.execute(
+                "SELECT * FROM portfolios WHERE slug=?", (slug,)).fetchone()
+
+    def portfolio_slug_taken(self, slug: str, exclude_id: str | None = None) -> bool:
+        with self._conn() as conn:
+            if exclude_id:
+                row = conn.execute(
+                    "SELECT 1 FROM portfolios WHERE slug=? AND id<>?",
+                    (slug, exclude_id),
+                ).fetchone()
+            else:
+                row = conn.execute(
+                    "SELECT 1 FROM portfolios WHERE slug=?", (slug,),
+                ).fetchone()
+        return row is not None
+
+    def save_pro_interest_event(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT INTO pro_interest_events
+                   (id,session_id,response,trigger,item_id,price_band_ars_month,created_at)
+                   VALUES (?,?,?,?,?,?,?)""",
+                (
+                    row["id"], row["session_id"], row["response"], row["trigger"],
+                    row["item_id"], row["price_band_ars_month"], row["created_at"],
+                ),
+            )
 
 
 def _ready(

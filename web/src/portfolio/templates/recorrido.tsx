@@ -1,46 +1,50 @@
-import { CvLink, FactOrigin, MadeWith, OriginLegend, Portrait } from "../parts"
-import { formatOccurredOn } from "../theme"
+import { CvLink, FactOrigin, MadeWith, OriginLegend } from "../parts"
+import { monthAndYear } from "../theme"
 import { TemplateShell, type TemplateProps } from "./shell"
 
 export function Recorrido({ portfolio }: TemplateProps) {
   const items = [...portfolio.items].sort((a, b) => (b.occurred_on ?? "").localeCompare(a.occurred_on ?? ""))
   return (
     <TemplateShell portfolio={portfolio}>
-      <div className="mx-auto flex max-w-[46rem] flex-col px-6 py-14 @2xl:py-20">
-        <header className="flex flex-col gap-5">
-          <Portrait portfolio={portfolio} className="size-14 rounded-2xl text-lg" />
-          <h1 className="font-(family-name:--font-archivo) text-[clamp(2.75rem,9cqi,4.5rem)] leading-[0.92] font-bold tracking-[-0.02em] [font-stretch:72%] text-balance">
+      <div className="mx-auto max-w-[80rem] px-6 py-10 @2xl:px-10 @5xl:py-16">
+        <header className="border-b-2 border-(--pf-ink) pb-7">
+          <h1 className="pf-rise font-(family-name:--font-archivo) text-[clamp(3.75rem,15cqi,8.5rem)] leading-[0.84] font-extrabold tracking-[-0.02em] text-balance uppercase [font-stretch:62%]">
             {portfolio.display_name}
           </h1>
-          {portfolio.headline && <p className="text-lg text-(--pf-muted)">{portfolio.headline}</p>}
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+            {portfolio.headline && <p className="text-xl text-(--pf-muted)">{portfolio.headline}</p>}
+            <CvLink portfolio={portfolio} />
+          </div>
         </header>
 
-        <ol className="mt-14 flex flex-col border-l-2 border-(--pf-accent)">
-          {items.map((item) => (
-            <li key={item.title} className="relative pb-12 pl-8 last:pb-0">
-              <span aria-hidden className="absolute top-1.5 -left-[7px] size-3 rounded-full bg-(--pf-accent) ring-4 ring-(--pf-bg)" />
-              <p className="font-(family-name:--font-archivo) text-sm font-semibold tracking-[0.01em] text-(--pf-accent) tabular-nums [font-stretch:85%]">
-                {formatOccurredOn(item.occurred_on) ?? "Sin fecha"}
-              </p>
-              <h2 className="mt-1.5 text-[1.375rem] leading-snug font-semibold tracking-[-0.015em] text-balance">{item.title}</h2>
-              <ul className="mt-3 flex flex-col gap-2.5">
-                {item.facts.map((fact) => (
-                  <li key={fact.text} className="flex gap-2.5 leading-relaxed text-pretty">
-                    <FactOrigin source={fact.source} />
-                    {fact.text}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
+        <ol>
+          {items.map((item) => {
+            const date = monthAndYear(item.occurred_on)
+            return (
+              <li key={item.title} className="grid gap-x-12 gap-y-4 border-b border-(--pf-ink)/15 py-9 @3xl:grid-cols-[minmax(11rem,3fr)_9fr] @3xl:py-12">
+                <p className="flex items-baseline gap-2.5 font-(family-name:--font-archivo) [font-stretch:68%] @3xl:flex-col @3xl:gap-1">
+                  <span className="text-[clamp(1.75rem,5.5cqi,3.75rem)] leading-none font-bold text-(--pf-accent)">{date?.month ?? "Sin fecha"}</span>
+                  {date && <span className="text-xl leading-none font-medium text-(--pf-muted) tabular-nums @3xl:text-2xl">{date.year}</span>}
+                </p>
+                <div>
+                  <h2 className="text-[1.625rem] leading-[1.15] font-semibold tracking-[-0.02em] text-balance">{item.title}</h2>
+                  <ul className="mt-5 flex max-w-[62ch] flex-col gap-3.5">
+                    {item.facts.map((fact) => (
+                      <li key={fact.text} className="flex gap-3 text-[17px] leading-relaxed text-pretty">
+                        <FactOrigin source={fact.source} />
+                        {fact.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            )
+          })}
         </ol>
 
-        <footer className="mt-16 flex flex-col gap-6">
+        <footer className="mt-8 flex flex-wrap items-start justify-between gap-6">
           <OriginLegend portfolio={portfolio} />
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <CvLink portfolio={portfolio} />
-            <MadeWith />
-          </div>
+          <MadeWith />
         </footer>
       </div>
     </TemplateShell>

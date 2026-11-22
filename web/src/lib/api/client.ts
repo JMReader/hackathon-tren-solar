@@ -49,6 +49,8 @@ export async function apiFetch<T>(path: string, init: ApiInit = {}): Promise<T> 
     const payload: unknown = await res.json().catch(() => null)
     throw new ApiRequestError(res.status, payload)
   }
-  if (res.status === 204) return undefined as T
-  return (await res.json()) as T
+  if (res.status === 204 || res.status === 202) return undefined as T
+  const text = await res.text()
+  if (!text) return undefined as T
+  return JSON.parse(text) as T
 }
