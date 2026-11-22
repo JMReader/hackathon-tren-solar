@@ -112,6 +112,57 @@ class Store:
                     price_band_ars_month TEXT,
                     created_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS candidate_profiles(
+                    session_id TEXT PRIMARY KEY,
+                    display_name TEXT NOT NULL,
+                    role TEXT,
+                    industry TEXT,
+                    location TEXT,
+                    work_mode TEXT,
+                    declared_skills TEXT NOT NULL DEFAULT '[]',
+                    is_synthetic INTEGER NOT NULL DEFAULT 1
+                );
+                CREATE TABLE IF NOT EXISTS discovery_consents(
+                    session_id TEXT PRIMARY KEY,
+                    active INTEGER NOT NULL,
+                    shared_fields TEXT NOT NULL,
+                    share_portfolio INTEGER NOT NULL DEFAULT 0,
+                    share_linkedin INTEGER NOT NULL DEFAULT 0,
+                    share_x INTEGER NOT NULL DEFAULT 0,
+                    publications_last_7_days INTEGER,
+                    linkedin_url TEXT,
+                    x_url TEXT,
+                    revoked_at TEXT,
+                    updated_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS employers(
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    verified INTEGER NOT NULL DEFAULT 0,
+                    plan TEXT NOT NULL DEFAULT 'free',
+                    plan_expires_at TEXT
+                );
+                CREATE TABLE IF NOT EXISTS employer_searches(
+                    id TEXT PRIMARY KEY,
+                    employer_id TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    required_skills TEXT NOT NULL,
+                    industry TEXT,
+                    location TEXT,
+                    work_mode TEXT,
+                    job_proposal TEXT,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS contact_requests(
+                    id TEXT PRIMARY KEY,
+                    employer_id TEXT NOT NULL,
+                    search_id TEXT NOT NULL,
+                    candidate_session_id TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
                 """
             )
             self._migrate_schema(conn)
@@ -125,6 +176,21 @@ class Store:
                 conn.execute(
                     f"ALTER TABLE {table} ADD COLUMN session_id TEXT NOT NULL DEFAULT ''"
                 )
+        cp_cols = {row[1] for row in conn.execute("PRAGMA table_info(candidate_profiles)")}
+        if cp_cols:
+            for col, typedef in (
+                ("province", "TEXT"),
+                ("country", "TEXT DEFAULT 'Argentina'"),
+                ("segment", "TEXT"),
+                ("discovery_public_id", "TEXT"),
+            ):
+                if col not in cp_cols:
+                    conn.execute(f"ALTER TABLE candidate_profiles ADD COLUMN {col} {typedef}")
+        es_cols = {row[1] for row in conn.execute("PRAGMA table_info(employer_searches)")}
+        if es_cols:
+            for col in ("province", "country"):
+                if col not in es_cols:
+                    conn.execute(f"ALTER TABLE employer_searches ADD COLUMN {col} TEXT")
 
     def _conn(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
@@ -399,6 +465,198 @@ class Store:
                     row["item_id"], row["price_band_ars_month"], row["created_at"],
                 ),
             )
+
+    # --- empresas (#9–#12) ---
+
+    def save_candidate_profile(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT OR REPLACE INTO candidate_profiles
+                   (session_id,display_name,role,industry,location,province,country,
+                    segment,work_mode,declared_skills,is_synthetic,discovery_public_id)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    row["session_id"], row["display_name"], row.get("role"),
+                    row.get("industry"), row.get("location"), row.get("province"),
+                    row.get("country", "Argentina"), row.get("segment"),
+                    row.get("work_mode"),
+                    json.dumps(row.get("declared_skills") or [], ensure_ascii=False),
+                    1 if row.get("is_synthetic", True) else 0,
+                    row.get("discovery_public_id"),
+                ),
+            )
+
+    def get_candidate_profile(self, session_id: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM candidate_profiles WHERE session_id=?", (session_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            "session_id": row["session_id"],
+            "display_name": row["display_name"],
+            "role": row["role"],
+            "industry": row["industry"],
+            "location": row["location"],
+            "province": row["province"] if "province" in row.keys() else None,
+            "country": row["country"] if "country" in row.keys() else "Argentina",
+            "segment": row["segment"] if "segment" in row.keys() else None,
+            "work_mode": row["work_mode"],
+            "declared_skills": json.loads(row["declared_skills"]),
+            "is_synthetic": bool(row["is_synthetic"]),
+            "discovery_public_id": row["discovery_public_id"]
+            if "discovery_public_id" in row.keys() else None,
+        }
+
+    def get_candidate_by_discovery_id(self, discovery_public_id: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM candidate_profiles WHERE discovery_public_id=?",
+                (discovery_public_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return self.get_candidate_profile(row["session_id"])
+
+    def save_discovery_consent(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT OR REPLACE INTO discovery_consents
+                   (session_id,active,shared_fields,share_portfolio,share_linkedin,
+                    share_x,publications_last_7_days,linkedin_url,x_url,revoked_at,updated_at)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    row["session_id"], 1 if row["active"] else 0,
+                    json.dumps(row.get("shared_fields") or [], ensure_ascii=False),
+                    1 if row.get("share_portfolio") else 0,
+                    1 if row.get("share_linkedin") else 0,
+                    1 if row.get("share_x") else 0,
+                    row.get("publications_last_7_days"),
+                    row.get("linkedin_url"), row.get("x_url"),
+                    row.get("revoked_at"), row["updated_at"],
+                ),
+            )
+
+    def get_discovery_consent(self, session_id: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM discovery_consents WHERE session_id=?", (session_id,),
+            ).fetchone()
+        return self._discovery_row(row) if row else None
+
+    def list_active_discovery_consents(self) -> list[dict]:
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT * FROM discovery_consents WHERE active=1",
+            ).fetchall()
+        return [self._discovery_row(r) for r in rows]
+
+    @staticmethod
+    def _discovery_row(row: sqlite3.Row) -> dict:
+        return {
+            "session_id": row["session_id"],
+            "active": bool(row["active"]),
+            "shared_fields": json.loads(row["shared_fields"]),
+            "share_portfolio": bool(row["share_portfolio"]),
+            "share_linkedin": bool(row["share_linkedin"]),
+            "share_x": bool(row["share_x"]),
+            "publications_last_7_days": row["publications_last_7_days"],
+            "linkedin_url": row["linkedin_url"],
+            "x_url": row["x_url"],
+            "revoked_at": row["revoked_at"],
+            "updated_at": row["updated_at"],
+        }
+
+    def save_employer(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT OR REPLACE INTO employers
+                   (id,name,verified,plan,plan_expires_at) VALUES (?,?,?,?,?)""",
+                (row["id"], row["name"], 1 if row.get("verified") else 0,
+                 row.get("plan", "free"), row.get("plan_expires_at")),
+            )
+
+    def get_employer(self, employer_id: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM employers WHERE id=?", (employer_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            "id": row["id"], "name": row["name"],
+            "verified": bool(row["verified"]),
+            "plan": row["plan"],
+            "plan_expires_at": row["plan_expires_at"],
+        }
+
+    def save_employer_search(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT OR REPLACE INTO employer_searches
+                   (id,employer_id,title,required_skills,industry,location,province,
+                    country,work_mode,job_proposal,created_at)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+                (
+                    row["id"], row["employer_id"], row["title"],
+                    json.dumps(row["required_skills"], ensure_ascii=False),
+                    row.get("industry"), row.get("location"),
+                    row.get("province"), row.get("country"),
+                    row.get("work_mode"), row.get("job_proposal"), row["created_at"],
+                ),
+            )
+
+    def get_employer_search(self, search_id: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM employer_searches WHERE id=?", (search_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            "id": row["id"], "employer_id": row["employer_id"],
+            "title": row["title"],
+            "required_skills": json.loads(row["required_skills"]),
+            "industry": row["industry"], "location": row["location"],
+            "province": row["province"] if "province" in row.keys() else None,
+            "country": row["country"] if "country" in row.keys() else None,
+            "work_mode": row["work_mode"], "job_proposal": row["job_proposal"],
+            "created_at": row["created_at"],
+        }
+
+    def save_contact_request(self, row: dict) -> None:
+        with self._lock, self._conn() as conn:
+            conn.execute(
+                """INSERT OR REPLACE INTO contact_requests
+                   (id,employer_id,search_id,candidate_session_id,message,status,
+                    created_at,updated_at)
+                   VALUES (?,?,?,?,?,?,?,?)""",
+                (
+                    row["id"], row["employer_id"], row["search_id"],
+                    row["candidate_session_id"], row["message"], row["status"],
+                    row["created_at"], row["updated_at"],
+                ),
+            )
+
+    def get_contact_request(self, contact_id: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM contact_requests WHERE id=?", (contact_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return dict(row)
+
+    def get_published_portfolio_for_session(self, session_id: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                """SELECT slug FROM portfolios
+                   WHERE session_id=? AND status='published' AND slug IS NOT NULL
+                   ORDER BY published_at DESC LIMIT 1""",
+                (session_id,),
+            ).fetchone()
+        return {"slug": row["slug"]} if row else None
 
 
 def _ready(

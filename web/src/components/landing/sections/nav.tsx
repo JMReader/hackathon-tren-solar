@@ -39,6 +39,9 @@ export function Nav() {
           ))}
         </nav>
         <div className="flex items-center justify-end gap-2">
+          <Button href="/empresas" variant="glass" size="sm">
+            Empresas
+          </Button>
           <Button href="#producto" variant="glass" size="sm" className="hidden sm:inline-flex">
             Cómo funciona
           </Button>

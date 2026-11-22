@@ -34,6 +34,7 @@ class Settings:
     max_audio_bytes: int = 25 * 1024 * 1024
     cors_origins: list[str] = field(default_factory=lambda: [
         "http://localhost:3000", "http://127.0.0.1:3000"])
+    employer_demo: bool = False
     extra: dict = field(default_factory=dict)
 
     @classmethod
@@ -77,4 +78,5 @@ class Settings:
             cors_origins=[o.strip() for o in env["CORS_ORIGINS"].split(",")
                           if o.strip()] if env.get("CORS_ORIGINS") else [
                 "http://localhost:3000", "http://127.0.0.1:3000"],
+            employer_demo=env.get("TS_EMPLOYER_DEMO", "") == "1",
         )

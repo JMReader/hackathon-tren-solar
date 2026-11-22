@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { DiscoveryConsent } from "./discovery-consent"
 import { ArrowRight, Camera, Check, ChevronLeft, FileCheck, FileText, ImagePlus } from "lucide-react"
 import type { AuthorProfile, Platform, StyleSyncResult } from "@/lib/api/types"
 import {
@@ -396,7 +397,7 @@ function Wizard({
                   onSaveSample={saveSample}
                 />
               )}
-              {step === 3 && <ProfileRows profile={profile} goToStep={goTo} />}
+              {step === 3 && <><ProfileRows profile={profile} goToStep={goTo} /><DiscoveryConsent /></>}
             </div>
           </>
         )}
