@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -42,6 +43,13 @@ def create_app(services: Services | None = None,
                settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Hackathon Tren Solar API", version="0.1.0")
     app.state.services = services or Services(settings)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=app.state.services.settings.cors_origins,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        allow_credentials=False,
+    )
 
     def _body(detail: ErrorDetail) -> dict:
         return ApiErrorBody(error=detail).model_dump(mode="json")
