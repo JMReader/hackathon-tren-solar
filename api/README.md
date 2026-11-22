@@ -33,6 +33,30 @@ POST  /achievements/{id}/drafts        # borradores LI/X (voice_context opcional
 GET/PATCH /drafts/{id}                 # edición independiente por red
 ```
 
+### Empresas (#9–#12, demo sintético)
+
+```bash
+export TS_ALLOW_SEED=1
+python -m scripts.seed && python -m scripts.seed --list
+```
+
+```bash
+# Plan free: solo conteo
+curl -H 'X-Employer-Id: seed_emp_free' -H 'Content-Type: application/json' \
+  -d '{"title":"UX React","required_skills":["React"]}' \
+  http://localhost:8000/api/v1/employer/searches
+curl -H 'X-Employer-Id: seed_emp_free' \
+  http://localhost:8000/api/v1/employer/searches/{id}/matches
+
+# Plan pago: hasta cinco fichas con evidencia
+curl -H 'X-Employer-Id: seed_emp_paid' ...
+```
+
+Rutas: `POST/DELETE /discovery/consent` (candidato, `X-Session-Id`),
+`POST /employer/searches`, `GET /employer/searches/{id}/matches`,
+`POST /contact-requests`, `GET/PATCH /contact-requests/{id}`.
+Empresas usan `X-Employer-Id`. Detalle en `../contracts/seed/README.md`.
+
 Todo salvo `POST /session` exige header `X-Session-Id`. Recursos aislados por
 sesión (otra sesión → 404). Errores siempre `{"error": {code, message, retryable}}`.
 

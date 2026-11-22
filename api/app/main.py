@@ -18,6 +18,8 @@ from .errors import ApiError, ProfileResponse
 from .llm.providers import build_llm
 from .media_store import MediaStore, SupabaseMediaStore
 from .models import ApiErrorBody, ErrorDetail
+from .employer.router import create_employer_router
+from .employer.service import EmployerService
 from .portfolio.router import create_portfolio_router
 from .portfolio.service import PortfolioService
 from .router import create_router
@@ -62,6 +64,7 @@ class Services:
                             else SocialStyleReader(self.social.service))
         self.sessions = SessionService(store, media, style_reader, ttl)
         self.portfolio = PortfolioService(store, media)
+        self.employer = EmployerService(store)
 
 
 def create_app(services: Services | None = None,
@@ -106,6 +109,11 @@ def create_app(services: Services | None = None,
 
     app.include_router(
         create_portfolio_router(svc.portfolio, svc.sessions),
+        prefix="/api/v1",
+    )
+
+    app.include_router(
+        create_employer_router(svc.employer, svc.sessions),
         prefix="/api/v1",
     )
 
