@@ -21,6 +21,7 @@
   <legend>1. Conexiones</legend>
   <button id="refresh">Actualizar estado</button>
   <button id="connect-linkedin">Conectar LinkedIn</button>
+  <button id="connect-x">Conectar X</button>
   <pre id="status">…</pre>
 </fieldset>
 
@@ -57,13 +58,15 @@ async function refresh() {
 }
 
 document.getElementById("refresh").onclick = refresh;
-document.getElementById("connect-linkedin").onclick = async () => {
-  const r = await fetch(`${api}/social/linkedin/connection`, {
+const connect = (platform) => async () => {
+  const r = await fetch(`${api}/social/${platform}/connection`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ return_to: "/dev" }),
   });
   const body = await r.json();
   if (r.ok) location.href = body.authorization_url; else show("status", { http: r.status, body });
 };
+document.getElementById("connect-linkedin").onclick = connect("linkedin");
+document.getElementById("connect-x").onclick = connect("x");
 
 document.getElementById("draft-form").onsubmit = async (event) => {
   event.preventDefault();

@@ -45,7 +45,9 @@ class PgConnectionStore:
         if row is None:
             return None
         try:
-            token = self._cipher.decrypt(row["encrypted_token"])
+            token = self._cipher.decrypt(bytes(row["encrypted_token"]))
+            refresh = row.get("encrypted_refresh_token")
+            refresh_token = self._cipher.decrypt(bytes(refresh)) if refresh else None
         except ValueError:
             return None
         return Connection(
@@ -55,29 +57,30 @@ class PgConnectionStore:
             expires_at=datetime.fromisoformat(row["expires_at"]) if row["expires_at"] else None,
             account_id=row["account_id"],
             account_handle=row["account_handle"],
+            refresh_token=refresh_token,
         )
 
     def put(self, owner_id: str, connection: Connection) -> None:
+        columns = ["owner_id", "platform", "encrypted_token", "scopes", "expires_at", "account_id", "account_handle"]
+        values = [
+            owner_id,
+            connection.platform.value,
+            self._cipher.encrypt(connection.access_token),
+            json.dumps(sorted(connection.scopes)),
+            connection.expires_at.isoformat() if connection.expires_at else None,
+            connection.account_id,
+            connection.account_handle,
+        ]
+        if connection.refresh_token is not None:
+            columns.append("encrypted_refresh_token")
+            values.append(self._cipher.encrypt(connection.refresh_token))
+        updates = ", ".join(f"{column}=EXCLUDED.{column}" for column in columns[2:])
         with self._db.connect() as conn:
             conn.execute(
-                """INSERT INTO social_connections
-                   (owner_id, platform, encrypted_token, scopes, expires_at, account_id, account_handle)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s)
-                   ON CONFLICT (owner_id, platform) DO UPDATE SET
-                    encrypted_token=EXCLUDED.encrypted_token,
-                    scopes=EXCLUDED.scopes,
-                    expires_at=EXCLUDED.expires_at,
-                    account_id=EXCLUDED.account_id,
-                    account_handle=EXCLUDED.account_handle""",
-                (
-                    owner_id,
-                    connection.platform.value,
-                    self._cipher.encrypt(connection.access_token),
-                    json.dumps(sorted(connection.scopes)),
-                    connection.expires_at.isoformat() if connection.expires_at else None,
-                    connection.account_id,
-                    connection.account_handle,
-                ),
+                f"INSERT INTO social_connections ({', '.join(columns)}) "
+                f"VALUES ({', '.join(['%s'] * len(columns))}) "
+                f"ON CONFLICT (owner_id, platform) DO UPDATE SET {updates}",
+                values,
             )
 
 

@@ -132,6 +132,7 @@ class Connection:
     expires_at: datetime | None = None
     account_id: str | None = None
     account_handle: str | None = None
+    refresh_token: str | None = field(default=None, repr=False)
 
 
 class OutcomeKind(StrEnum):
