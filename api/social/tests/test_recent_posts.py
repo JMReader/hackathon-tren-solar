@@ -16,7 +16,7 @@ def x_reader(env):
     adapter.posts = ["post 1", "post 2"]
     adapter.reads = []
 
-    def read_recent_posts(connection, limit):
+    def read_recent_posts(connection, limit, profile_url=None):
         adapter.reads.append((connection.account_id, limit))
         if isinstance(adapter.posts, Exception):
             raise adapter.posts

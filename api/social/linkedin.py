@@ -9,9 +9,10 @@ from urllib.parse import quote, urlencode
 
 import httpx2
 
+from .apify import ApifyLinkedInPosts
 from .little import to_little
 from .models import Connection, Platform, ProviderOutcome, Publication, PublishableDraft, PublishableMedia
-from .ports import OAuthError
+from .ports import OAuthError, ProviderReadError
 
 AUTHORIZATION_URL = "https://www.linkedin.com/oauth/v2/authorization"
 TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken"
@@ -36,17 +37,19 @@ class LinkedInAdapter:
     platform = Platform.LINKEDIN
     required_scopes = frozenset({"w_member_social"})
     supports_image = True
-    supports_read_posts = False
 
     def __init__(
         self,
         config: LinkedInConfig,
         http: httpx2.Client,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        posts: ApifyLinkedInPosts | None = None,
     ) -> None:
         self._config = config
         self._http = http
         self._clock = clock
+        self._posts = posts
+        self.supports_read_posts = posts is not None
 
     def access_unavailable(self) -> None:
         return None
@@ -136,6 +139,15 @@ class LinkedInAdapter:
 
     def lookup(self, connection: Connection, publication: Publication) -> ProviderOutcome | None:
         return None
+
+    def read_recent_posts(self, connection: Connection, limit: int, profile_url: str | None = None) -> list[str]:
+        if self._posts is None:
+            raise ProviderReadError("READ_UNAVAILABLE", "La lectura de posts de LinkedIn no está configurada.", False)
+        if not profile_url:
+            raise ProviderReadError(
+                "PROFILE_URL_REQUIRED", "Pegá la URL de tu perfil de LinkedIn para importar tus posts.", False
+            )
+        return self._posts.read(profile_url, connection.account_handle, limit)
 
     def _upload_image(self, connection: Connection, author: str, media: PublishableMedia) -> str:
         data = Path(media.local_path).read_bytes()

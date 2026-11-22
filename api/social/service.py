@@ -106,7 +106,9 @@ class SocialService:
             account_handle=connection.account_handle,
         )
 
-    def recent_posts(self, owner_id: str, platform: Platform, limit: int) -> RecentPosts:
+    def recent_posts(
+        self, owner_id: str, platform: Platform, limit: int, profile_url: str | None = None
+    ) -> RecentPosts:
         status = self.connection_status(owner_id, platform)
         if status.status is not ConnectionState.CONNECTED:
             return RecentPosts(ReadStatus.SKIPPED, message=status.reason)
@@ -117,7 +119,7 @@ class SocialService:
             )
         reader: PostReader = self._adapters[platform]
         try:
-            posts = reader.read_recent_posts(self._connections.get(owner_id, platform), limit)
+            posts = reader.read_recent_posts(self._connections.get(owner_id, platform), limit, profile_url)
         except ProviderReadError as error:
             return RecentPosts(ReadStatus.FAILED if error.retryable else ReadStatus.UNAVAILABLE, message=error.message)
         except Exception:

@@ -20,7 +20,9 @@ class ProviderReadError(Exception):
 
 
 class PostReader(Protocol):
-    def read_recent_posts(self, connection: Connection, limit: int) -> list[str]: ...
+    def read_recent_posts(
+        self, connection: Connection, limit: int, profile_url: str | None = None
+    ) -> list[str]: ...
 
 
 class SocialAdapter(Protocol):

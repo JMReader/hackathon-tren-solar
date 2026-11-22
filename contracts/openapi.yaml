@@ -740,6 +740,10 @@ components:
           minimum: 1
           maximum: 20
           default: 5
+        linkedin_profile_url:
+          type: [string, "null"]
+          maxLength: 300
+          description: URL del perfil propio (linkedin.com/in/<perfil>) para importar posts de LinkedIn (Issue #5).
 
     CompleteOnboardingRequest:
       type: object

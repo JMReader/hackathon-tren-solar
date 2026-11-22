@@ -127,7 +127,7 @@ class XAdapter:
             refresh_token=payload.get("refresh_token") or connection.refresh_token,
         )
 
-    def read_recent_posts(self, connection: Connection, limit: int) -> list[str]:
+    def read_recent_posts(self, connection: Connection, limit: int, profile_url: str | None = None) -> list[str]:
         limit = max(1, min(limit, MAX_READ_POSTS))
         try:
             response = self._http.get(

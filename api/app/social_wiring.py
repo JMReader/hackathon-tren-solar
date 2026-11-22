@@ -37,8 +37,10 @@ class SocialStyleReader:
     def __init__(self, social: SocialService) -> None:
         self._social = social
 
-    def fetch_recent_posts(self, session_id: str, platform: str, max_posts: int) -> StyleOutcome:
-        result = self._social.recent_posts(session_id, Platform(platform), max_posts)
+    def fetch_recent_posts(
+        self, session_id: str, platform: str, max_posts: int, profile_url: str | None = None
+    ) -> StyleOutcome:
+        result = self._social.recent_posts(session_id, Platform(platform), max_posts, profile_url)
         return StyleOutcome(status=result.status.value, posts=list(result.posts), message=result.message)
 
 
