@@ -1,0 +1,55 @@
+{
+  "request_headers": {
+    "Idempotency-Key": "9f8c2b10-44a1-4e7d-9b31-0a12bc34de56"
+  },
+  "request_body": {
+    "draft_revision": 1,
+    "confirm_publish": true
+  },
+  "responses": {
+    "succeeded": {
+      "id": "pub_01J9XA550",
+      "draft_id": "drf_x_01J9X9002",
+      "draft_revision": 1,
+      "platform": "x",
+      "idempotency_key": "9f8c2b10-44a1-4e7d-9b31-0a12bc34de56",
+      "status": "succeeded",
+      "external_post_id": "1859981234567890123",
+      "external_url": "https://x.com/i/web/status/1859981234567890123",
+      "published_at": "2026-11-22T15:40:12Z",
+      "error": null
+    },
+    "unknown_timeout": {
+      "id": "pub_01J9XA551",
+      "draft_id": "drf_li_01J9X9001",
+      "draft_revision": 1,
+      "platform": "linkedin",
+      "idempotency_key": "2a1b3c4d-55e6-4f88-8123-abcdef012345",
+      "status": "unknown",
+      "external_post_id": null,
+      "external_url": null,
+      "published_at": null,
+      "error": {
+        "code": "PROVIDER_TIMEOUT_AFTER_SEND",
+        "message": "LinkedIn no confirmó a tiempo. Verificá en tu perfil antes de reintentar para no duplicar.",
+        "retryable": false
+      }
+    },
+    "failed_recoverable": {
+      "id": "pub_01J9XA552",
+      "draft_id": "drf_li_01J9X9001",
+      "draft_revision": 1,
+      "platform": "linkedin",
+      "idempotency_key": "7c9d8e11-1234-4abc-9999-001122334455",
+      "status": "failed",
+      "external_post_id": null,
+      "external_url": null,
+      "published_at": null,
+      "error": {
+        "code": "OAUTH_TOKEN_EXPIRED",
+        "message": "La sesión de LinkedIn venció. Reconectá tu cuenta o copiá el texto para publicarlo manualmente.",
+        "retryable": true
+      }
+    }
+  }
+}

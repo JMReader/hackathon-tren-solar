@@ -1,0 +1,37 @@
+{
+  "id": "ach_01J9X8K2M4",
+  "input_type": "text",
+  "status": "needs_review",
+  "revision": 1,
+  "photo_id": "med_01J9X8A7B6",
+  "transcript": "Este finde en Jujuy hicimos una app de turnos médicos en React para una clínica local. Éramos 3 en el equipo; yo diseñé todas las pantallas en Figma y armé el flujo de reserva en 3 pasos. Todavía no medimos cuánta gente la usó.",
+  "facts": [
+    {
+      "id": "fact_1",
+      "category": "project",
+      "text": "Equipo de 3 personas construyó una app de turnos médicos en React para una clínica local en Jujuy.",
+      "source_quote": "hicimos una app de turnos médicos en React para una clínica local. Éramos 3 en el equipo",
+      "source": "transcript"
+    },
+    {
+      "id": "fact_2",
+      "category": "role",
+      "text": "Diseñó todas las pantallas en Figma y definió el flujo de reserva en 3 pasos.",
+      "source_quote": "yo diseñé todas las pantallas en Figma y armé el flujo de reserva en 3 pasos",
+      "source": "transcript"
+    }
+  ],
+  "open_questions": [
+    {
+      "id": "q_1",
+      "field": "tech_contribution",
+      "question": "Se menciona que la app está en React: ¿también escribiste código frontend o tu rol fue 100% diseño en Figma?"
+    },
+    {
+      "id": "q_2",
+      "field": "impact",
+      "question": "Indicaste que aún no hay métricas de uso. ¿Querés destacar algún problema concreto que resolvía el flujo de 3 pasos?"
+    }
+  ],
+  "error": null
+}
