@@ -1,6 +1,7 @@
 @layer ui-sdk;
 @import "tailwindcss";
 @import "../styles/components.css" layer(components);
+@import "./landing-theme.css";
 
 @theme {
   --color-night: #2d2e3e;
