@@ -151,7 +151,7 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
   }
 
   return (
-    <div className="flex flex-1 flex-col lg:grid lg:h-dvh lg:grid-cols-[380px_1fr]">
+    <div className="flex flex-1 flex-col lg:grid lg:h-dvh lg:flex-none lg:grid-cols-[380px_1fr] lg:grid-rows-[minmax(0,1fr)]">
       <aside className="hidden bg-night px-10 py-12 lg:flex lg:flex-col lg:gap-10 lg:overflow-y-auto">
         <header className="flex flex-col gap-2">
           <p className="font-display text-3xl tracking-display text-inverse">Tren Solar</p>
@@ -206,10 +206,11 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
             </div>
           </div>
 
-          <div className="mt-4 flex h-[40rem] justify-center lg:mt-8 lg:h-auto lg:min-h-0 lg:flex-1">
+          <div className="mt-4 flex justify-center lg:mt-8 lg:min-h-0 lg:flex-1">
             <div
+              key={templateId}
               className={cn(
-                "relative h-full overflow-y-auto overscroll-contain rounded-[22px] bg-paper shadow-panel transition-[width] duration-300 ease-out motion-reduce:transition-none lg:shadow-popover",
+                "relative animate-step-in overflow-hidden rounded-[22px] bg-paper shadow-panel transition-[width] duration-300 ease-out motion-reduce:animate-none motion-reduce:transition-none lg:overflow-y-auto lg:overscroll-contain lg:shadow-popover",
                 device === "mobile" ? "w-full lg:w-[390px]" : "w-full",
               )}
             >
