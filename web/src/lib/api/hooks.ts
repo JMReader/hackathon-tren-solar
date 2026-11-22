@@ -29,6 +29,11 @@ function profileKey(sessionId: string | undefined) {
   return ["profile", sessionId] as const
 }
 
+// Profile writes share one queue so each request reads the revision left by the previous one.
+function profileScope(sessionId: string | undefined) {
+  return { id: `profile-${sessionId}` }
+}
+
 function errorMessage(error: unknown, fallback: string) {
   if (error instanceof ApiRequestError) {
     const detail = (error.body as ApiError | null)?.error
@@ -102,6 +107,7 @@ export function useSocialConnection(
 export function useUpdateProfile(sessionId: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
+    scope: profileScope(sessionId),
     mutationFn: (patch: {
       profession?: string | null
       writing_sample?: string | null
@@ -123,6 +129,7 @@ export function useUpdateProfile(sessionId: string | undefined) {
 export function useUploadPhoto(sessionId: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
+    scope: profileScope(sessionId),
     mutationFn: async (file: File) => {
       const formData = new FormData()
       formData.append("file", file)
@@ -147,6 +154,7 @@ export function useUploadPhoto(sessionId: string | undefined) {
 export function useUploadCv(sessionId: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
+    scope: profileScope(sessionId),
     mutationFn: (file: File) => {
       const formData = new FormData()
       formData.append("file", file)
@@ -179,13 +187,8 @@ export function useConnectSocial(
       void queryClient.invalidateQueries({
         queryKey: ["connection", platform, sessionId],
       })
-      if (error instanceof ApiRequestError && error.status === 503) {
-        const status = error.body as SocialConnectionStatus | null
-        toast.error("No se puede conectar ahora", {
-          description: status?.reason ?? "El proveedor no tiene acceso habilitado.",
-        })
-        return
-      }
+      // 503 leaves the card in access_unavailable, which explains it inline.
+      if (error instanceof ApiRequestError && error.status === 503) return
       toast.error("No se pudo iniciar la conexión", {
         description: errorMessage(error, "Intentá de nuevo en un rato."),
       })
@@ -196,6 +199,7 @@ export function useConnectSocial(
 export function useSyncStyle(sessionId: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
+    scope: profileScope(sessionId),
     mutationFn: async (request: SyncStyleRequest = {}) => {
       try {
         const profile = await apiFetch<AuthorProfile>(
@@ -240,6 +244,7 @@ export function useSyncStyle(sessionId: string | undefined) {
 export function useCompleteOnboarding(sessionId: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
+    scope: profileScope(sessionId),
     mutationFn: () => {
       const profile = queryClient.getQueryData<AuthorProfile>(
         profileKey(sessionId),
