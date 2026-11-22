@@ -176,6 +176,20 @@ class Store:
                 conn.execute(
                     f"ALTER TABLE {table} ADD COLUMN session_id TEXT NOT NULL DEFAULT ''"
                 )
+        cp_cols = {row[1] for row in conn.execute("PRAGMA table_info(candidate_profiles)")}
+        if cp_cols:
+            for col, typedef in (
+                ("province", "TEXT"),
+                ("country", "TEXT DEFAULT 'Argentina'"),
+                ("segment", "TEXT"),
+            ):
+                if col not in cp_cols:
+                    conn.execute(f"ALTER TABLE candidate_profiles ADD COLUMN {col} {typedef}")
+        es_cols = {row[1] for row in conn.execute("PRAGMA table_info(employer_searches)")}
+        if es_cols:
+            for col in ("province", "country"):
+                if col not in es_cols:
+                    conn.execute(f"ALTER TABLE employer_searches ADD COLUMN {col} TEXT")
 
     def _conn(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
@@ -457,12 +471,14 @@ class Store:
         with self._lock, self._conn() as conn:
             conn.execute(
                 """INSERT OR REPLACE INTO candidate_profiles
-                   (session_id,display_name,role,industry,location,work_mode,
-                    declared_skills,is_synthetic)
-                   VALUES (?,?,?,?,?,?,?,?)""",
+                   (session_id,display_name,role,industry,location,province,country,
+                    segment,work_mode,declared_skills,is_synthetic)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     row["session_id"], row["display_name"], row.get("role"),
-                    row.get("industry"), row.get("location"), row.get("work_mode"),
+                    row.get("industry"), row.get("location"), row.get("province"),
+                    row.get("country", "Argentina"), row.get("segment"),
+                    row.get("work_mode"),
                     json.dumps(row.get("declared_skills") or [], ensure_ascii=False),
                     1 if row.get("is_synthetic", True) else 0,
                 ),
@@ -481,6 +497,9 @@ class Store:
             "role": row["role"],
             "industry": row["industry"],
             "location": row["location"],
+            "province": row["province"] if "province" in row.keys() else None,
+            "country": row["country"] if "country" in row.keys() else "Argentina",
+            "segment": row["segment"] if "segment" in row.keys() else None,
             "work_mode": row["work_mode"],
             "declared_skills": json.loads(row["declared_skills"]),
             "is_synthetic": bool(row["is_synthetic"]),
@@ -562,14 +581,15 @@ class Store:
         with self._lock, self._conn() as conn:
             conn.execute(
                 """INSERT OR REPLACE INTO employer_searches
-                   (id,employer_id,title,required_skills,industry,location,
-                    work_mode,job_proposal,created_at)
-                   VALUES (?,?,?,?,?,?,?,?,?)""",
+                   (id,employer_id,title,required_skills,industry,location,province,
+                    country,work_mode,job_proposal,created_at)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     row["id"], row["employer_id"], row["title"],
                     json.dumps(row["required_skills"], ensure_ascii=False),
-                    row.get("industry"), row.get("location"), row.get("work_mode"),
-                    row.get("job_proposal"), row["created_at"],
+                    row.get("industry"), row.get("location"),
+                    row.get("province"), row.get("country"),
+                    row.get("work_mode"), row.get("job_proposal"), row["created_at"],
                 ),
             )
 
@@ -585,6 +605,8 @@ class Store:
             "title": row["title"],
             "required_skills": json.loads(row["required_skills"]),
             "industry": row["industry"], "location": row["location"],
+            "province": row["province"] if "province" in row.keys() else None,
+            "country": row["country"] if "country" in row.keys() else None,
             "work_mode": row["work_mode"], "job_proposal": row["job_proposal"],
             "created_at": row["created_at"],
         }

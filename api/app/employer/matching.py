@@ -34,7 +34,6 @@ def skill_evidence(
 ) -> list[SkillEvidence]:
     approved = [a for a in achievements if a.status == "approved"]
     by_skill: dict[str, tuple[str, str]] = {}
-    declared_cf = {s.strip().casefold(): s.strip() for s in declared if s.strip()}
     for ach in approved:
         for fact in ach.facts:
             if fact.category not in ("tech", "learning", None):
@@ -56,8 +55,6 @@ def skill_evidence(
                 skill=skill, state="supported",
                 achievement_id=ach_id, citation=citation,
             ))
-        elif key in declared_cf:
-            out.append(SkillEvidence(skill=skill, state="supported", citation=declared_cf[key]))
         else:
             out.append(SkillEvidence(skill=skill, state="missing"))
     return out

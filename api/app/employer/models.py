@@ -24,6 +24,9 @@ class CandidateProfileRecord(BaseModel):
     role: str | None = None
     industry: str | None = None
     location: str | None = None
+    province: str | None = "Jujuy"
+    country: str | None = "Argentina"
+    segment: str | None = None
     work_mode: WorkMode | None = None
     declared_skills: list[str] = Field(default_factory=list)
     is_synthetic: bool = True
@@ -60,7 +63,9 @@ class CreateEmployerSearchRequest(BaseModel):
     title: str = Field(min_length=2)
     required_skills: list[str] = Field(min_length=1)
     industry: str | None = None
-    location: str | None = None
+    location: str | None = "Jujuy, Argentina"
+    province: str | None = "Jujuy"
+    country: str | None = "Argentina"
     work_mode: WorkMode | None = None
     job_proposal: str | None = None
 
@@ -72,6 +77,8 @@ class EmployerSearch(BaseModel):
     required_skills: list[str]
     industry: str | None = None
     location: str | None = None
+    province: str | None = None
+    country: str | None = None
     work_mode: WorkMode | None = None
     job_proposal: str | None = None
     created_at: str

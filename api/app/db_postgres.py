@@ -362,20 +362,25 @@ class PostgresStore:
         with self._lock, self._conn() as conn:
             conn.execute(
                 """INSERT INTO candidate_profiles
-                   (session_id,display_name,role,industry,location,work_mode,
-                    declared_skills,is_synthetic)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                   (session_id,display_name,role,industry,location,province,country,
+                    segment,work_mode,declared_skills,is_synthetic)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                    ON CONFLICT (session_id) DO UPDATE SET
                     display_name=EXCLUDED.display_name,
                     role=EXCLUDED.role,
                     industry=EXCLUDED.industry,
                     location=EXCLUDED.location,
+                    province=EXCLUDED.province,
+                    country=EXCLUDED.country,
+                    segment=EXCLUDED.segment,
                     work_mode=EXCLUDED.work_mode,
                     declared_skills=EXCLUDED.declared_skills,
                     is_synthetic=EXCLUDED.is_synthetic""",
                 (
                     row["session_id"], row["display_name"], row.get("role"),
-                    row.get("industry"), row.get("location"), row.get("work_mode"),
+                    row.get("industry"), row.get("location"), row.get("province"),
+                    row.get("country", "Argentina"), row.get("segment"),
+                    row.get("work_mode"),
                     json.dumps(row.get("declared_skills") or [], ensure_ascii=False),
                     row.get("is_synthetic", True),
                 ),
@@ -394,6 +399,9 @@ class PostgresStore:
             "role": row["role"],
             "industry": row["industry"],
             "location": row["location"],
+            "province": row.get("province"),
+            "country": row.get("country") or "Argentina",
+            "segment": row.get("segment"),
             "work_mode": row["work_mode"],
             "declared_skills": json.loads(row["declared_skills"])
             if isinstance(row["declared_skills"], str) else (row["declared_skills"] or []),
@@ -487,17 +495,20 @@ class PostgresStore:
         with self._lock, self._conn() as conn:
             conn.execute(
                 """INSERT INTO employer_searches
-                   (id,employer_id,title,required_skills,industry,location,
-                    work_mode,job_proposal,created_at)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                   (id,employer_id,title,required_skills,industry,location,province,
+                    country,work_mode,job_proposal,created_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                    ON CONFLICT (id) DO UPDATE SET
                     title=EXCLUDED.title,
-                    required_skills=EXCLUDED.required_skills""",
+                    required_skills=EXCLUDED.required_skills,
+                    province=EXCLUDED.province,
+                    country=EXCLUDED.country""",
                 (
                     row["id"], row["employer_id"], row["title"],
                     json.dumps(row["required_skills"], ensure_ascii=False),
-                    row.get("industry"), row.get("location"), row.get("work_mode"),
-                    row.get("job_proposal"), row["created_at"],
+                    row.get("industry"), row.get("location"),
+                    row.get("province"), row.get("country"),
+                    row.get("work_mode"), row.get("job_proposal"), row["created_at"],
                 ),
             )
 

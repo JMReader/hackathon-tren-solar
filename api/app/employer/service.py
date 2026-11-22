@@ -19,6 +19,8 @@ from .models import (
     UpdateContactRequest,
 )
 from ..employer_matches import CandidateEvidence
+from ..models import Achievement
+from .territory import matches_territory
 
 
 def _now() -> str:
@@ -129,6 +131,8 @@ class EmployerService:
             "required_skills": req.required_skills,
             "industry": req.industry,
             "location": req.location,
+            "province": req.province,
+            "country": req.country,
             "work_mode": req.work_mode,
             "job_proposal": req.job_proposal,
             "created_at": now,
@@ -151,6 +155,8 @@ class EmployerService:
             required_skills=list(row["required_skills"]),
             industry=row.get("industry"),
             location=row.get("location"),
+            province=row.get("province"),
+            country=row.get("country"),
             work_mode=row.get("work_mode"),
             job_proposal=row.get("job_proposal"),
             created_at=row["created_at"],
@@ -173,10 +179,16 @@ class EmployerService:
         discoverable = self._discoverable_candidates()
         evidence_rows: list[CandidateEvidence] = []
         ctx: dict[str, tuple[dict, dict, list]] = {}
+        search_row = {
+            "province": search.province,
+            "country": search.country,
+            "location": search.location,
+        }
         for consent, profile, achievements in discoverable:
+            if not matches_territory(search_row, profile):
+                continue
             sid = profile["session_id"]
             skills = approved_skills_from_achievements(achievements)
-            skills.extend(profile.get("declared_skills") or [])
             evidence_rows.append(CandidateEvidence(sid, True, tuple(skills)))
             ctx[sid] = (consent, profile, achievements)
 

@@ -1,17 +1,17 @@
 {
   "employers": [
     {
+      "id": "seed_emp_free",
+      "name": "Empresa Free (demo)",
+      "verified": true,
+      "plan": "free"
+    },
+    {
       "id": "seed_emp_paid",
-      "name": "Norte Talent (demo)",
+      "name": "Empresa Pro (demo)",
       "verified": true,
       "plan": "paid",
       "plan_expires_at": "2099-12-31T00:00:00Z"
-    },
-    {
-      "id": "seed_emp_free",
-      "name": "Consultora Piloto (demo)",
-      "verified": true,
-      "plan": "free"
     },
     {
       "id": "seed_emp_unverified",

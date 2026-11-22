@@ -6,6 +6,9 @@ CREATE TABLE IF NOT EXISTS candidate_profiles (
     role TEXT,
     industry TEXT,
     location TEXT,
+    province TEXT DEFAULT 'Jujuy',
+    country TEXT DEFAULT 'Argentina',
+    segment TEXT,
     work_mode TEXT CHECK (work_mode IN ('onsite', 'hybrid', 'remote')),
     declared_skills JSONB NOT NULL DEFAULT '[]'::jsonb,
     is_synthetic BOOLEAN NOT NULL DEFAULT TRUE
@@ -40,6 +43,8 @@ CREATE TABLE IF NOT EXISTS employer_searches (
     required_skills JSONB NOT NULL,
     industry TEXT,
     location TEXT,
+    province TEXT DEFAULT 'Jujuy',
+    country TEXT DEFAULT 'Argentina',
     work_mode TEXT CHECK (work_mode IN ('onsite', 'hybrid', 'remote')),
     job_proposal TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
