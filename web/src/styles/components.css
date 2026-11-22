@@ -137,3 +137,8 @@
   height: var(--segmented-control-indicator-height);
   translate: var(--segmented-control-indicator-left) var(--segmented-control-indicator-top);
 }
+
+/* Onboarding: keep toasts above the wizard action bar. */
+body:has([data-onboarding-actions]) [data-slot="toast-region"][data-side="bottom"] {
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}
