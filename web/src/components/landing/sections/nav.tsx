@@ -50,7 +50,8 @@ export function Nav() {
             Ingresar
           </Link>
           <Button href={START_HREF} variant="light" size="sm" className="h-9 px-4">
-            Grabar<span className="hidden sm:inline">&nbsp;mi logro</span>
+            <span className="sm:hidden">Grabar</span>
+            <span className="hidden sm:inline">Grabar mi logro</span>
           </Button>
         </div>
       </div>

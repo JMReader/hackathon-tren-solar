@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BRAND } from "@/components/landing/content";
 import { lpInter, lpMono } from "@/components/landing/fonts";
 import { Audience } from "@/components/landing/sections/audience";
+import { Consent, Employers } from "@/components/landing/sections/employers";
 import { Faq } from "@/components/landing/sections/faq";
 import { Features } from "@/components/landing/sections/features";
 import { FinalCta, Footer } from "@/components/landing/sections/footer";
@@ -28,6 +29,8 @@ export default function LandingPage() {
         <Features />
         <Proof />
         <Origin />
+        <Employers />
+        <Consent />
         <Audience />
         <Faq />
         <FinalCta />

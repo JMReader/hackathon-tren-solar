@@ -1,5 +1,6 @@
 import Image, { type StaticImageData } from "next/image";
 import { cn } from "@/lib/utils";
+import empresas from "./screens/empresas.jpg";
 import grabar from "./screens/grabar.jpg";
 import portfolio from "./screens/portfolio.jpg";
 import publicar from "./screens/publicar.jpg";
@@ -12,6 +13,12 @@ export const APP_SCREENS: { src: StaticImageData; path: string; alt: string }[] 
   { src: publicar, path: "/app/crear/…/publicar", alt: "Los posts para LinkedIn y X, listos para copiar, con la foto del proyecto" },
   { src: portfolio, path: "/app/portfolio", alt: "Editor del portfolio con la plantilla Galería y el logro aprobado" },
 ];
+
+export const EMPLOYER_SCREEN: (typeof APP_SCREENS)[number] = {
+  src: empresas,
+  path: "/empresas",
+  alt: "Búsqueda Pro para empresas: cinco perfiles coinciden con Diseño UX en Jujuy, con el detalle de por qué coincide uno de ellos",
+};
 
 export function AppFrame({
   screen,
