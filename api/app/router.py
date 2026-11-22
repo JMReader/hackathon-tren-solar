@@ -14,6 +14,8 @@ from .models import (
     Draft,
     GenerateDraftsRequest,
     GenerateDraftsResponse,
+    LoginRequest,
+    LoginResponse,
     MediaAsset,
     SessionCreated,
     SetAuthorProfilePhotoRequest,
@@ -52,6 +54,10 @@ def create_router(
     @router.post("/session", status_code=201, tags=["session"])
     def create_session() -> SessionCreated:
         return sessions.create_session()
+
+    @router.post("/auth/login", tags=["auth"])
+    def demo_login(req: LoginRequest) -> LoginResponse:
+        return sessions.demo_login(req.email, req.password)
 
     @router.get("/session/profile", tags=["session"])
     def get_profile(session_id: Session) -> AuthorProfile:

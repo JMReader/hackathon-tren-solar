@@ -62,7 +62,8 @@ class Services:
             fake_posts = os.environ.get("FAKE_STYLE_POSTS")
             style_reader = (build_style_reader(fake_posts) if fake_posts
                             else SocialStyleReader(self.social.service))
-        self.sessions = SessionService(store, media, style_reader, ttl)
+        self.sessions = SessionService(store, media, style_reader, ttl,
+                                       demo_accounts=settings.demo_accounts)
         self.portfolio = PortfolioService(store, media)
         self.employer = EmployerService(store, demo_enabled=settings.employer_demo)
 

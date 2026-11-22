@@ -1,11 +1,32 @@
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
 API_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_DATA_DIR = API_DIR / ".data"
+
+# Cuentas fijas para el pitch (spec docs/spec-login-demo.md). No es auth de
+# producción: POST /session ya crea sesiones anónimas sin credenciales.
+_DEMO_ACCOUNT_DEFAULTS = [
+    {"email": "juanmcoro2003@gmail.com", "password": "Demo1234", "display_name": "Juan"},
+    {"email": "mauromamani.b@gmail.com", "password": "Demo1234", "display_name": "Mauro"},
+    {"email": "maykox34f@gmail.com", "password": "Demo1234", "display_name": "Mayko"},
+    {"email": "riosmaurii@gmail.com", "password": "Demo1234", "display_name": "Mauri"},
+]
+
+
+def _demo_accounts(raw: str | None) -> list[dict]:
+    if raw:
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, list) and parsed:
+                return parsed
+        except json.JSONDecodeError:
+            pass
+    return [dict(a) for a in _DEMO_ACCOUNT_DEFAULTS]
 
 
 @dataclass
@@ -35,6 +56,7 @@ class Settings:
     cors_origins: list[str] = field(default_factory=lambda: [
         "http://localhost:3000", "http://127.0.0.1:3000"])
     employer_demo: bool = False
+    demo_accounts: list[dict] = field(default_factory=list)
     extra: dict = field(default_factory=dict)
 
     @classmethod
@@ -79,4 +101,5 @@ class Settings:
                           if o.strip()] if env.get("CORS_ORIGINS") else [
                 "http://localhost:3000", "http://127.0.0.1:3000"],
             employer_demo=env.get("TS_EMPLOYER_DEMO", "") == "1",
+            demo_accounts=_demo_accounts(env.get("DEMO_ACCOUNTS")),
         )

@@ -159,6 +159,16 @@ class SessionCreated(BaseModel):
     expires_at: str
 
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    session_id: str
+    display_name: str
+
+
 class CvDocument(BaseModel):
     cv_id: str
     mime_type: str
