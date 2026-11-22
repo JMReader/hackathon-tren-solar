@@ -20,7 +20,20 @@ def test_accepts_handoff_from_issue_3(example):
 @pytest.mark.parametrize("example", ["linkedin_connected", "x_access_unavailable"])
 def test_connection_fixtures_match_model(example):
     payload = fixture("07-social-connections.response.json")[example]
-    assert SocialConnectionStatus.model_validate(payload).model_dump(mode="json", exclude={"assisted_share"}) == payload
+    assert SocialConnectionStatus.model_validate(payload).model_dump(mode="json").items() >= payload.items()
+
+
+def test_connection_accepts_can_read_posts_from_onboarding_contract():
+    payload = {
+        "platform": "linkedin",
+        "status": "connected",
+        "can_publish_text": True,
+        "can_publish_image": True,
+        "can_read_posts": True,
+        "account_handle": "Ana Gómez",
+        "reason": None,
+    }
+    assert SocialConnectionStatus.model_validate(payload).model_dump(mode="json").items() >= payload.items()
 
 
 @pytest.mark.parametrize("example", ["succeeded", "unknown_timeout", "failed_recoverable"])

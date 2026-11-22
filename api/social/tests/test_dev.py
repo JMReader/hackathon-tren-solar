@@ -65,7 +65,12 @@ def test_full_linkedin_flow_against_mock_api(client):
     assert (location.path, parse_qs(location.query)["result"]) == ("/dev", ["connected"])
 
     status = client.get("/api/v1/social/linkedin/connection").json()
-    assert (status["status"], status["account_handle"], status["can_publish_image"]) == ("connected", "Mayko", True)
+    assert (status["status"], status["account_handle"], status["can_publish_image"], status["can_read_posts"]) == (
+        "connected",
+        "Mayko",
+        True,
+        False,
+    )
 
     draft = client.post("/dev/drafts", data={"platform": "linkedin", "body": "Hola #TrenSolar"}).json()
     published = client.post(

@@ -15,6 +15,7 @@ class SocialAdapter(Protocol):
     platform: Platform
     required_scopes: frozenset[str]
     supports_image: bool
+    supports_read_posts: bool
 
     def access_unavailable(self) -> str | None: ...
 

@@ -100,6 +100,7 @@ class SocialService:
             platform,
             ConnectionState.CONNECTED,
             can_publish_image=adapter.supports_image,
+            can_read_posts=adapter.supports_read_posts,
             account_handle=connection.account_handle,
         )
 
@@ -303,6 +304,7 @@ def _status(
     state: ConnectionState,
     *,
     can_publish_image: bool = False,
+    can_read_posts: bool = False,
     account_handle: str | None = None,
     reason: str | None = None,
 ) -> SocialConnectionStatus:
@@ -312,6 +314,7 @@ def _status(
         status=state,
         can_publish_text=connected,
         can_publish_image=connected and can_publish_image,
+        can_read_posts=connected and can_read_posts,
         account_handle=account_handle,
         reason=reason,
         assisted_share=assisted.support(platform),

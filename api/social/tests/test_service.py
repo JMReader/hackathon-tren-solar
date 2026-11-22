@@ -64,6 +64,18 @@ class TestConnectionStatus:
             "Mayko",
         )
 
+    @pytest.mark.parametrize("supports_read_posts", [True, False])
+    def test_read_posts_capability_is_independent_from_publishing(self, env, supports_read_posts):
+        env.adapters[Platform.LINKEDIN].supports_read_posts = supports_read_posts
+        env.connect(Platform.LINKEDIN)
+        row = env.service.connection_status(OWNER, Platform.LINKEDIN)
+        assert (row.can_publish_text, row.can_read_posts) == (True, supports_read_posts)
+
+    def test_read_posts_requires_a_usable_connection(self, env):
+        env.adapters[Platform.LINKEDIN].supports_read_posts = True
+        env.connect(Platform.LINKEDIN, expires_at=NOW - timedelta(seconds=1))
+        assert env.service.connection_status(OWNER, Platform.LINKEDIN).can_read_posts is False
+
     def test_default_adapters_never_pretend_to_publish(self):
         service = SocialService(
             default_adapters(),
@@ -73,7 +85,7 @@ class TestConnectionStatus:
         )
         rows = [service.connection_status(OWNER, p) for p in Platform]
         assert all(r.status is ConnectionState.ACCESS_UNAVAILABLE and r.reason for r in rows)
-        assert not any(r.can_publish_text or r.can_publish_image for r in rows)
+        assert not any(r.can_publish_text or r.can_publish_image or r.can_read_posts for r in rows)
 
 
 class TestPublish:

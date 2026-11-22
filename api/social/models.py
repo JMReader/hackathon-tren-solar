@@ -48,6 +48,7 @@ class SocialConnectionStatus(BaseModel):
     status: ConnectionState
     can_publish_text: bool
     can_publish_image: bool
+    can_read_posts: bool = False
     account_handle: str | None = None
     reason: str | None = None
     assisted_share: AssistedShareSupport | None = None

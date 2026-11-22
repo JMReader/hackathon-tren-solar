@@ -7,6 +7,7 @@ from .ports import SocialAdapter
 class BlockedAdapter:
     required_scopes: frozenset[str] = frozenset()
     supports_image = False
+    supports_read_posts = False
 
     def __init__(self, platform: Platform, reason: str) -> None:
         self.platform = platform

@@ -191,6 +191,11 @@ def test_created_without_post_id_is_not_confirmed():
     assert (outcome.kind, outcome.external_post_id, outcome.external_url) == (OutcomeKind.SUCCEEDED, None, None)
 
 
+def test_member_posts_are_not_readable():
+    linkedin, _ = adapter(lambda r: httpx2.Response(500))
+    assert linkedin.supports_read_posts is False
+
+
 def test_cannot_look_up_member_posts():
     linkedin, recorder = adapter(lambda r: httpx2.Response(500))
     assert linkedin.lookup(CONNECTION, None) is None

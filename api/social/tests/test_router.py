@@ -32,7 +32,12 @@ def test_connection_status(client):
     response = client.get("/api/v1/social/x/connection")
     assert response.status_code == 200
     body = response.json()
-    assert (body["status"], body["can_publish_text"], body["can_publish_image"]) == ("disconnected", False, False)
+    assert (body["status"], body["can_publish_text"], body["can_publish_image"], body["can_read_posts"]) == (
+        "disconnected",
+        False,
+        False,
+        False,
+    )
     assert body["assisted_share"] == {"official": True, "attaches_photo": False}
 
 

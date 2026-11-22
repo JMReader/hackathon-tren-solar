@@ -36,6 +36,7 @@ class LinkedInAdapter:
     platform = Platform.LINKEDIN
     required_scopes = frozenset({"w_member_social"})
     supports_image = True
+    supports_read_posts = False
 
     def __init__(
         self,

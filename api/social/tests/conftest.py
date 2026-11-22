@@ -26,6 +26,7 @@ class FakeAdapter:
         self.platform = platform
         self.required_scopes = frozenset({"write"})
         self.supports_image = True
+        self.supports_read_posts = False
         self.reason: str | None = None
         self.outcome: ProviderOutcome | Exception = ProviderOutcome.succeeded(
             f"{platform}-post-1", f"https://example.test/{platform}/post-1"
