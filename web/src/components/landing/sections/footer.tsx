@@ -14,6 +14,8 @@ const COLUMNS = [
     title: "Empezar",
     links: [
       { label: "Grabar un logro", href: START_HREF },
+      { label: "Ingresar", href: "/login" },
+      { label: "Empresas", href: "/empresas" },
       { label: "Preguntas", href: "#preguntas" },
     ],
   },

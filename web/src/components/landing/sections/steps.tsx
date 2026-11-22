@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { STEPS } from "../content";
 import { Container, Heading, Reveal, Tag } from "../kit";
-import { STEP_SCREENS } from "../mockups";
+import { APP_SCREENS, AppFrame } from "../app-screens";
 import { Scene } from "../scene";
 
 function StepText({ step, className }: { step: (typeof STEPS)[number]; className?: string }) {
@@ -62,8 +62,8 @@ export function Steps() {
 
       {/* Desktop: sticky scroll-driven steps */}
       <div ref={trackRef} className="relative hidden h-[300vh] lg:block">
-        <div className="sticky top-14 flex h-[calc(100vh-3.5rem)] items-start pt-6">
-          <Container className="grid h-[min(600px,calc(100vh-6rem))] grid-cols-[300px_1fr] grid-rows-[1fr_auto] gap-3">
+        <div className="sticky top-20 flex h-[calc(100vh-5rem)] items-start pt-4">
+          <Container className="grid max-w-[1200px] grid-cols-[300px_1fr] grid-rows-[auto_auto] gap-3">
             <div className="relative overflow-hidden rounded-2xl border border-lp-line bg-gradient-to-b from-white/[0.05] to-transparent p-5">
               {STEPS.map((s, i) => (
                 <StepText
@@ -85,20 +85,21 @@ export function Steps() {
                 ))}
               </div>
             </div>
-            <div className="relative">
-              {STEP_SCREENS.map((Screen, i) => (
+            <div className="grid">
+              {APP_SCREENS.map((screen, i) => (
                 <div
-                  key={i}
+                  key={screen.path}
+                  aria-hidden={i !== active}
                   className={cn(
-                    "absolute inset-0 transition-all duration-700 ease-lp",
+                    "[grid-area:1/1] transition-all duration-700 ease-lp",
                     i === active ? "scale-100 opacity-100" : "pointer-events-none scale-[0.98] opacity-0",
                   )}
                 >
-                  <Screen />
+                  <AppFrame screen={screen} priority={i === 0} />
                 </div>
               ))}
             </div>
-            <p className="col-span-2 text-center text-xs text-lp-muted">Pantallas ilustrativas con datos de ejemplo.</p>
+            <p className="col-span-2 text-center text-xs text-lp-muted">Capturas reales de la app, con datos de ejemplo.</p>
           </Container>
         </div>
       </div>
@@ -106,17 +107,15 @@ export function Steps() {
       {/* Mobile / tablet: stacked */}
       <Container className="mt-8 flex flex-col gap-10 pb-10 lg:hidden">
         {STEPS.map((s, i) => {
-          const Screen = STEP_SCREENS[i];
+          const screen = APP_SCREENS[i];
           return (
             <Reveal key={s.n} className="flex flex-col gap-3">
               <StepText step={s} className="rounded-2xl border border-lp-line bg-white/[0.03] p-5" />
-              <div className="h-[460px]">
-                <Screen />
-              </div>
+              <AppFrame screen={screen} />
             </Reveal>
           );
         })}
-        <p className="text-center text-xs text-lp-muted">Pantallas ilustrativas con datos de ejemplo.</p>
+        <p className="text-center text-xs text-lp-muted">Capturas reales de la app, con datos de ejemplo.</p>
       </Container>
     </section>
   );

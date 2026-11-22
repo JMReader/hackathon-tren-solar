@@ -711,7 +711,7 @@ function SocialSync() {
     const connected = params.get("connected")
     if (connected === "linkedin" || connected === "x") {
       handled.current = true
-      mutate({})
+      if (connected === "x") mutate({ platforms: ["x"] })
       params.delete("connected")
       const qs = params.toString()
       router.replace(qs ? `/onboarding?${qs}` : "/onboarding", { scroll: false })

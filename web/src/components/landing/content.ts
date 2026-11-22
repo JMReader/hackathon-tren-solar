@@ -53,9 +53,9 @@ export const STEPS = [
   },
   {
     n: "03",
-    label: "Publicá",
+    label: "Copiá",
     title: "Posts con tu voz, listos para LinkedIn y X.",
-    body: "Un borrador por red, con el largo justo para cada una. Nada se publica sin que vos lo confirmes.",
+    body: "Un borrador por red, con el largo justo para cada una. Lo editás, lo copiás y lo publicás vos: nada sale sin tu OK.",
   },
   {
     n: "04",
