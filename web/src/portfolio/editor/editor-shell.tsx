@@ -73,7 +73,7 @@ export function PortfolioEditorShell() {
     queryFn: () => loadOrCreatePortfolio(profileQuery.data!, approved),
   })
 
-  if (session.isPending || profileQuery.isLoading) {
+  if (session.isPending || profileQuery.isLoading || (sessionId && achievementsQuery.isLoading)) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-night">
         <Spinner className="size-8 text-on-dark" />
