@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS candidate_profiles (
     segment TEXT,
     work_mode TEXT CHECK (work_mode IN ('onsite', 'hybrid', 'remote')),
     declared_skills JSONB NOT NULL DEFAULT '[]'::jsonb,
-    is_synthetic BOOLEAN NOT NULL DEFAULT TRUE
+    is_synthetic BOOLEAN NOT NULL DEFAULT TRUE,
+    discovery_public_id TEXT UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS discovery_consents (

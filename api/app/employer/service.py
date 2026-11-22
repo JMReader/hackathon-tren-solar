@@ -6,20 +6,23 @@ from ..errors import ApiError
 from ..ids import new_id
 from .matching import approved_skills_from_achievements, rank_discoverable, skill_evidence
 from .models import (
+    CandidateContactRequest,
     CandidateProfileRecord,
-    ContactRequest,
     CreateContactRequest,
     CreateEmployerSearchRequest,
     DiscoveryConsent,
+    EmployerContactRequest,
     EmployerInfo,
     EmployerSearch,
     EmployerSearchMatches,
     MatchCard,
+    SkillEvidence,
     UpsertDiscoveryConsentRequest,
     UpdateContactRequest,
 )
 from ..employer_matches import CandidateEvidence
 from ..models import Achievement
+from .public_id import discovery_public_id, is_seed_employer
 from .territory import matches_territory
 
 
@@ -28,8 +31,9 @@ def _now() -> str:
 
 
 class EmployerService:
-    def __init__(self, store):
+    def __init__(self, store, *, demo_enabled: bool = False):
         self._store = store
+        self._demo_enabled = demo_enabled
 
     def get_employer(self, employer_id: str) -> EmployerInfo:
         row = self._store.get_employer(employer_id)
@@ -61,6 +65,16 @@ class EmployerService:
     def require_employer(self, employer_id: str | None) -> EmployerInfo:
         if not employer_id:
             raise ApiError(401, "unauthorized", "Falta el header X-Employer-Id.")
+        if not self._demo_enabled:
+            raise ApiError(
+                403, "employer_demo_disabled",
+                "La API empresarial de demo requiere TS_EMPLOYER_DEMO=1.",
+            )
+        if not is_seed_employer(employer_id):
+            raise ApiError(
+                403, "employer_not_allowed",
+                "Sólo empresas seed_* en modo demo.",
+            )
         return self.get_employer(employer_id)
 
     def get_consent(self, session_id: str) -> DiscoveryConsent | None:
@@ -170,9 +184,17 @@ class EmployerService:
             profile = self._store.get_candidate_profile(session_id)
             if profile is None:
                 continue
+            if self._demo_enabled and not profile.get("is_synthetic"):
+                continue
             achievements = self._store.list_achievements(session_id)
             out.append((consent, profile, achievements))
         return out
+
+    def _public_candidate_id(self, profile: dict) -> str:
+        pid = profile.get("discovery_public_id")
+        if not pid:
+            raise ApiError(500, "missing_public_id", "Perfil sin identificador público.")
+        return pid
 
     def search_matches(self, employer: EmployerInfo, search_id: str) -> EmployerSearchMatches:
         search = self.get_search(employer.id, search_id)
@@ -187,20 +209,21 @@ class EmployerService:
         for consent, profile, achievements in discoverable:
             if not matches_territory(search_row, profile):
                 continue
-            sid = profile["session_id"]
+            public_id = self._public_candidate_id(profile)
             skills = approved_skills_from_achievements(achievements)
-            evidence_rows.append(CandidateEvidence(sid, True, tuple(skills)))
-            ctx[sid] = (consent, profile, achievements)
+            evidence_rows.append(CandidateEvidence(public_id, True, tuple(skills)))
+            ctx[public_id] = (consent, profile, achievements)
 
         count, ranked = rank_discoverable(search.required_skills, evidence_rows)
         plan = employer.plan
         cards: list[MatchCard] | None = None
         if plan == "paid":
             cards = []
-            for sid, matched in ranked:
-                consent, profile, achievements = ctx[sid]
+            for public_id, matched in ranked:
+                consent, profile, achievements = ctx[public_id]
                 cards.append(self._match_card(
-                    sid, consent, profile, achievements, search.required_skills, matched,
+                    public_id, consent, profile, achievements,
+                    search.required_skills, matched,
                 ))
 
         return EmployerSearchMatches(
@@ -210,33 +233,53 @@ class EmployerService:
             matches=cards,
         )
 
+    @staticmethod
+    def _filter_evidence(
+        evidence: list[SkillEvidence],
+        shared_fields: list[str],
+    ) -> list[SkillEvidence]:
+        show_citation = "evidence" in shared_fields
+        out: list[SkillEvidence] = []
+        for item in evidence:
+            out.append(SkillEvidence(
+                skill=item.skill,
+                state=item.state,
+                citation=item.citation if show_citation else None,
+            ))
+        return out
+
     def _match_card(
         self,
-        session_id: str,
+        candidate_id: str,
         consent: dict,
         profile: dict,
         achievements: list,
         required: list[str],
         matched_skills: list[str],
     ) -> MatchCard:
-        evidence = skill_evidence(required, achievements, profile.get("declared_skills") or [])
+        shared = consent.get("shared_fields") or []
+        evidence = self._filter_evidence(
+            skill_evidence(required, achievements, profile.get("declared_skills") or []),
+            shared,
+        )
+        skills_out = matched_skills if "skills" in shared else []
         slug = None
-        if consent.get("share_portfolio"):
-            pf = self._store.get_published_portfolio_for_session(session_id)
+        if consent.get("share_portfolio") and "portfolio" in shared:
+            pf = self._store.get_published_portfolio_for_session(profile["session_id"])
             if pf:
                 slug = pf.get("slug")
-        display_name = profile.get("display_name") if "display_name" in (consent.get("shared_fields") or []) else None
-        role = profile.get("role") if "role" in (consent.get("shared_fields") or []) else None
+        display_name = profile.get("display_name") if "display_name" in shared else None
+        role = profile.get("role") if "role" in shared else None
         linkedin = consent.get("linkedin_url") if consent.get("share_linkedin") else None
         x_url = consent.get("x_url") if consent.get("share_x") else None
         pubs = consent.get("publications_last_7_days")
-        if "publications_7d" not in (consent.get("shared_fields") or []):
+        if "publications_7d" not in shared:
             pubs = None
         return MatchCard(
-            session_id=session_id,
+            candidate_id=candidate_id,
             display_name=display_name,
             role=role,
-            matched_skills=matched_skills,
+            matched_skills=skills_out,
             evidence=evidence,
             portfolio_slug=slug,
             linkedin_url=linkedin,
@@ -245,36 +288,58 @@ class EmployerService:
         )
 
     def create_contact_request(self, employer: EmployerInfo,
-                               req: CreateContactRequest) -> ContactRequest:
+                               req: CreateContactRequest) -> EmployerContactRequest:
         search = self.get_search(employer.id, req.search_id)
-        consent = self._store.get_discovery_consent(req.candidate_session_id)
+        profile = self._store.get_candidate_by_discovery_id(req.candidate_id)
+        if profile is None:
+            raise ApiError(404, "candidate_not_found", "Candidato no encontrado.")
+        session_id = profile["session_id"]
+        consent = self._store.get_discovery_consent(session_id)
         if consent is None or not consent.get("active"):
             raise ApiError(422, "not_discoverable", "El candidato no está visible para empresas.")
+        if self._demo_enabled and not profile.get("is_synthetic"):
+            raise ApiError(403, "candidate_not_allowed", "Sólo perfiles sintéticos en demo.")
         now = _now()
         cid = new_id("contact")
         row = {
             "id": cid,
             "employer_id": employer.id,
             "search_id": search.id,
-            "candidate_session_id": req.candidate_session_id,
+            "candidate_session_id": session_id,
             "message": req.message,
             "status": "pending",
             "created_at": now,
             "updated_at": now,
         }
         self._store.save_contact_request(row)
-        return self._contact_from_row(row, employer.name)
+        return EmployerContactRequest(
+            id=cid,
+            search_id=search.id,
+            candidate_id=req.candidate_id,
+            message=req.message,
+            status="pending",
+            created_at=now,
+            updated_at=now,
+        )
 
-    def get_contact_request(self, session_id: str, contact_id: str) -> ContactRequest:
+    def get_contact_request(self, session_id: str, contact_id: str) -> CandidateContactRequest:
         row = self._store.get_contact_request(contact_id)
         if row is None or row["candidate_session_id"] != session_id:
             raise ApiError(404, "contact_not_found", "Solicitud no encontrada.")
         emp = self._store.get_employer(row["employer_id"])
-        name = emp["name"] if emp else row["employer_id"]
-        return self._contact_from_row(row, name)
+        name = emp["name"] if emp else "Empresa"
+        return CandidateContactRequest(
+            id=row["id"],
+            employer_name=name,
+            search_id=row["search_id"],
+            message=row["message"],
+            status=row["status"],
+            created_at=row["created_at"],
+            updated_at=row["updated_at"],
+        )
 
     def update_contact_request(self, session_id: str, contact_id: str,
-                               req: UpdateContactRequest) -> ContactRequest:
+                               req: UpdateContactRequest) -> CandidateContactRequest:
         row = self._store.get_contact_request(contact_id)
         if row is None or row["candidate_session_id"] != session_id:
             raise ApiError(404, "contact_not_found", "Solicitud no encontrada.")
@@ -285,22 +350,21 @@ class EmployerService:
         row["updated_at"] = _now()
         self._store.save_contact_request(row)
         emp = self._store.get_employer(row["employer_id"])
-        name = emp["name"] if emp else row["employer_id"]
-        return self._contact_from_row(row, name)
-
-    def save_candidate_profile(self, record: CandidateProfileRecord) -> None:
-        self._store.save_candidate_profile(record.model_dump())
-
-    @staticmethod
-    def _contact_from_row(row: dict, employer_name: str) -> ContactRequest:
-        return ContactRequest(
+        name = emp["name"] if emp else "Empresa"
+        return CandidateContactRequest(
             id=row["id"],
-            employer_id=row["employer_id"],
-            employer_name=employer_name,
+            employer_name=name,
             search_id=row["search_id"],
-            candidate_session_id=row["candidate_session_id"],
             message=row["message"],
             status=row["status"],
             created_at=row["created_at"],
             updated_at=row["updated_at"],
         )
+
+    def save_candidate_profile(self, record: CandidateProfileRecord) -> None:
+        data = record.model_dump()
+        explicit = getattr(record, "discovery_public_id", None)
+        data["discovery_public_id"] = discovery_public_id(
+            record.session_id, explicit or data.get("discovery_public_id"),
+        )
+        self._store.save_candidate_profile(data)

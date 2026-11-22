@@ -37,6 +37,7 @@ GET/PATCH /drafts/{id}                 # edición independiente por red
 
 ```bash
 export TS_ALLOW_SEED=1
+export TS_EMPLOYER_DEMO=1
 python -m scripts.seed && python -m scripts.seed --list
 ```
 
@@ -55,7 +56,8 @@ curl -H 'X-Employer-Id: seed_emp_paid' ...
 Rutas: `POST/DELETE /discovery/consent` (candidato, `X-Session-Id`),
 `POST /employer/searches`, `GET /employer/searches/{id}/matches`,
 `POST /contact-requests`, `GET/PATCH /contact-requests/{id}`.
-Empresas usan `X-Employer-Id`. Detalle en `../contracts/seed/README.md`.
+Empresas usan `X-Employer-Id` (sólo `seed_emp_*` con `TS_EMPLOYER_DEMO=1`).
+Las fichas devuelven `candidate_id` opaco, nunca `session_id`. Detalle en `../contracts/seed/README.md`.
 
 Todo salvo `POST /session` exige header `X-Session-Id`. Recursos aislados por
 sesión (otra sesión → 404). Errores siempre `{"error": {code, message, retryable}}`.

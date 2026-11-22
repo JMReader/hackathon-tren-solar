@@ -57,7 +57,7 @@ def _seed_candidate(services, session_id: str, skills: list[str], *,
     if consent:
         services.employer.upsert_consent(session_id, UpsertDiscoveryConsentRequest(
             active=True,
-            shared_fields=["display_name", "role", "skills", "portfolio"],
+            shared_fields=["display_name", "role", "skills", "portfolio", "evidence"],
             share_portfolio=True,
         ))
 
@@ -109,8 +109,13 @@ def test_revoked_consent_excluded(client, employers):
         "required_skills": ["React"],
     }).json()["id"]
     body = client.get(f"/api/v1/employer/searches/{sid}/matches", headers=headers).json()
-    ids = {m["session_id"] for m in (body["matches"] or [])}
-    assert "gone" not in ids
+    profile = employers.employer._store.get_candidate_profile("gone")
+    assert profile
+    gone_public = profile["discovery_public_id"]
+    ids = {m["candidate_id"] for m in (body["matches"] or [])}
+    assert gone_public not in ids
+    for m in body["matches"] or []:
+        assert "session_id" not in m
 
 
 def test_employer_isolation_on_search(client, employers):
@@ -132,13 +137,17 @@ def test_contact_request_without_direct_data(client, employers):
         "title": "Rol React",
         "required_skills": ["React"],
     }).json()["id"]
+    pub = employers.employer._store.get_candidate_profile("contact_me")["discovery_public_id"]
     created = client.post("/api/v1/contact-requests", headers=emp_h, json={
         "search_id": sid,
-        "candidate_session_id": "contact_me",
+        "candidate_id": pub,
         "message": "Nos interesa tu perfil para un rol React.",
     })
     assert created.status_code == 201
-    cid = created.json()["id"]
+    body = created.json()
+    assert "candidate_session_id" not in body
+    assert body["candidate_id"] == pub
+    cid = body["id"]
     got = client.get(f"/api/v1/contact-requests/{cid}",
                      headers={"X-Session-Id": "contact_me"})
     assert got.status_code == 200

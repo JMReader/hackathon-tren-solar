@@ -182,6 +182,7 @@ class Store:
                 ("province", "TEXT"),
                 ("country", "TEXT DEFAULT 'Argentina'"),
                 ("segment", "TEXT"),
+                ("discovery_public_id", "TEXT"),
             ):
                 if col not in cp_cols:
                     conn.execute(f"ALTER TABLE candidate_profiles ADD COLUMN {col} {typedef}")
@@ -472,8 +473,8 @@ class Store:
             conn.execute(
                 """INSERT OR REPLACE INTO candidate_profiles
                    (session_id,display_name,role,industry,location,province,country,
-                    segment,work_mode,declared_skills,is_synthetic)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+                    segment,work_mode,declared_skills,is_synthetic,discovery_public_id)
+                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     row["session_id"], row["display_name"], row.get("role"),
                     row.get("industry"), row.get("location"), row.get("province"),
@@ -481,6 +482,7 @@ class Store:
                     row.get("work_mode"),
                     json.dumps(row.get("declared_skills") or [], ensure_ascii=False),
                     1 if row.get("is_synthetic", True) else 0,
+                    row.get("discovery_public_id"),
                 ),
             )
 
@@ -503,7 +505,19 @@ class Store:
             "work_mode": row["work_mode"],
             "declared_skills": json.loads(row["declared_skills"]),
             "is_synthetic": bool(row["is_synthetic"]),
+            "discovery_public_id": row["discovery_public_id"]
+            if "discovery_public_id" in row.keys() else None,
         }
+
+    def get_candidate_by_discovery_id(self, discovery_public_id: str) -> dict | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT * FROM candidate_profiles WHERE discovery_public_id=?",
+                (discovery_public_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return self.get_candidate_profile(row["session_id"])
 
     def save_discovery_consent(self, row: dict) -> None:
         with self._lock, self._conn() as conn:

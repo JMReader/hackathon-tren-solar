@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, Header, Response
 
 from ..session_service import SessionService
 from .models import (
-    ContactRequest,
+    CandidateContactRequest,
+    EmployerContactRequest,
     CreateContactRequest,
     CreateEmployerSearchRequest,
     DiscoveryConsent,
@@ -66,16 +67,16 @@ def create_employer_router(
         return employer.search_matches(emp, search_id)
 
     @router.post("/contact-requests", status_code=201, tags=["contact"])
-    def create_contact(emp: Employer, req: CreateContactRequest) -> ContactRequest:
+    def create_contact(emp: Employer, req: CreateContactRequest) -> EmployerContactRequest:
         return employer.create_contact_request(emp, req)
 
     @router.get("/contact-requests/{contact_id}", tags=["contact"])
-    def get_contact(session_id: Session, contact_id: str) -> ContactRequest:
+    def get_contact(session_id: Session, contact_id: str) -> CandidateContactRequest:
         return employer.get_contact_request(session_id, contact_id)
 
     @router.patch("/contact-requests/{contact_id}", tags=["contact"])
     def update_contact(session_id: Session, contact_id: str,
-                       req: UpdateContactRequest) -> ContactRequest:
+                       req: UpdateContactRequest) -> CandidateContactRequest:
         return employer.update_contact_request(session_id, contact_id, req)
 
     return router
