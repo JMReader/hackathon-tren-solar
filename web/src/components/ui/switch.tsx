@@ -1,15 +1,26 @@
-import {
-  Switch as SwitchPrimitive,
-  SwitchThumb,
-} from "@ui-sdk/react/switch"
+import { Switch as SwitchPrimitive, SwitchThumb as SwitchThumbPrimitive } from "@ui-sdk/react/switch"
 import type { ComponentProps } from "react"
 import { cn } from "@/lib/utils"
 
-function Switch({ className, ...props }: ComponentProps<typeof SwitchPrimitive>) {
+function Switch({ className, children, ...props }: ComponentProps<typeof SwitchPrimitive>) {
   return (
     <SwitchPrimitive
       className={cn(
-        "inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border border-transparent bg-[#d5d5d2] p-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime data-checked:bg-accent data-disabled:cursor-default data-disabled:opacity-50",
+        "focus-ring group/switch inline-flex h-[22px] w-[38px] shrink-0 cursor-pointer items-center rounded-full bg-control-edge p-[2px] transition-colors duration-200 ease-out data-checked:bg-ink data-disabled:cursor-not-allowed data-disabled:opacity-45",
+        className,
+      )}
+      {...props}
+    >
+      {children ?? <SwitchThumb />}
+    </SwitchPrimitive>
+  )
+}
+
+function SwitchThumb({ className, ...props }: ComponentProps<typeof SwitchThumbPrimitive>) {
+  return (
+    <SwitchThumbPrimitive
+      className={cn(
+        "block size-[18px] rounded-full bg-paper shadow-thumb transition-[translate,width] duration-200 ease-out group-active/switch:w-[22px] data-checked:translate-x-4 group-active/switch:data-checked:translate-x-3 motion-reduce:transition-none",
         className,
       )}
       {...props}

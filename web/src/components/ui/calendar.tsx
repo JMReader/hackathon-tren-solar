@@ -2,61 +2,91 @@
 
 import {
   Calendar as CalendarPrimitive,
-  CalendarDay as CalendarDayPrimitive,
+  CalendarDay,
   CalendarGrid,
-  CalendarHeading as CalendarHeadingPrimitive,
-  CalendarNext as CalendarNextPrimitive,
-  CalendarPrevious as CalendarPreviousPrimitive,
-  CalendarWeekday as CalendarWeekdayPrimitive,
+  CalendarHeading,
+  CalendarNext,
+  CalendarPrevious,
+  CalendarWeekday,
   CalendarWeekdays,
   CalendarWeeks,
 } from "@ui-sdk/react/calendar"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Suspense, type ComponentProps } from "react"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "./skeleton"
 
 const navButton =
-  "inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-fill-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime data-disabled:opacity-40"
+  "pressable focus-ring inline-flex size-8 cursor-pointer items-center justify-center rounded-full text-ink-muted hover:bg-fill-soft hover:text-ink data-disabled:pointer-events-none data-disabled:opacity-35"
 
-function Calendar({
-  className,
-  ...props
-}: ComponentProps<typeof CalendarPrimitive>) {
+const dayFace =
+  "relative mx-auto flex size-9 items-center justify-center rounded-full text-[13px] tabular-nums text-ink transition-[background-color,color,scale] duration-150 ease-out " +
+  "group-hover/day:bg-fill-soft group-active/day:scale-95 " +
+  "group-data-outside/day:text-ink-faint " +
+  "group-data-unavailable/day:text-ink-faint group-data-unavailable/day:line-through " +
+  "group-data-disabled/day:opacity-40 group-data-disabled/day:group-hover/day:bg-transparent " +
+  "group-data-range-middle/day:rounded-none group-data-range-middle/day:bg-sunken " +
+  "group-data-selected/day:bg-ink group-data-selected/day:text-inverse group-data-selected/day:group-hover/day:bg-ink " +
+  "group-data-range-middle/day:group-data-selected/day:bg-sunken group-data-range-middle/day:group-data-selected/day:text-ink " +
+  "group-focus-visible/day:outline-2 group-focus-visible/day:outline-offset-1 group-focus-visible/day:outline-accent-strong"
+
+function CalendarBody() {
   return (
-    <Suspense fallback={<Skeleton className="h-[320px] w-[300px]" />}>
-      <CalendarPrimitive
-      className={cn(
-        "w-fit rounded-2xl border border-border-card bg-paper p-4 shadow-ambient",
-        className,
-      )}
-      {...props}
-    >
-      <div className="mb-3 flex items-center justify-between">
-        <CalendarPreviousPrimitive className={navButton} />
-        <CalendarHeadingPrimitive className="font-display text-sm font-semibold text-ink" />
-        <CalendarNextPrimitive className={navButton} />
+    <>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <CalendarPrevious aria-label="Mes anterior" className={navButton}>
+          <ChevronLeft aria-hidden className="size-4" />
+        </CalendarPrevious>
+        <CalendarHeading className="font-display text-[15px] font-medium tracking-display text-ink first-letter:uppercase" />
+        <CalendarNext aria-label="Mes siguiente" className={navButton}>
+          <ChevronRight aria-hidden className="size-4" />
+        </CalendarNext>
       </div>
-      <CalendarGrid>
+      <CalendarGrid className="border-separate border-spacing-y-0.5">
         <CalendarWeekdays>
           {(index) => (
-            <CalendarWeekdayPrimitive
+            <CalendarWeekday
               index={index}
-              className="flex h-8 w-9 items-center justify-center text-[11px] font-medium text-ink-faint uppercase"
+              className="h-8 w-10 text-center align-middle text-[11px] font-medium text-ink-muted uppercase"
             />
           )}
         </CalendarWeekdays>
         <CalendarWeeks>
           {(cell) => (
-            <CalendarDayPrimitive
+            <CalendarDay
               value={cell.date}
-              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-sm text-ink transition-colors select-none hover:bg-fill-soft focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-lime data-disabled:opacity-40 data-outside:text-ink-faint/60 data-range-end:bg-accent data-range-end:text-inverse data-range-middle:bg-accent-soft data-range-start:bg-accent data-range-start:text-inverse data-selected:bg-accent data-selected:text-inverse data-today:font-semibold data-today:ring-1 data-today:ring-lime data-unavailable:text-ink-faint/50 data-unavailable:line-through"
-            />
+              className="group/day h-9 w-10 cursor-pointer p-0 text-center align-middle outline-none data-disabled:cursor-not-allowed"
+            >
+              {(state) => (
+                <span className={dayFace}>
+                  {state.label}
+                  {state.today && (
+                    <span
+                      aria-hidden
+                      className="absolute bottom-1 size-1 rounded-full bg-accent group-data-selected/day:bg-inverse"
+                    />
+                  )}
+                </span>
+              )}
+            </CalendarDay>
           )}
         </CalendarWeeks>
       </CalendarGrid>
+    </>
+  )
+}
+
+function Calendar({ className, ...props }: ComponentProps<typeof CalendarPrimitive>) {
+  return (
+    <Suspense fallback={<Skeleton className="h-[318px] w-[312px] rounded-[22px]" />}>
+      <CalendarPrimitive
+        className={cn("w-fit rounded-[22px] bg-paper p-4 shadow-raised", className)}
+        {...props}
+      >
+        <CalendarBody />
       </CalendarPrimitive>
     </Suspense>
   )
 }
 
-export { Calendar }
+export { Calendar, CalendarBody }

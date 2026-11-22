@@ -3,12 +3,7 @@ import type { ComponentProps } from "react"
 import { cn } from "@/lib/utils"
 
 function Label({ className, ...props }: ComponentProps<typeof LabelPrimitive>) {
-  return (
-    <LabelPrimitive
-      className={cn("text-sm font-medium text-ink", className)}
-      {...props}
-    />
-  )
+  return <LabelPrimitive className={cn("text-[13px] font-medium text-ink", className)} {...props} />
 }
 
 export { Label }

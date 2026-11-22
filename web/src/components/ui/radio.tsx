@@ -1,28 +1,34 @@
 import {
   Radio as RadioPrimitive,
   RadioGroup as RadioGroupPrimitive,
-  RadioIndicator,
+  RadioIndicator as RadioIndicatorPrimitive,
 } from "@ui-sdk/react/radio"
 import type { ComponentProps } from "react"
 import { cn } from "@/lib/utils"
 
-function RadioGroup({
-  className,
-  ...props
-}: ComponentProps<typeof RadioGroupPrimitive>) {
-  return (
-    <RadioGroupPrimitive
-      className={cn("flex flex-col gap-2.5", className)}
-      {...props}
-    />
-  )
+function RadioGroup({ className, ...props }: ComponentProps<typeof RadioGroupPrimitive>) {
+  return <RadioGroupPrimitive className={cn("flex flex-col gap-3", className)} {...props} />
 }
 
-function Radio({ className, ...props }: ComponentProps<typeof RadioPrimitive>) {
+function Radio({ className, children, ...props }: ComponentProps<typeof RadioPrimitive>) {
   return (
     <RadioPrimitive
       className={cn(
-        "inline-flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#adada4] bg-paper transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime data-checked:border-accent data-disabled:cursor-default data-disabled:opacity-50",
+        "pressable focus-ring inline-flex size-[18px] shrink-0 cursor-pointer items-center justify-center rounded-full border border-control-edge bg-paper data-checked:border-ink data-checked:bg-ink data-disabled:cursor-not-allowed data-disabled:opacity-45",
+        className,
+      )}
+      {...props}
+    >
+      {children ?? <RadioIndicator />}
+    </RadioPrimitive>
+  )
+}
+
+function RadioIndicator({ className, ...props }: ComponentProps<typeof RadioIndicatorPrimitive>) {
+  return (
+    <RadioIndicatorPrimitive
+      className={cn(
+        "size-[7px] rounded-full bg-inverse transition-[opacity,scale] duration-150 ease-out data-ending-style:scale-50 data-ending-style:opacity-0 data-starting-style:scale-50 data-starting-style:opacity-0",
         className,
       )}
       {...props}
@@ -30,16 +36,4 @@ function Radio({ className, ...props }: ComponentProps<typeof RadioPrimitive>) {
   )
 }
 
-function RadioDot({
-  className,
-  ...props
-}: ComponentProps<typeof RadioIndicator>) {
-  return (
-    <RadioIndicator
-      className={cn("h-2.5 w-2.5 rounded-full data-checked:bg-accent", className)}
-      {...props}
-    />
-  )
-}
-
-export { RadioGroup, Radio, RadioDot as RadioIndicator }
+export { RadioGroup, Radio, RadioIndicator }

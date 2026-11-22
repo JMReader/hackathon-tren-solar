@@ -14,4 +14,9 @@ Before using ui-sdk (`@ui-sdk/react` / `@ui-sdk/core`), follow the `ui-sdk` skil
 
 ## UI kit
 
-Styled wrappers live in `src/components/ui/` (Granola "oats" theme: cream `#f7f7f2`, ink `#292929`, olive accent `#5b6f00`, pill buttons, hairline borders). Tokens map to `--ui-*` in `src/app/globals.css`. The `/ui` route is a live showcase of every component and state — check it before adding a new pattern.
+Styled wrappers live in `src/components/ui/` on top of ui-sdk parts. The `/ui` route is the live showcase of every component and state; check it before adding a new pattern.
+
+- Visual language follows AudioPen: night `#2d2e3e` canvas, cream `#f7f0f0` panels, white cards, slate ink `#3d3f54`, brand orange `#ff5c0a` for accents and `#cc4600` for CTAs/focus (white text on `#ff5c0a` fails AA). Fraunces for display, DM Sans for UI. Checked controls use ink; orange is reserved for the primary action and selected chips.
+- `@ui-sdk/core/web.css` is intentionally not imported: it themed every part and clashed with the wrappers. All styling lives in `src/app/globals.css` (tokens + `focus-ring`, `pressable`, `control`, `popup`, `modal`, `backdrop` utilities) and `src/styles/components.css` (toast stack, drawer viewport, sliding indicators).
+- Motion follows Emil Kowalski's rules: `--ease-out` cubic-bezier(.23,1,.32,1), press `scale(.97)`, popups scale from `--transform-origin`, exits faster than entrances, tooltips instant after the first, toasts 400ms `ease`, `prefers-reduced-motion` drops movement. Raised surfaces use semi-transparent shadows, not solid borders.
+- Variants use `cva`; icons come from `lucide-react`. Wrappers that inject their own children type `children` as `ReactNode`.

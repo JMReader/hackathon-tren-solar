@@ -1,19 +1,13 @@
-import {
-  Tooltip,
-  TooltipArrow as TooltipArrowPrimitive,
-  TooltipContent as TooltipContentPrimitive,
-} from "@ui-sdk/react/tooltip"
+import { Tooltip, TooltipContent as TooltipContentPrimitive } from "@ui-sdk/react/tooltip"
 import type { ComponentProps } from "react"
 import { cn } from "@/lib/utils"
 
-function TooltipContent({
-  className,
-  ...props
-}: ComponentProps<typeof TooltipContentPrimitive>) {
+function TooltipContent({ className, sideOffset = 6, ...props }: ComponentProps<typeof TooltipContentPrimitive>) {
   return (
     <TooltipContentPrimitive
+      sideOffset={sideOffset}
       className={cn(
-        "rounded-lg bg-[#363635] px-2.5 py-1.5 text-xs font-medium text-inverse shadow-paper transition-[opacity,scale] duration-150 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
+        "origin-(--transform-origin) rounded-lg border-0 bg-tooltip px-2.5 py-1.5 text-xs font-medium text-inverse shadow-[0_4px_12px_rgb(12_12_22/0.2)] transition-[opacity,scale] duration-125 ease-out data-starting-style:scale-97 data-starting-style:opacity-0 data-ending-style:scale-97 data-ending-style:opacity-0 data-ending-style:duration-100 data-instant:duration-0 motion-reduce:transition-opacity",
         className,
       )}
       {...props}
@@ -21,14 +15,5 @@ function TooltipContent({
   )
 }
 
-function TooltipArrow({
-  className,
-  ...props
-}: ComponentProps<typeof TooltipArrowPrimitive>) {
-  return (
-    <TooltipArrowPrimitive className={cn("fill-[#363635]", className)} {...props} />
-  )
-}
-
-export { Tooltip, TooltipContent, TooltipArrow }
-export { TooltipTrigger, TooltipShortcut } from "@ui-sdk/react/tooltip"
+export { Tooltip, TooltipContent }
+export { TooltipTrigger, TooltipArrow, TooltipShortcut } from "@ui-sdk/react/tooltip"

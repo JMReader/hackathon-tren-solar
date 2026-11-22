@@ -3,35 +3,43 @@ import {
   SelectContent as SelectContentPrimitive,
   SelectGroupLabel as SelectGroupLabelPrimitive,
   SelectItem as SelectItemPrimitive,
+  SelectItemIndicator,
+  SelectItemText,
   SelectSeparator as SelectSeparatorPrimitive,
   SelectTrigger as SelectTriggerPrimitive,
 } from "@ui-sdk/react/select"
-import type { ComponentProps } from "react"
+import { Check, ChevronDown } from "lucide-react"
+import type { ComponentProps, ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 function SelectTrigger({
   className,
+  children,
   ...props
-}: ComponentProps<typeof SelectTriggerPrimitive>) {
+}: Omit<ComponentProps<typeof SelectTriggerPrimitive>, "children"> & { children?: ReactNode }) {
   return (
     <SelectTriggerPrimitive
       className={cn(
-        "flex h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border border-border-card bg-paper px-4 text-sm text-ink transition-colors data-placeholder:text-ink-faint focus-visible:border-accent focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/12 data-disabled:opacity-50",
+        "control focus-ring group/trigger flex h-10 w-full cursor-pointer items-center justify-between gap-2 px-3.5 text-left text-sm data-disabled:cursor-not-allowed data-disabled:opacity-50 data-placeholder:text-ink-muted",
         className,
       )}
       {...props}
-    />
+    >
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      <ChevronDown
+        aria-hidden
+        className="size-4 shrink-0 text-ink-muted transition-[rotate] duration-200 ease-out group-data-open/trigger:rotate-180"
+      />
+    </SelectTriggerPrimitive>
   )
 }
 
-function SelectContent({
-  className,
-  ...props
-}: ComponentProps<typeof SelectContentPrimitive>) {
+function SelectContent({ className, ...props }: ComponentProps<typeof SelectContentPrimitive>) {
   return (
     <SelectContentPrimitive
+      sideOffset={6}
       className={cn(
-        "min-w-(--anchor-width) rounded-xl border border-border-card bg-paper p-1 shadow-paper transition-[opacity,scale] duration-150 data-ending-style:scale-98 data-ending-style:opacity-0 data-starting-style:scale-98 data-starting-style:opacity-0",
+        "popup max-h-[min(20rem,var(--available-height))] min-w-(--anchor-width) overflow-y-auto overscroll-contain rounded-xl border-0 p-1 outline-none",
         className,
       )}
       {...props}
@@ -41,51 +49,39 @@ function SelectContent({
 
 function SelectItem({
   className,
+  children,
   ...props
-}: ComponentProps<typeof SelectItemPrimitive>) {
+}: Omit<ComponentProps<typeof SelectItemPrimitive>, "children"> & { children?: ReactNode }) {
   return (
     <SelectItemPrimitive
       className={cn(
-        "flex h-9 cursor-pointer items-center rounded-lg px-3 text-sm text-ink outline-none data-disabled:opacity-50 data-highlighted:bg-fill-soft data-selected:font-medium",
+        "flex h-9 cursor-pointer items-center gap-2 rounded-lg px-2.5 text-sm text-ink outline-none select-none data-disabled:cursor-not-allowed data-disabled:opacity-45 data-highlighted:bg-fill-soft-hover",
         className,
       )}
       {...props}
-    />
+    >
+      <SelectItemText className="min-w-0 flex-1 truncate">{children}</SelectItemText>
+      <SelectItemIndicator className="text-accent-strong">
+        <Check aria-hidden className="size-4" strokeWidth={2.5} />
+      </SelectItemIndicator>
+    </SelectItemPrimitive>
   )
 }
 
-function SelectGroupLabel({
-  className,
-  ...props
-}: ComponentProps<typeof SelectGroupLabelPrimitive>) {
+function SelectGroupLabel({ className, ...props }: ComponentProps<typeof SelectGroupLabelPrimitive>) {
   return (
     <SelectGroupLabelPrimitive
-      className={cn("px-3 pt-2 pb-1 text-xs font-medium text-ink-faint", className)}
+      className={cn("px-2.5 pt-2 pb-1 text-[11px] font-medium tracking-wide text-ink-muted uppercase", className)}
       {...props}
     />
   )
 }
 
-function SelectSeparator({
-  className,
-  ...props
-}: ComponentProps<typeof SelectSeparatorPrimitive>) {
-  return (
-    <SelectSeparatorPrimitive
-      className={cn("mx-1 my-1 h-px bg-border-divider", className)}
-      {...props}
-    />
-  )
+function SelectSeparator({ className, ...props }: ComponentProps<typeof SelectSeparatorPrimitive>) {
+  return <SelectSeparatorPrimitive className={cn("-mx-1 my-1 h-px bg-divider", className)} {...props} />
 }
 
-export {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectGroupLabel,
-  SelectSeparator,
-}
+export { Select, SelectTrigger, SelectContent, SelectItem, SelectGroupLabel, SelectSeparator }
 export {
   SelectValue,
   SelectLabel,
@@ -93,8 +89,5 @@ export {
   SelectGroup,
   SelectInput,
   SelectEmpty,
-  SelectItemText,
-  SelectItemIndicator,
   SelectArrow,
 } from "@ui-sdk/react/select"
-export type { ComponentProps as SelectProps }

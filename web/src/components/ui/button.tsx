@@ -1,43 +1,55 @@
 import { Button as ButtonPrimitive } from "@ui-sdk/react/button"
-import type { ComponentProps } from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import type { ComponentProps, ReactNode } from "react"
 import { cn } from "@/lib/utils"
+import { Spinner } from "./spinner"
 
-const variants = {
-  primary: "bg-accent text-inverse hover:bg-accent-hover",
-  secondary: "bg-accent-soft text-accent-deep hover:bg-lime/40",
-  outline: "bg-paper text-ink border border-border-card hover:bg-sunken",
-  ghost: "text-ink hover:bg-fill-soft",
-  danger: "bg-danger text-inverse hover:bg-danger-hover",
-} as const
+const buttonStyles = cva(
+  "pressable focus-ring relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full font-medium whitespace-nowrap select-none data-disabled:cursor-not-allowed data-disabled:opacity-45 data-pending:cursor-progress [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        primary: "bg-accent-strong text-white shadow-accent hover:bg-accent-hover",
+        secondary: "bg-sunken text-ink hover:bg-[#e3d8d5]",
+        dark: "bg-slate text-inverse hover:bg-slate-hover",
+        outline: "bg-paper text-ink shadow-raised hover:bg-sunken",
+        ghost: "text-ink hover:bg-fill-soft",
+        danger: "bg-danger text-inverse hover:bg-danger-hover",
+      },
+      size: {
+        sm: "h-8 px-3.5 text-[13px]",
+        md: "h-10 px-5 text-sm",
+        lg: "h-12 px-6 text-[15px]",
+        icon: "size-10",
+        "icon-sm": "size-8",
+      },
+    },
+    defaultVariants: { variant: "primary", size: "md" },
+  },
+)
 
-const sizes = {
-  sm: "h-9 px-4 text-sm",
-  md: "h-11 px-6 text-sm",
-  lg: "h-13 px-7 text-base",
-} as const
+type ButtonProps = Omit<ComponentProps<typeof ButtonPrimitive>, "children"> &
+  VariantProps<typeof buttonStyles> & { children?: ReactNode }
 
-type ButtonStyleOptions = {
-  variant?: keyof typeof variants
-  size?: keyof typeof sizes
-}
-
-function buttonStyles({ variant = "primary", size = "md" }: ButtonStyleOptions = {}) {
-  return cn(
-    "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full font-medium transition-colors duration-200 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lime data-disabled:pointer-events-none data-disabled:opacity-50 data-pending:pointer-events-none data-pending:opacity-60",
-    variants[variant],
-    sizes[size],
-  )
-}
-
-type ButtonProps = ComponentProps<typeof ButtonPrimitive> & ButtonStyleOptions
-
-function Button({ className, variant, size, ...props }: ButtonProps) {
+function Button({ className, variant, size, children, ...props }: ButtonProps) {
   return (
-    <ButtonPrimitive
-      className={cn(buttonStyles({ variant, size }), className)}
-      {...props}
-    />
+    <ButtonPrimitive className={cn(buttonStyles({ variant, size }), className)} {...props}>
+      <PendingSwap>{children}</PendingSwap>
+    </ButtonPrimitive>
   )
 }
 
-export { Button, buttonStyles }
+function PendingSwap({ children }: { children: ReactNode }) {
+  return (
+    <>
+      <span className="inline-flex items-center gap-2 transition-[opacity,filter] duration-200 ease-out in-data-pending:opacity-0 in-data-pending:blur-[2px]">
+        {children}
+      </span>
+      <span className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 ease-out in-data-pending:opacity-100">
+        <Spinner />
+      </span>
+    </>
+  )
+}
+
+export { Button, buttonStyles, PendingSwap }

@@ -11,39 +11,28 @@ import type { ComponentProps } from "react"
 import { cn } from "@/lib/utils"
 
 function Field({ className, ...props }: ComponentProps<typeof FieldPrimitive>) {
-  return (
-    <FieldPrimitive className={cn("flex flex-col gap-1.5", className)} {...props} />
-  )
+  return <FieldPrimitive className={cn("flex flex-col gap-1.5", className)} {...props} />
 }
 
-function FieldLabel({
-  className,
-  ...props
-}: ComponentProps<typeof FieldLabelPrimitive>) {
+function FieldLabel({ className, ...props }: ComponentProps<typeof FieldLabelPrimitive>) {
   return (
     <FieldLabelPrimitive
-      className={cn("text-sm font-medium text-ink", className)}
+      className={cn("text-[13px] font-medium text-ink data-disabled:opacity-50", className)}
       {...props}
     />
   )
 }
 
-function FieldDescription({
-  className,
-  ...props
-}: ComponentProps<typeof FieldDescriptionPrimitive>) {
+function FieldDescription({ className, ...props }: ComponentProps<typeof FieldDescriptionPrimitive>) {
   return (
     <FieldDescriptionPrimitive
-      className={cn("text-xs text-ink-muted", className)}
+      className={cn("max-w-[65ch] text-xs leading-relaxed text-ink-muted", className)}
       {...props}
     />
   )
 }
 
-function FieldError({
-  className,
-  ...props
-}: ComponentProps<typeof FieldErrorPrimitive>) {
+function FieldError({ className, ...props }: ComponentProps<typeof FieldErrorPrimitive>) {
   return (
     <FieldErrorPrimitive
       className={cn("text-xs font-medium text-danger", className)}
@@ -52,44 +41,22 @@ function FieldError({
   )
 }
 
-function FieldSet({
-  className,
-  ...props
-}: ComponentProps<typeof FieldSetPrimitive>) {
-  return (
-    <FieldSetPrimitive
-      className={cn("flex flex-col gap-4", className)}
-      {...props}
-    />
-  )
+function FieldSet({ className, ...props }: ComponentProps<typeof FieldSetPrimitive>) {
+  return <FieldSetPrimitive className={cn("flex flex-col gap-4", className)} {...props} />
 }
 
-function FieldLegend({
-  className,
-  ...props
-}: ComponentProps<typeof FieldLegendPrimitive>) {
+function FieldLegend({ className, ...props }: ComponentProps<typeof FieldLegendPrimitive>) {
   return (
     <FieldLegendPrimitive
-      className={cn("font-display text-base font-semibold", className)}
+      className={cn("mb-1 font-display text-base font-semibold tracking-display", className)}
       {...props}
     />
   )
 }
 
-function FieldGroup({
-  className,
-  ...props
-}: ComponentProps<typeof FieldGroupPrimitive>) {
+function FieldGroup({ className, ...props }: ComponentProps<typeof FieldGroupPrimitive>) {
   return <FieldGroupPrimitive className={cn("flex flex-col gap-4", className)} {...props} />
 }
 
-export {
-  Field,
-  FieldLabel,
-  FieldDescription,
-  FieldError,
-  FieldSet,
-  FieldLegend,
-  FieldGroup,
-}
+export { Field, FieldLabel, FieldDescription, FieldError, FieldSet, FieldLegend, FieldGroup }
 export { FieldControl, useFieldControl } from "@ui-sdk/react/field"

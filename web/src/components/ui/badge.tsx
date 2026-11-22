@@ -1,29 +1,33 @@
+import { cva, type VariantProps } from "class-variance-authority"
 import type { ComponentProps } from "react"
 import { cn } from "@/lib/utils"
 
-const variants = {
-  default: "border-border-card bg-paper text-ink",
-  accent: "border-accent/25 bg-accent-soft text-accent-deep",
-  lime: "border-lime/50 bg-lime/15 text-accent-deep",
-  neutral: "border-transparent bg-fill-soft text-ink-muted",
-  danger: "border-danger/25 bg-danger/10 text-danger-hover",
-} as const
+const badgeStyles = cva(
+  "inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full px-2.5 text-xs font-medium whitespace-nowrap [&_svg]:size-3",
+  {
+    variants: {
+      variant: {
+        default: "bg-paper text-ink shadow-raised",
+        accent: "bg-accent-soft text-accent-deep",
+        outline: "text-ink-muted ring-1 ring-hairline ring-inset",
+        neutral: "bg-fill-soft text-ink-muted",
+        danger: "bg-danger-soft text-danger-hover",
+      },
+    },
+    defaultVariants: { variant: "default" },
+  },
+)
 
-type BadgeProps = ComponentProps<"span"> & {
-  variant?: keyof typeof variants
+function Badge({
+  className,
+  variant,
+  ...props
+}: ComponentProps<"span"> & VariantProps<typeof badgeStyles>) {
+  return <span className={cn(badgeStyles({ variant }), className)} {...props} />
 }
 
-function Badge({ className, variant = "default", ...props }: BadgeProps) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium",
-        variants[variant],
-        className,
-      )}
-      {...props}
-    />
-  )
+function StatusDot({ className, ...props }: ComponentProps<"span">) {
+  return <span aria-hidden className={cn("size-1.5 rounded-full bg-current", className)} {...props} />
 }
 
-export { Badge }
+export { Badge, StatusDot, badgeStyles }
