@@ -307,7 +307,7 @@ export async function startConnection(
   const body = (await request.json().catch(() => ({}))) as {
     return_to?: string | null
   }
-  const returnTo = body.return_to ?? "/"
+  const returnTo = body.return_to ?? "/onboarding"
   const authorizationUrl = `/api/v1/social/${platform}/callback?state=${encodeURIComponent(
     s.id,
   )}&return_to=${encodeURIComponent(returnTo)}`
@@ -324,7 +324,7 @@ export function handleCallback(
 ): Response {
   const url = new URL(request.url)
   const state = url.searchParams.get("state")
-  const returnTo = url.searchParams.get("return_to") ?? "/"
+  const returnTo = url.searchParams.get("return_to") ?? "/onboarding"
   const error = url.searchParams.get("error")
   const session = state ? store.sessions.get(state) : undefined
 
