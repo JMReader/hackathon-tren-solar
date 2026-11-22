@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import os
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from social.router import create_router as create_social_router
 
 from .config import Settings
 from .db import Store
@@ -17,13 +19,15 @@ from .models import ApiErrorBody, ErrorDetail
 from .router import create_router
 from .service import CoreService
 from .session_service import SessionService
+from .social_wiring import SocialStyleReader, build_social
 from .stt.whisper import build_transcriber
 from .style_reader import build_style_reader
 
 
 class Services:
     def __init__(self, settings: Settings | None = None,
-                 llm=None, transcriber=None, style_reader=None):
+                 llm=None, transcriber=None, style_reader=None,
+                 social_settings=None, social_http=None):
         settings = settings or Settings.from_env()
         self.settings = settings
         store = Store(settings.db_path)
@@ -32,10 +36,14 @@ class Services:
         llm = llm if llm is not None else build_llm(settings)
         transcriber = (transcriber if transcriber is not None
                        else build_transcriber(settings))
-        style_reader = (style_reader if style_reader is not None
-                        else build_style_reader(os.environ.get("FAKE_STYLE_POSTS")))
         ttl = int(os.environ.get("SESSION_TTL_HOURS", "24"))
         self.core = CoreService(store, media, llm, transcriber)
+        self.social = build_social(self.core, settings.db_path.parent,
+                                   social_settings, social_http)
+        if style_reader is None:
+            fake_posts = os.environ.get("FAKE_STYLE_POSTS")
+            style_reader = (build_style_reader(fake_posts) if fake_posts
+                            else SocialStyleReader(self.social.service))
         self.sessions = SessionService(store, media, style_reader, ttl)
 
 
@@ -78,6 +86,14 @@ def create_app(services: Services | None = None,
 
     svc = app.state.services
     app.include_router(create_router(svc.core, svc.sessions), prefix="/api/v1")
+
+    def social_owner(x_session_id: str | None = Header(None)) -> str:
+        return svc.sessions.require_session(x_session_id)
+
+    app.include_router(
+        create_social_router(svc.social.service, svc.social.flow, social_owner),
+        prefix="/api/v1",
+    )
     return app
 
 
