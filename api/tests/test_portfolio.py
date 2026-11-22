@@ -192,62 +192,82 @@ def _current(client, auth):
     return client.get("/api/v1/portfolios/current", headers=auth)
 
 
-def test_approve_without_cv_does_not_create_portfolio(client, ready):
+def _add(client, auth, achievement):
+    return client.post(
+        "/api/v1/portfolios/current/items",
+        headers=auth, json={"achievement_id": achievement["id"]},
+    )
+
+
+def test_approve_alone_does_not_touch_portfolio(client, ready):
+    _upload_cv(client, ready)
     approve(client, ready, create_text(client, ready))
     assert _current(client, ready).status_code == 404
 
 
-def test_approve_creates_then_extends_portfolio(client, ready, openapi):
+def test_add_without_cv_is_rejected(client, ready):
+    ach = approve(client, ready, create_text(client, ready))
+    resp = _add(client, ready, ach)
+    assert resp.status_code == 422
+    assert resp.json()["error"]["code"] == "cv_required"
+    assert _current(client, ready).status_code == 404
+
+
+def test_add_requires_approved_achievement(client, ready):
+    _upload_cv(client, ready)
+    resp = _add(client, ready, create_text(client, ready))
+    assert resp.status_code == 422
+    assert resp.json()["error"]["code"] == "achievement_not_approved"
+
+
+def test_add_creates_then_extends_portfolio(client, ready, openapi):
     _upload_cv(client, ready)
     first = approve(client, ready, create_text(client, ready))
-    created = _current(client, ready)
-    assert created.status_code == 200
-    body = created.json()
+    resp = _add(client, ready, first)
+    assert resp.status_code == 200
+    body = resp.json()
     validate_schema(body, "Portfolio", openapi)
     assert body["status"] == "draft"
     assert [i["achievement_id"] for i in body["items"]] == [first["id"]]
     assert 3 <= len(body["items"][0]["title"]) <= 80
 
     second = approve(client, ready, create_text(client, ready))
-    body = _current(client, ready).json()
+    body = _add(client, ready, second).json()
     assert [i["achievement_id"] for i in body["items"]] == [first["id"], second["id"]]
     assert body["revision"] == 2
 
 
-def test_approve_twice_does_not_duplicate(client, ready):
+def test_add_twice_does_not_duplicate(client, ready):
     _upload_cv(client, ready)
     ach = approve(client, ready, create_text(client, ready))
-    again = client.post(
-        f"/api/v1/achievements/{ach['id']}/approve",
-        headers=ready, json={"revision": ach["revision"]},
-    )
+    _add(client, ready, ach)
+    again = _add(client, ready, ach)
     assert again.status_code == 200
-    assert len(_current(client, ready).json()["items"]) == 1
+    assert len(again.json()["items"]) == 1
+    assert again.json()["revision"] == 1
 
 
-def test_approve_can_skip_portfolio(client, ready):
+def test_approve_flag_adds_for_headless_clients(client, ready):
     _upload_cv(client, ready)
     ach = create_text(client, ready)
     resp = client.post(
         f"/api/v1/achievements/{ach['id']}/approve",
-        headers=ready, json={"revision": ach["revision"], "add_to_portfolio": False},
+        headers=ready, json={"revision": ach["revision"], "add_to_portfolio": True},
     )
     assert resp.status_code == 200
-    assert _current(client, ready).status_code == 404
+    assert len(_current(client, ready).json()["items"]) == 1
 
 
 def test_new_achievement_leaves_published_page_untouched(client, ready):
     _upload_cv(client, ready)
-    approve(client, ready, create_text(client, ready))
-    pf = _current(client, ready).json()
+    pf = _add(client, ready, approve(client, ready, create_text(client, ready))).json()
     pub = client.post(
         f"/api/v1/portfolios/{pf['id']}/publish",
         headers=ready, json={"revision": pf["revision"], "confirm_public": True},
     ).json()
     before = client.get(f"/api/v1/p/{pub['slug']}").json()
 
-    approve(client, ready, create_text(client, ready))
-    after = _current(client, ready).json()
+    after = _add(client, ready, approve(client, ready, create_text(client, ready))).json()
     assert len(after["items"]) == 2
     assert after["revision"] > after["published_revision"]
     assert client.get(f"/api/v1/p/{pub['slug']}").json() == before
@@ -255,13 +275,17 @@ def test_new_achievement_leaves_published_page_untouched(client, ready):
 
 def test_portfolio_stops_at_twelve_items(client, ready):
     _upload_cv(client, ready)
-    for _ in range(13):
-        approve(client, ready, create_text(client, ready))
+    for _ in range(12):
+        assert _add(client, ready, approve(client, ready, create_text(client, ready))).status_code == 200
+    resp = _add(client, ready, approve(client, ready, create_text(client, ready)))
+    assert resp.status_code == 422
+    assert resp.json()["error"]["code"] == "portfolio_full"
     assert len(_current(client, ready).json()["items"]) == 12
 
 
-def test_current_portfolio_is_per_session(client, ready):
+def test_cannot_add_another_sessions_achievement(client, ready):
     _upload_cv(client, ready)
-    approve(client, ready, create_text(client, ready))
+    ach = approve(client, ready, create_text(client, ready))
     other = {"X-Session-Id": client.post("/api/v1/session").json()["session_id"]}
+    assert _add(client, other, ach).status_code == 404
     assert _current(client, other).status_code == 404

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tansta
 import { useSyncExternalStore } from "react"
 import { toast } from "@/components/ui/toast"
 import { achievementsIndex, type AchievementEntry } from "@/lib/achievements-index"
-import { fetchCurrentPortfolio } from "@/portfolio/portfolio-api"
+import { addCurrentPortfolioItem, fetchCurrentPortfolio } from "@/portfolio/portfolio-api"
 import { ApiRequestError, apiFetch } from "./client"
 import type { Achievement, ApiError, Draft, Fact, GenerateDraftsResponse, Platform } from "./types"
 
@@ -78,6 +78,29 @@ export function useStoredPortfolio(sessionId: string | undefined) {
   })
 }
 
+/** The person chose to add this approved achievement to their portfolio. */
+export function useAddToPortfolio(achievementId: string, sessionId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => addCurrentPortfolioItem(achievementId),
+    onSuccess: (portfolio) => {
+      queryClient.setQueryData(["portfolio-summary", sessionId], portfolio)
+      void queryClient.invalidateQueries({ queryKey: ["portfolio-draft"] })
+    },
+    onError: (error) => {
+      const code = apiErrorCode(error)
+      toast.error("No se pudo sumar al portfolio", {
+        description:
+          code === "portfolio_full"
+            ? "Tu portfolio ya tiene 12 logros. Quitá uno para sumar otro."
+            : code === "cv_required"
+              ? "Primero subí tu CV."
+              : apiErrorMessage(error, "Revisá tu conexión e intentá de nuevo."),
+      })
+    },
+  })
+}
+
 export type CreateAchievementInput =
   | { kind: "audio"; audio: Blob; photo: File }
   | { kind: "text"; text: string; photo: File }
@@ -127,14 +150,12 @@ export function useApproveAndDraft(id: string, sessionId: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
     scope: { id: `achievement-${id}` },
-    mutationFn: async (options: { addToPortfolio?: boolean } | void) => {
+    mutationFn: async () => {
       const current = queryClient.getQueryData<Achievement>(achievementKey(id))
       const approved = await apiFetch<Achievement>(`/achievements/${id}/approve`, {
         method: "POST",
-        json: { revision: current?.revision ?? 1, add_to_portfolio: options?.addToPortfolio ?? true },
+        json: { revision: current?.revision ?? 1 },
       })
-      void queryClient.invalidateQueries({ queryKey: ["portfolio-summary"] })
-      void queryClient.invalidateQueries({ queryKey: ["portfolio-draft"] })
       queryClient.setQueryData(achievementKey(id), approved)
       return apiFetch<GenerateDraftsResponse>(`/achievements/${id}/drafts`, {
         method: "POST",

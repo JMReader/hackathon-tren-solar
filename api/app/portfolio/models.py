@@ -18,6 +18,10 @@ class PortfolioItemInput(BaseModel):
     show_photo: bool = True
 
 
+class AddPortfolioItemRequest(BaseModel):
+    achievement_id: str
+
+
 class CreatePortfolioRequest(BaseModel):
     display_name: str = Field(min_length=2, max_length=60)
     headline: str | None = Field(default=None, max_length=120)

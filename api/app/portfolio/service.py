@@ -206,6 +206,22 @@ class PortfolioService:
         self.store.save_portfolio(row)
         return "added"
 
+    def add_to_current(self, session_id: str, achievement_id: str) -> Portfolio:
+        """La persona eligió sumar un logro aprobado a su portfolio."""
+        achievement = self.store.get_achievement(achievement_id)
+        if achievement is None or self.store.achievement_session(achievement_id) != session_id:
+            raise not_found("achievement", achievement_id)
+        outcome = self.add_achievement(session_id, achievement)
+        if outcome == "not_approved":
+            raise ApiError(422, "achievement_not_approved",
+                           f"El logro '{achievement_id}' debe estar aprobado.")
+        if outcome == "cv_required":
+            raise ApiError(422, "cv_required", "Subí tu CV para tener portfolio.")
+        if outcome == "full":
+            raise ApiError(422, "portfolio_full",
+                           f"El portfolio ya tiene {MAX_ITEMS} logros. Quitá uno para sumar otro.")
+        return self.get_current(session_id)
+
     def update(self, portfolio_id: str, session_id: str,
                req: UpdatePortfolioRequest) -> Portfolio:
         row = self._require_owned(portfolio_id, session_id)
