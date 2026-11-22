@@ -18,7 +18,7 @@ class Settings:
     gemini_api_key: str | None = None
     groq_api_key: str | None = None
     openai_model: str = "gpt-4o-mini"
-    gemini_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-3-flash-preview"
     groq_model: str = "llama-3.3-70b-versatile"
     whisper_model: str = "whisper-1"
     fake_transcript: str | None = None
@@ -39,7 +39,7 @@ class Settings:
             gemini_api_key=env.get("GEMINI_API_KEY"),
             groq_api_key=env.get("GROQ_API_KEY"),
             openai_model=env.get("OPENAI_MODEL", "gpt-4o-mini"),
-            gemini_model=env.get("GEMINI_MODEL", "gemini-2.0-flash"),
+            gemini_model=env.get("GEMINI_MODEL", "gemini-3-flash-preview"),
             groq_model=env.get("GROQ_MODEL", "llama-3.3-70b-versatile"),
             whisper_model=env.get("WHISPER_MODEL", "whisper-1"),
             fake_transcript=env.get("FAKE_TRANSCRIPT"),
