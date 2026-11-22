@@ -9,7 +9,7 @@ y borradores independientes LinkedIn/X. Contrato: `../contracts/openapi.yaml`.
 ```bash
 cd api
 python3 -m venv .venv && .venv/bin/pip install fastapi "uvicorn[standard]" \
-  python-multipart httpx pydantic mcp pytest pyyaml jsonschema
+  python-multipart httpx pydantic mcp pytest pyyaml jsonschema cryptography "psycopg[binary]"
 .venv/bin/uvicorn app.main:app --port 8000        # o: .venv/bin/python -m app.main
 ```
 

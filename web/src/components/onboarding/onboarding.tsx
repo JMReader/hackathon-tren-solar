@@ -1,9 +1,10 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { DiscoveryConsent } from "./discovery-consent"
-import { Camera, Check, ChevronLeft, FileCheck, FileText, ImagePlus } from "lucide-react"
+import { ArrowRight, Camera, Check, ChevronLeft, FileCheck, FileText, ImagePlus } from "lucide-react"
 import type { AuthorProfile, Platform, StyleSyncResult } from "@/lib/api/types"
 import {
   useCompleteOnboarding,
@@ -22,7 +23,7 @@ import {
   savePhotoPreview,
 } from "@/lib/photo-preview"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Button, buttonStyles } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Field,
@@ -942,6 +943,9 @@ function DonePanel({
         <p className="max-w-[52ch] text-[15px] leading-relaxed text-ink-muted">
           Tu perfil está completo. Ya podemos armar tu primer post con tu voz.
         </p>
+        <Link href="/app/crear" className={buttonStyles({ size: "lg" })}>
+          Contar mi primer logro <ArrowRight aria-hidden />
+        </Link>
       </div>
       <ProfileRows profile={profile} />
     </div>

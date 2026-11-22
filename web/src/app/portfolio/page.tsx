@@ -1,10 +1,6 @@
-import type { Metadata } from "next"
-import { PortfolioEditorShell } from "@/portfolio/editor/editor-shell"
+import { redirect } from "next/navigation"
 
-export const metadata: Metadata = {
-  title: "Tu portfolio",
-}
-
+// The editor lives inside the user space now.
 export default function PortfolioEditorPage() {
-  return <PortfolioEditorShell />
+  redirect("/app/portfolio")
 }

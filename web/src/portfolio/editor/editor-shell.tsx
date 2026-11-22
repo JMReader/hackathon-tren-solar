@@ -1,6 +1,10 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
+import { ArrowRight, LayoutTemplate } from "lucide-react"
+import Link from "next/link"
+import { useState } from "react"
+import { buttonStyles } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { apiFetch } from "@/lib/api/client"
 import type { Achievement, AuthorProfile } from "@/lib/api/types"
@@ -15,7 +19,15 @@ import {
   type PortfolioRecord,
 } from "../portfolio-api"
 import { clearStoredPortfolioId, getStoredPortfolioId, setStoredPortfolioId } from "../storage"
+import { CvGate } from "./cv-gate"
 import { PortfolioEditor } from "./editor"
+
+const toItem = (a: Achievement) => ({
+  achievement_id: a.id,
+  title: defaultAchievementTitle(a),
+  occurred_on: null,
+  show_photo: true,
+})
 
 async function loadOrCreatePortfolio(
   profile: AuthorProfile,
@@ -23,10 +35,21 @@ async function loadOrCreatePortfolio(
 ): Promise<PortfolioRecord> {
   const storedId = getStoredPortfolioId()
   if (storedId) {
+    let stored: PortfolioRecord | null = null
     try {
-      return await fetchPortfolio(storedId)
+      stored = await fetchPortfolio(storedId)
     } catch {
       clearStoredPortfolioId()
+    }
+    if (stored) {
+      // Achievements approved after the portfolio was created join it automatically.
+      const present = new Set(stored.items.map((item) => item.achievement_id))
+      const missing = approved.filter((a) => !present.has(a.id)).slice(0, Math.max(0, 12 - stored.items.length))
+      if (missing.length === 0) return stored
+      return updatePortfolio(stored.id, {
+        revision: stored.revision,
+        items: [...stored.items, ...missing.map(toItem)],
+      })
     }
   }
   const displayName =
@@ -36,12 +59,7 @@ async function loadOrCreatePortfolio(
   const created = await createPortfolio({
     display_name: displayName,
     headline: profile.profession,
-    items: approved.map((a) => ({
-      achievement_id: a.id,
-      title: defaultAchievementTitle(a),
-      occurred_on: null,
-      show_photo: true,
-    })),
+    items: approved.slice(0, 12).map(toItem),
     template_id: "esencial",
     palette_id: "azul-salina",
     cv_downloadable: false,
@@ -50,10 +68,41 @@ async function loadOrCreatePortfolio(
   return created
 }
 
-export function PortfolioEditorShell() {
+function EmptyPortfolio() {
+  return (
+    <div className="flex flex-1 flex-col px-4 lg:px-14 lg:pt-12 xl:px-20">
+      <div className="mx-auto flex w-full max-w-xl flex-col gap-5 rounded-[22px] bg-paper p-6 shadow-raised lg:max-w-[1120px] lg:bg-transparent lg:p-0 lg:shadow-none">
+        <h1 className="font-display text-[28px] leading-tight tracking-display text-ink lg:text-[40px]">Tu portfolio</h1>
+        <div className="flex flex-col gap-4 rounded-[22px] bg-sunken p-6 sm:flex-row sm:items-center">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-paper text-ink-muted shadow-raised">
+            <LayoutTemplate aria-hidden className="size-5" />
+          </span>
+          <div className="flex-1">
+            <p className="text-[15px] font-medium text-ink">Se arma solo con tus logros aprobados</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
+              Contá un logro, revisalo y aprobalo: aparece acá y elegís plantilla y colores.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/p/${demoPortfolio.slug}`} target="_blank" className={buttonStyles({ variant: "ghost" })}>
+              Ver un ejemplo
+            </Link>
+            <Link href="/app/crear" className={buttonStyles({ variant: "dark" })}>
+              Contar un logro <ArrowRight aria-hidden />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean }) {
   const session = useSessionId()
   const sessionId = session.data
   const profileQuery = useProfile(sessionId)
+  const [showExample, setShowExample] = useState(false)
+  const cvId = profileQuery.data?.cv_document?.cv_id ?? null
 
   const achievementsQuery = useQuery({
     queryKey: ["achievements", sessionId],
@@ -68,26 +117,34 @@ export function PortfolioEditorShell() {
     (!sessionId || approved.length === 0)
 
   const portfolioQuery = useQuery({
-    queryKey: ["portfolio-draft", sessionId, approved.map((a) => a.id).join(",")],
+    queryKey: ["portfolio-draft", sessionId, approved.map((a) => a.id).join(","), cvId],
     enabled: Boolean(sessionId && profileQuery.data && approved.length > 0),
     queryFn: () => loadOrCreatePortfolio(profileQuery.data!, approved),
   })
 
   if (session.isPending || profileQuery.isLoading || (sessionId && achievementsQuery.isLoading)) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-night">
+      <div className={embedded ? "flex flex-1 items-center justify-center py-24" : "flex min-h-dvh items-center justify-center bg-night"}>
         <Spinner className="size-8 text-on-dark" />
       </div>
     )
   }
 
+  if (showExample) {
+    return <PortfolioEditor portfolio={demoPortfolio} isDemo embedded={embedded} />
+  }
+
+  if (sessionId && profileQuery.data && !cvId) {
+    return <CvGate sessionId={sessionId} embedded={embedded} onExample={() => setShowExample(true)} />
+  }
+
   if (useDemo) {
-    return <PortfolioEditor portfolio={demoPortfolio} isDemo />
+    return embedded ? <EmptyPortfolio /> : <PortfolioEditor portfolio={demoPortfolio} isDemo />
   }
 
   if (portfolioQuery.isLoading || !portfolioQuery.data || !profileQuery.data) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-night">
+      <div className={embedded ? "flex flex-1 items-center justify-center py-24" : "flex min-h-dvh items-center justify-center bg-night"}>
         <Spinner className="size-8 text-on-dark" />
       </div>
     )
@@ -124,7 +181,9 @@ export function PortfolioEditorShell() {
       key={`${record.id}-${record.revision}`}
       portfolio={preview}
       isDemo={false}
-      publicSlug={record.status === "published" && record.slug ? record.slug : null}
+      embedded={embedded}
+      publicSlug={record.status === "published" && record.slug && record.published_revision === record.revision ? record.slug : null}
+      outdatedSlug={record.status === "published" && record.published_revision !== record.revision ? record.slug : null}
       hasCv={record.has_cv}
       onTemplateChange={async (templateId) => {
         await persist({ template_id: templateId })

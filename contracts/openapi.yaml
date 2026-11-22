@@ -2211,6 +2211,7 @@ components:
           - template
           - palette
           - customize
+          - domain
         item_id:
           type:
           - string

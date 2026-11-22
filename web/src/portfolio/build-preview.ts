@@ -2,6 +2,7 @@ import { findPalette, palettes } from "./catalog"
 import type { PortfolioItem, PortfolioRecord } from "./portfolio-api"
 import type { FactCategory, FactSource, PublicPortfolio } from "./types"
 import type { Achievement, AuthorProfile } from "@/lib/api/types"
+import { getPhotoPreview } from "@/lib/photo-preview"
 
 function factCategory(value: string | null | undefined): FactCategory | undefined {
   if (!value) return undefined
@@ -28,7 +29,8 @@ export function buildEditorPreview(
     slug: portfolio.slug ?? "borrador",
     display_name: portfolio.display_name,
     headline: portfolio.headline ?? profile.profession,
-    photo_url: null,
+    // The API keeps photos private until publishing; the editor previews the copies kept in this browser.
+    photo_url: getPhotoPreview(profile.photo_id),
     template_id: templateId,
     palette,
     cv_url: cvDownloadable ? "#cv" : null,
@@ -38,7 +40,7 @@ export function buildEditorPreview(
       return {
         title: item.title,
         occurred_on: item.occurred_on,
-        photo_url: null,
+        photo_url: item.show_photo ? getPhotoPreview(ach?.photo_id) : null,
         facts:
           ach?.facts.map((f) => ({
             category: factCategory(f.category),

@@ -1,13 +1,15 @@
 import { findPalette, findTemplate } from "./catalog"
+import { findMockPublicPortfolio } from "@/lib/api/mock-portfolios"
 import { findDemoPortfolio } from "./demo"
 import type { PublicPortfolio } from "./types"
 
 const apiUrl = process.env.PORTFOLIO_API_URL
 
 export async function getPublicPortfolio(slug: string): Promise<PublicPortfolio | null> {
-  if (!apiUrl) return findDemoPortfolio(slug) ?? null
+  // Without an API, also look at portfolios published against the local mock (next dev).
+  if (!apiUrl) return findDemoPortfolio(slug) ?? findMockPublicPortfolio(slug)
   const response = await fetch(`${apiUrl}/p/${encodeURIComponent(slug)}`, { cache: "no-store" })
-  if (response.status === 404) return null
+  if (response.status === 404) return findDemoPortfolio(slug) ?? null
   if (!response.ok) throw new Error(`GET /p/${slug} respondió ${response.status}`)
   return response.json()
 }
