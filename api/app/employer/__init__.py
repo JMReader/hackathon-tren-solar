@@ -1,0 +1,1 @@
+"""Empresas: matching, consentimiento y contacto (#9–#12, #30–#31)."""
