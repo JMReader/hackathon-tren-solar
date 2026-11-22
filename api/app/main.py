@@ -64,7 +64,7 @@ class Services:
                             else SocialStyleReader(self.social.service))
         self.sessions = SessionService(store, media, style_reader, ttl)
         self.portfolio = PortfolioService(store, media)
-        self.employer = EmployerService(store)
+        self.employer = EmployerService(store, demo_enabled=settings.employer_demo)
 
 
 def create_app(services: Services | None = None,

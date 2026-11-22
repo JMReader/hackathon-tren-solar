@@ -363,8 +363,8 @@ class PostgresStore:
             conn.execute(
                 """INSERT INTO candidate_profiles
                    (session_id,display_name,role,industry,location,province,country,
-                    segment,work_mode,declared_skills,is_synthetic)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    segment,work_mode,declared_skills,is_synthetic,discovery_public_id)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                    ON CONFLICT (session_id) DO UPDATE SET
                     display_name=EXCLUDED.display_name,
                     role=EXCLUDED.role,
@@ -375,7 +375,8 @@ class PostgresStore:
                     segment=EXCLUDED.segment,
                     work_mode=EXCLUDED.work_mode,
                     declared_skills=EXCLUDED.declared_skills,
-                    is_synthetic=EXCLUDED.is_synthetic""",
+                    is_synthetic=EXCLUDED.is_synthetic,
+                    discovery_public_id=EXCLUDED.discovery_public_id""",
                 (
                     row["session_id"], row["display_name"], row.get("role"),
                     row.get("industry"), row.get("location"), row.get("province"),
@@ -383,6 +384,7 @@ class PostgresStore:
                     row.get("work_mode"),
                     json.dumps(row.get("declared_skills") or [], ensure_ascii=False),
                     row.get("is_synthetic", True),
+                    row.get("discovery_public_id"),
                 ),
             )
 
@@ -406,7 +408,18 @@ class PostgresStore:
             "declared_skills": json.loads(row["declared_skills"])
             if isinstance(row["declared_skills"], str) else (row["declared_skills"] or []),
             "is_synthetic": bool(row["is_synthetic"]),
+            "discovery_public_id": row.get("discovery_public_id"),
         }
+
+    def get_candidate_by_discovery_id(self, discovery_public_id: str) -> dict[str, Any] | None:
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT session_id FROM candidate_profiles WHERE discovery_public_id=%s",
+                (discovery_public_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return self.get_candidate_profile(row["session_id"])
 
     def save_discovery_consent(self, row: dict) -> None:
         with self._lock, self._conn() as conn:

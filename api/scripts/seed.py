@@ -82,7 +82,7 @@ def load_candidates(services: Services) -> None:
             services.employer.upsert_consent(c["session_id"], UpsertDiscoveryConsentRequest(
                 active=True,
                 shared_fields=[
-                    "display_name", "role", "skills", "portfolio",
+                    "display_name", "role", "skills", "portfolio", "evidence",
                     "linkedin", "publications_7d",
                 ],
                 share_portfolio=bool(c.get("slug")),

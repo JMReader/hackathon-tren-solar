@@ -7,6 +7,7 @@
 ```bash
 cd api
 export TS_ALLOW_SEED=1
+export TS_EMPLOYER_DEMO=1
 python -m scripts.seed
 python -m scripts.seed --list
 python -m scripts.seed --demo   # conteos Free vs Pro

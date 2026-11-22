@@ -50,10 +50,9 @@ def skill_evidence(
             continue
         key = skill.casefold()
         if key in by_skill:
-            ach_id, citation = by_skill[key]
+            _ach_id, citation = by_skill[key]
             out.append(SkillEvidence(
-                skill=skill, state="supported",
-                achievement_id=ach_id, citation=citation,
+                skill=skill, state="supported", citation=citation,
             ))
         else:
             out.append(SkillEvidence(skill=skill, state="missing"))

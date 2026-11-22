@@ -46,6 +46,7 @@ def settings(tmp_path) -> Settings:
         media_dir=tmp_path / "media",
         llm_provider="fake",
         stt_provider="fake",
+        employer_demo=True,
     )
 
 

@@ -912,7 +912,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContactRequest'
+                $ref: '#/components/schemas/EmployerContactRequest'
   /contact-requests/{contact_id}:
     parameters:
     - $ref: '#/components/parameters/SessionId'
@@ -932,7 +932,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContactRequest'
+                $ref: '#/components/schemas/CandidateContactRequest'
     patch:
       tags: [contact]
       summary: Aceptar o rechazar solicitud
@@ -955,7 +955,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContactRequest'
+                $ref: '#/components/schemas/CandidateContactRequest'
 components:
   parameters:
     SessionId:
@@ -2106,7 +2106,9 @@ components:
         title: {type: string, minLength: 2}
         required_skills: {type: array, items: {type: string}, minItems: 1}
         industry: {type: [string, 'null']}
-        location: {type: [string, 'null']}
+        location: {type: [string, 'null'], default: 'Jujuy, Argentina'}
+        province: {type: [string, 'null'], default: Jujuy}
+        country: {type: [string, 'null'], default: Argentina}
         work_mode: {type: [string, 'null'], enum: [onsite, hybrid, remote, null]}
         job_proposal: {type: [string, 'null']}
     EmployerSearch:
@@ -2119,6 +2121,8 @@ components:
         required_skills: {type: array, items: {type: string}}
         industry: {type: [string, 'null']}
         location: {type: [string, 'null']}
+        province: {type: [string, 'null']}
+        country: {type: [string, 'null']}
         work_mode: {type: [string, 'null']}
         job_proposal: {type: [string, 'null']}
         created_at: {type: string, format: date-time}
@@ -2128,13 +2132,16 @@ components:
       properties:
         skill: {type: string}
         state: {type: string, enum: [supported, missing, unknown]}
-        achievement_id: {type: [string, 'null']}
-        citation: {type: [string, 'null']}
+        citation:
+          type: [string, 'null']
+          description: Sólo si el candidato incluyó evidence en shared_fields.
     MatchCard:
       type: object
-      required: [session_id, matched_skills, evidence]
+      required: [candidate_id, evidence]
       properties:
-        session_id: {type: string}
+        candidate_id:
+          type: string
+          description: Identificador público opaco (no es X-Session-Id).
         display_name: {type: [string, 'null']}
         role: {type: [string, 'null']}
         matched_skills: {type: array, items: {type: string}}
@@ -2156,20 +2163,29 @@ components:
         rule_version: {type: string}
     CreateContactRequest:
       type: object
-      required: [search_id, candidate_session_id, message]
+      required: [search_id, candidate_id, message]
       properties:
         search_id: {type: string}
-        candidate_session_id: {type: string}
+        candidate_id: {type: string}
         message: {type: string, minLength: 10}
-    ContactRequest:
+    EmployerContactRequest:
       type: object
-      required: [id, employer_id, employer_name, search_id, candidate_session_id, message, status, created_at, updated_at]
+      required: [id, search_id, candidate_id, message, status, created_at, updated_at]
       properties:
         id: {type: string}
-        employer_id: {type: string}
+        search_id: {type: string}
+        candidate_id: {type: string}
+        message: {type: string}
+        status: {type: string, enum: [pending, accepted, declined, withdrawn]}
+        created_at: {type: string, format: date-time}
+        updated_at: {type: string, format: date-time}
+    CandidateContactRequest:
+      type: object
+      required: [id, employer_name, search_id, message, status, created_at, updated_at]
+      properties:
+        id: {type: string}
         employer_name: {type: string}
         search_id: {type: string}
-        candidate_session_id: {type: string}
         message: {type: string}
         status: {type: string, enum: [pending, accepted, declined, withdrawn]}
         created_at: {type: string, format: date-time}

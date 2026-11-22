@@ -30,6 +30,7 @@ class CandidateProfileRecord(BaseModel):
     work_mode: WorkMode | None = None
     declared_skills: list[str] = Field(default_factory=list)
     is_synthetic: bool = True
+    discovery_public_id: str | None = None
 
 
 class DiscoveryConsent(BaseModel):
@@ -87,12 +88,11 @@ class EmployerSearch(BaseModel):
 class SkillEvidence(BaseModel):
     skill: str
     state: EvidenceState
-    achievement_id: str | None = None
     citation: str | None = None
 
 
 class MatchCard(BaseModel):
-    session_id: str
+    candidate_id: str
     display_name: str | None = None
     role: str | None = None
     matched_skills: list[str]
@@ -113,16 +113,24 @@ class EmployerSearchMatches(BaseModel):
 
 class CreateContactRequest(BaseModel):
     search_id: str
-    candidate_session_id: str
+    candidate_id: str
     message: str = Field(min_length=10, max_length=2000)
 
 
-class ContactRequest(BaseModel):
+class EmployerContactRequest(BaseModel):
     id: str
-    employer_id: str
+    search_id: str
+    candidate_id: str
+    message: str
+    status: ContactStatus
+    created_at: str
+    updated_at: str
+
+
+class CandidateContactRequest(BaseModel):
+    id: str
     employer_name: str
     search_id: str
-    candidate_session_id: str
     message: str
     status: ContactStatus
     created_at: str
