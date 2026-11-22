@@ -143,7 +143,7 @@ export function AppHome() {
             <p className="text-[13px] leading-relaxed text-ink-muted">
               {portfolio.data?.status === "published"
                 ? portfolio.data.published_revision === portfolio.data.revision
-                  ? `Publicado con ${portfolio.data.items.length} logro${portfolio.data.items.length === 1 ? "" : "s"}. Los nuevos aprobados se suman al abrirlo.`
+                  ? `Publicado con ${portfolio.data.items.length} logro${portfolio.data.items.length === 1 ? "" : "s"}. Cada logro que aprobás se suma al borrador.`
                   : "Publicado, con cambios nuevos sin publicar. Abrilo y tocá «Actualizar página»."
                 : approvedCount > 0
                   ? `${approvedCount} logro${approvedCount === 1 ? " aprobado listo" : "s aprobados listos"} para mostrar. Elegí plantilla y colores.`

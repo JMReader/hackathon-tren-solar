@@ -3,6 +3,7 @@
 import { findPalette, findTemplate } from "@/portfolio/catalog"
 import type { PortfolioItem, PortfolioRecord } from "@/portfolio/portfolio-api"
 import type { PublicPortfolio } from "@/portfolio/types"
+import type { Achievement } from "./types"
 import { findOwnedAchievement } from "./mock-achievements"
 import { apiError, requireSession } from "./mock-store"
 
@@ -82,6 +83,49 @@ export async function createPortfolio(request: Request): Promise<Response> {
   }
   store.portfolios.set(row.id, row)
   return Response.json(toRecord(row, s), { status: 201 })
+}
+
+function latestOf(s: Session): Row | undefined {
+  return [...store.portfolios.values()].filter((row) => row.owner === s.id).at(-1)
+}
+
+export function getCurrentPortfolio(request: Request): Response {
+  const s = requireSession(request)
+  if (s instanceof Response) return s
+  const row = latestOf(s)
+  return row ? Response.json(toRecord(row, s)) : apiError(404, "not_found", "Todavía no tenés portfolio")
+}
+
+/** Mirrors PortfolioService.add_achievement: approving adds the achievement to the draft. */
+export function addApprovedToPortfolio(s: Session, achievement: Achievement) {
+  if (!s.cvDocument) return
+  const first = achievement.facts[0]?.text.trim() ?? ""
+  const title = first.length < 3 ? "Mi logro" : first.length > 80 ? `${first.slice(0, 77)}...` : first
+  const item: PortfolioItem = { achievement_id: achievement.id, title, occurred_on: null, show_photo: true }
+  const row = latestOf(s)
+  if (!row) {
+    const profession = s.profession?.trim() ?? ""
+    const created: Row = {
+      owner: s.id,
+      id: `pf_${crypto.randomUUID().replaceAll("-", "").slice(0, 12)}`,
+      status: "draft",
+      revision: 1,
+      display_name: profession.length >= 2 ? profession.slice(0, 60) : "Tu portfolio",
+      headline: null,
+      items: [item],
+      template_id: "esencial",
+      palette_id: "azul-salina",
+      cv_downloadable: false,
+      slug: null,
+      published_revision: null,
+      published_at: null,
+    }
+    store.portfolios.set(created.id, created)
+    return
+  }
+  if (row.items.length >= 12 || row.items.some((i) => i.achievement_id === achievement.id)) return
+  row.items = [...row.items, item]
+  row.revision += 1
 }
 
 export function getPortfolio(request: Request, id: string): Response {

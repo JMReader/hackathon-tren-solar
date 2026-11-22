@@ -4,8 +4,7 @@ import { useMutation, useQuery, useQueryClient, type QueryClient } from "@tansta
 import { useSyncExternalStore } from "react"
 import { toast } from "@/components/ui/toast"
 import { achievementsIndex, type AchievementEntry } from "@/lib/achievements-index"
-import { fetchPortfolio } from "@/portfolio/portfolio-api"
-import { getStoredPortfolioId } from "@/portfolio/storage"
+import { fetchCurrentPortfolio } from "@/portfolio/portfolio-api"
 import { ApiRequestError, apiFetch } from "./client"
 import type { Achievement, ApiError, Draft, Fact, GenerateDraftsResponse, Platform } from "./types"
 
@@ -75,11 +74,7 @@ export function useStoredPortfolio(sessionId: string | undefined) {
   return useQuery({
     queryKey: ["portfolio-summary", sessionId],
     enabled: Boolean(sessionId),
-    queryFn: async () => {
-      const id = getStoredPortfolioId()
-      if (!id) return null
-      return fetchPortfolio(id).catch(() => null)
-    },
+    queryFn: () => fetchCurrentPortfolio().catch(() => null),
   })
 }
 
@@ -132,12 +127,14 @@ export function useApproveAndDraft(id: string, sessionId: string | undefined) {
   const queryClient = useQueryClient()
   return useMutation({
     scope: { id: `achievement-${id}` },
-    mutationFn: async () => {
+    mutationFn: async (options: { addToPortfolio?: boolean } | void) => {
       const current = queryClient.getQueryData<Achievement>(achievementKey(id))
       const approved = await apiFetch<Achievement>(`/achievements/${id}/approve`, {
         method: "POST",
-        json: { revision: current?.revision ?? 1 },
+        json: { revision: current?.revision ?? 1, add_to_portfolio: options?.addToPortfolio ?? true },
       })
+      void queryClient.invalidateQueries({ queryKey: ["portfolio-summary"] })
+      void queryClient.invalidateQueries({ queryKey: ["portfolio-draft"] })
       queryClient.setQueryData(achievementKey(id), approved)
       return apiFetch<GenerateDraftsResponse>(`/achievements/${id}/drafts`, {
         method: "POST",

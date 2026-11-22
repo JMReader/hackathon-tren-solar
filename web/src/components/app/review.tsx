@@ -7,6 +7,7 @@ import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonStyles } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { achievementsIndex } from "@/lib/achievements-index"
 import { useAchievement, useAchievementEntries, useApproveAndDraft, useUpdateFacts } from "@/lib/api/achievements"
@@ -141,6 +142,8 @@ function ReviewBody({ achievement, sessionId }: { achievement: Achievement; sess
   const approve = useApproveAndDraft(achievement.id, sessionId)
   const [adding, setAdding] = useState(false)
   const [newFact, setNewFact] = useState("")
+  const [addToPortfolio, setAddToPortfolio] = useState(true)
+  const hasCv = Boolean(useAppSession().profile?.cv_document)
   const entry = useAchievementEntries(sessionId).find((e) => e.id === achievement.id)
   const dismissed = new Set(entry?.dismissedQuestions ?? [])
   const questions = achievement.open_questions.filter((q) => !dismissed.has(q.id))
@@ -265,6 +268,21 @@ function ReviewBody({ achievement, sessionId }: { achievement: Achievement; sess
               ? `${questions.length} pregunta${questions.length === 1 ? "" : "s"} sin responder (podés saltearlas).`
               : "Solo usamos lo que aprobás."}
         </p>
+        {achievement.status !== "approved" &&
+          (hasCv ? (
+            <label className="flex cursor-pointer items-center justify-end gap-3 text-[13px] text-ink">
+              También sumarlo a mi portfolio
+              <Switch checked={addToPortfolio} onCheckedChange={(next) => setAddToPortfolio(next)} disabled={busy} />
+            </label>
+          ) : (
+            <p className="text-right text-[13px] text-ink-muted">
+              Para que también vaya a tu portfolio,{" "}
+              <Link href="/app/portfolio" className="font-medium text-accent-strong hover:underline">
+                subí tu CV
+              </Link>
+              .
+            </p>
+          ))}
         <div className="flex items-center gap-2">
           <Link href="/app/crear" className={cn(buttonStyles({ variant: "ghost" }), "max-sm:px-3")}>
             <ChevronLeft aria-hidden /> Nuevo logro
@@ -279,7 +297,7 @@ function ReviewBody({ achievement, sessionId }: { achievement: Achievement; sess
               className="ml-auto"
               disabled={achievement.facts.length === 0 || busy}
               onClick={async () => {
-                const done = await approve.mutateAsync().catch(() => null)
+                const done = await approve.mutateAsync({ addToPortfolio: hasCv && addToPortfolio }).catch(() => null)
                 if (done) router.push(`/app/crear/${achievement.id}/publicar`)
               }}
             >

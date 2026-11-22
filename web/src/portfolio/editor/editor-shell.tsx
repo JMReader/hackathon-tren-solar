@@ -13,12 +13,12 @@ import { buildEditorPreview, defaultAchievementTitle } from "../build-preview"
 import { demoPortfolio } from "../demo"
 import {
   createPortfolio,
-  fetchPortfolio,
+  fetchCurrentPortfolio,
   publishPortfolio,
   updatePortfolio,
   type PortfolioRecord,
 } from "../portfolio-api"
-import { clearStoredPortfolioId, getStoredPortfolioId, setStoredPortfolioId } from "../storage"
+import { setStoredPortfolioId } from "../storage"
 import { CvGate } from "./cv-gate"
 import { PortfolioEditor } from "./editor"
 
@@ -33,24 +33,10 @@ async function loadOrCreatePortfolio(
   profile: AuthorProfile,
   approved: Achievement[],
 ): Promise<PortfolioRecord> {
-  const storedId = getStoredPortfolioId()
-  if (storedId) {
-    let stored: PortfolioRecord | null = null
-    try {
-      stored = await fetchPortfolio(storedId)
-    } catch {
-      clearStoredPortfolioId()
-    }
-    if (stored) {
-      // Achievements approved after the portfolio was created join it automatically.
-      const present = new Set(stored.items.map((item) => item.achievement_id))
-      const missing = approved.filter((a) => !present.has(a.id)).slice(0, Math.max(0, 12 - stored.items.length))
-      if (missing.length === 0) return stored
-      return updatePortfolio(stored.id, {
-        revision: stored.revision,
-        items: [...stored.items, ...missing.map(toItem)],
-      })
-    }
+  const current = await fetchCurrentPortfolio()
+  if (current) {
+    setStoredPortfolioId(current.id)
+    return current
   }
   const displayName =
     (profile.profession?.trim().length ?? 0) >= 2
