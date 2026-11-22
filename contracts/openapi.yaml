@@ -230,6 +230,25 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
   /achievements:
+    get:
+      tags:
+      - achievements
+      summary: Listar logros de la sesión (Issue #6 — editor de portfolio)
+      description: Devuelve todos los logros de la sesión, del más reciente al primero. Sin paginación ni filtros; el cliente filtra por `status` (p. ej. `approved`).
+      operationId: listAchievements
+      parameters:
+      - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Logros de la sesión (puede ser una lista vacía)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Achievement'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     post:
       tags:
       - achievements

@@ -17,6 +17,7 @@ SDD onboarding (no es el backend entero): `docs/features/onboarding/`. Motor y p
 ### Issue #3 — Juan (Ingesta modular `text`/`audio`/`mcp` + Revisión + Borradores)
 - `POST /media` — sube imagen privada opcional y devuelve `photo_id`.
 - `POST /achievements` — crea logro desde texto (`input_type: "text"`), MCP (`"mcp"`) o multipart (`audio` + `photo`).
+- `GET /achievements` — lista los logros de la sesión (array de `Achievement`, sin envelope).
 - `GET /achievements/{id}` — devuelve `transcript`, `facts[]`, `open_questions[]`, `revision` y `status`.
 - `PATCH /achievements/{id}` — corrige hechos verificando `revision` (`409` si quedó desactualizada).
 - `POST /achievements/{id}/approve` — congela una revisión aprobada.
