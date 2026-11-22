@@ -368,7 +368,7 @@ function Wizard({
         className="animate-step-in rounded-[22px] bg-paper p-5 shadow-raised motion-reduce:animate-none sm:p-6 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none"
       >
         {isDone ? (
-          <DonePanel profile={profile} headingRef={headingRef} />
+          <DonePanel profile={profile} sessionId={sessionId} headingRef={headingRef} />
         ) : (
           <>
             <h1
@@ -982,11 +982,14 @@ function ProfileRows({
 
 function DonePanel({
   profile,
+  sessionId,
   headingRef,
 }: {
   profile: AuthorProfile
+  sessionId: string
   headingRef: React.RefObject<HTMLHeadingElement | null>
 }) {
+  const noop = async () => {}
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col items-start gap-4">
@@ -1001,8 +1004,12 @@ function DonePanel({
           ¡Listo!
         </h1>
         <p className="max-w-[52ch] text-[15px] leading-relaxed text-ink-muted">
-          Tu perfil está completo. Ya podemos armar tu primer post con tu voz.
+          Tu perfil está completo. Conectá tus redes y contanos tu primer logro.
         </p>
+        <div className="flex flex-col gap-3 self-stretch">
+          <SocialCard platform="linkedin" sessionId={sessionId} imported={profile.style_sync.linkedin} beforeConnect={noop} />
+          <SocialCard platform="x" sessionId={sessionId} imported={profile.style_sync.x} beforeConnect={noop} />
+        </div>
         <Link href="/app/crear" className={buttonStyles({ size: "lg" })}>
           Contar mi primer logro <ArrowRight aria-hidden />
         </Link>

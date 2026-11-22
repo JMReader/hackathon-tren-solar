@@ -223,23 +223,29 @@ function ReviewBody({ achievement, sessionId }: { achievement: Achievement; sess
               <Plus aria-hidden /> Agregar un dato
             </Button>
           )}
+
+          {questions.length > 0 && (
+            <div className="mt-6 flex flex-col gap-4">
+              <p className="text-[13px] font-medium text-ink-muted">Preguntas para completar tu historia</p>
+              {questions.map((q) => (
+                <QuestionCard
+                  key={q.id}
+                  question={q}
+                  busy={busy}
+                  onAnswer={(answer) =>
+                    save([...achievement.facts, { id: nextId(), category: null, text: answer, source: "user" }]).then(
+                      () => achievementsIndex.dismissQuestion(sessionId, achievement.id, q.id),
+                      () => undefined,
+                    )
+                  }
+                  onSkip={() => achievementsIndex.dismissQuestion(sessionId, achievement.id, q.id)}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         <aside className="flex flex-col gap-4">
-          {questions.map((q) => (
-            <QuestionCard
-              key={q.id}
-              question={q}
-              busy={busy}
-              onAnswer={(answer) =>
-                save([...achievement.facts, { id: nextId(), category: null, text: answer, source: "user" }]).then(
-                  () => achievementsIndex.dismissQuestion(sessionId, achievement.id, q.id),
-                  () => undefined,
-                )
-              }
-              onSkip={() => achievementsIndex.dismissQuestion(sessionId, achievement.id, q.id)}
-            />
-          ))}
           <Card variant="muted" className="gap-2 p-5">
             <p className="text-[13px] font-medium text-ink">{achievement.input_type === "audio" ? "Lo que dijiste" : "Lo que escribiste"}</p>
             <p className="text-[13px] leading-relaxed text-ink-muted">“{achievement.transcript}”</p>
