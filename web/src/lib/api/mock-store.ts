@@ -250,7 +250,14 @@ async function readFile(
 export async function uploadMedia(request: Request): Promise<Response> {
   const parsed = await readFile(request)
   if (parsed instanceof Response) return parsed
-  const { file, altText } = parsed
+  const asset = saveImage(parsed.file)
+  if (asset instanceof Response) return asset
+  asset.alt_text = parsed.altText
+  return Response.json(asset, { status: 201 })
+}
+
+/** Stores an image that arrives inside another request (e.g. multipart achievements). */
+export function saveImage(file: File): MediaAsset | Response {
   if (!IMAGE_TYPES.has(file.type))
     return apiError(
       422,
@@ -259,15 +266,18 @@ export async function uploadMedia(request: Request): Promise<Response> {
     )
   if (file.size > MAX_FILE_BYTES)
     return apiError(422, "file_too_large", "La imagen no puede superar 10 MB")
-
   const asset: MediaAsset = {
     photo_id: `med_${crypto.randomUUID().replaceAll("-", "").slice(0, 16)}`,
     mime_type: file.type,
-    alt_text: altText,
+    alt_text: null,
     size_bytes: file.size,
   }
   store.media.set(asset.photo_id, asset)
-  return Response.json(asset, { status: 201 })
+  return asset
+}
+
+export function hasMedia(photoId: string) {
+  return store.media.has(photoId)
 }
 
 export async function uploadCv(
