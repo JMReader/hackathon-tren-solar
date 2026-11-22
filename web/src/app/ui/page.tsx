@@ -67,9 +67,12 @@ import { Toaster, toast } from "@/components/ui/toast"
 import { Toggle, ToggleGroup } from "@/components/ui/toggle"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Display, Eyebrow, Highlight } from "@/components/ui/typography"
+import { ShimmeringText } from "@/components/audio/shimmering-text"
+import { CompactPlayerDemo, PlayerDemo, RecorderDemo, VoiceButtonDemo } from "./audio-demos"
 
 const sections = [
   ["fundamentos", "Fundamentos"],
+  ["audio", "Audio"],
   ["botones", "Botones"],
   ["cards", "Cards"],
   ["inputs", "Inputs"],
@@ -206,6 +209,35 @@ export default function UIPage() {
                         <span className="min-w-0 truncate text-xs text-ink-muted">{use}</span>
                       </div>
                     ))}
+                  </div>
+                </Demo>
+              </div>
+            </Section>
+
+            <Section
+              id="audio"
+              eyebrow="Voz · ElevenLabs UI"
+              title="Grabar, escuchar, revisar"
+              description="Componentes de ElevenLabs UI portados a nuestro kit: la onda en vivo comparte el micrófono con la grabación, el scrubber muestra la onda real del clip y se maneja con teclado."
+            >
+              <div className="grid gap-5 lg:grid-cols-2">
+                <Demo label="Grabador (usa tu micrófono)">
+                  <RecorderDemo />
+                </Demo>
+                <Demo label="Reproductor con transcripción">
+                  <PlayerDemo />
+                </Demo>
+              </div>
+              <div className="grid gap-8 lg:grid-cols-2">
+                <Demo label="Voice button">
+                  <VoiceButtonDemo />
+                </Demo>
+                <Demo label="Reproductor compacto y estado de carga">
+                  <div className="flex flex-col gap-5">
+                    <CompactPlayerDemo />
+                    <p className="text-[15px]">
+                      <ShimmeringText>Generando tus borradores para LinkedIn y X…</ShimmeringText>
+                    </p>
                   </div>
                 </Demo>
               </div>

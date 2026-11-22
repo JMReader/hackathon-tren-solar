@@ -22,7 +22,7 @@ function DatePicker({ className, ...props }: ComponentProps<typeof DatePickerPri
             className,
           )}
         >
-          <DatePickerInput placeholder="dd/mm/aaaa" className="h-full min-w-0 flex-1 bg-transparent text-sm tabular-nums outline-none placeholder:text-ink-muted" />
+          <DatePickerInput className="h-full min-w-0 flex-1 bg-transparent text-sm tabular-nums outline-none placeholder:text-ink-muted" />
           <DatePickerTrigger
             aria-label="Abrir calendario"
             className="pressable focus-ring inline-flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-[10px] text-ink-muted hover:bg-fill-soft hover:text-ink"
