@@ -1,4 +1,7 @@
 "use client";
+import { Card } from "@/components/ui/card";
+import { RadioGroup, Radio } from "@/components/ui/radio";
+import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import {
   SegmentedControl,
@@ -11,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { apiFetch } from "@/lib/api/client";
 type Candidate = {
-  candidate_id?: string;
+  candidate_id: string;
   display_name?: string | null;
   role?: string | null;
   evidence: { skill: string; state: string; citation?: string | null }[];
@@ -213,19 +216,19 @@ export default function EmpresasPage() {
           </div>
         )}
         {error && (
-          <p role="alert" className="mt-5 text-red-700">
+          <p role="alert" className="mt-5 text-danger">
             {error}
           </p>
         )}
         {matches && (
-          <div className="mt-10 border-t border-[#ded4d1] pt-8">
+          <div className="mt-10 border-t border-divider pt-8">
             <p className="font-display text-6xl">{matches.eligible_count}</p>
             <p className="mt-1 text-xl">perfiles coinciden</p>
             <p className="text-sm text-ink-muted">
               {skill} · {location}
             </p>
             {plan === "free" ? (
-              <p className="mt-8 rounded-xl bg-white p-5">
+              <Card className="mt-8 items-start gap-3 p-5">
                 Con Empresas Pro podés revisar hasta cinco portfolios.{" "}
                 <Button
                   onClick={() => {
@@ -236,30 +239,36 @@ export default function EmpresasPage() {
                 >
                   Probar empresa Pro
                 </Button>
-              </p>
+              </Card>
             ) : (
               candidates.length > 0 && (
                 <div className="mt-8 grid gap-6 md:grid-cols-[220px_1fr]">
-                  <div role="list" aria-label="Candidatos">
-                    {candidates.slice(0, 5).map((c, i) => (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        key={c.candidate_id ?? i}
-                        onClick={() => setSelected(i)}
-                        className={`block w-full rounded-lg p-3 text-left ${selected === i ? "bg-[#eadfdb]" : "hover:bg-white/70"}`}
+                  <RadioGroup
+                    aria-label="Candidatos"
+                    value={candidate?.candidate_id}
+                    onValueChange={(id) =>
+                      setSelected(
+                        candidates.findIndex((c) => c.candidate_id === id),
+                      )
+                    }
+                  >
+                    {candidates.map((c) => (
+                      <Label
+                        key={c.candidate_id}
+                        className="flex items-center gap-3 rounded-xl p-3 has-[[data-checked]]:bg-sunken"
                       >
+                        <Radio value={c.candidate_id} />
                         {c.display_name || "Perfil compartido"}
-                      </Button>
+                      </Label>
                     ))}
-                  </div>
+                  </RadioGroup>
                   {candidate && (
-                    <article className="rounded-2xl bg-white p-6">
+                    <Card className="p-6">
                       <h2 className="font-display text-3xl">
                         {candidate.display_name || "Perfil compartido"}
                       </h2>
                       <p className="mt-1 text-ink-muted">{candidate.role}</p>
-                      <hr className="my-5" />
+                      <Separator className="my-5" />
                       <h3 className="font-medium">Por qué coincide</h3>
                       {candidate.evidence
                         .filter((e) => e.state === "supported")
@@ -308,7 +317,7 @@ export default function EmpresasPage() {
                           Abrir portfolio
                         </a>
                       )}
-                    </article>
+                    </Card>
                   )}
                 </div>
               )
