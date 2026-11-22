@@ -56,6 +56,7 @@
 
   --animate-indeterminate: indeterminate 1.4s linear infinite;
   --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-text-shimmer: text-shimmer 2.2s linear infinite;
 
   @keyframes indeterminate {
     from {
@@ -63,6 +64,15 @@
     }
     to {
       translate: 250% 0;
+    }
+  }
+
+  @keyframes text-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0% 0;
     }
   }
 
