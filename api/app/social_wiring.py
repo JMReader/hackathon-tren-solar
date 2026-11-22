@@ -5,14 +5,13 @@ from pathlib import Path
 
 import httpx2
 
-from social.adapters import default_adapters
 from social.crypto import TokenCipher
-from social.linkedin import LinkedInAdapter
 from social.models import ConnectionState, Platform, PublishableDraft
 from social.oauth import ConnectionFlow
 from social.service import SocialService
 from social.settings import Settings as SocialSettings
 from social.sqlite import SqliteConnectionStore, SqliteDatabase, SqlitePublicationStore
+from social.wiring import build_providers
 
 from .errors import ApiError
 from .service import CoreService
@@ -64,16 +63,13 @@ def build_social(
 ) -> SocialModule:
     settings = settings or SocialSettings.from_env()
     db = SqliteDatabase(data_dir / "social.db")
-    connections = SqliteConnectionStore(db, TokenCipher(settings.token_key or TokenCipher.generate_key()))
-    linkedin = (
-        LinkedInAdapter(settings.linkedin, http or httpx2.Client(timeout=httpx2.Timeout(20.0, connect=5.0)))
-        if settings.linkedin
-        else None
+    providers = build_providers(
+        settings,
+        SqliteConnectionStore(db, TokenCipher(settings.token_key or TokenCipher.generate_key())),
+        http or httpx2.Client(timeout=httpx2.Timeout(20.0, connect=5.0)),
     )
     service = SocialService(
-        default_adapters(linkedin), connections, SqlitePublicationStore(db), CoreDraftSource(core)
+        providers.adapters, providers.connections, SqlitePublicationStore(db), CoreDraftSource(core)
     )
-    flow = ConnectionFlow(
-        service, {Platform.LINKEDIN: linkedin} if linkedin else {}, connections, settings.web_base_url
-    )
+    flow = ConnectionFlow(service, providers.oauth, providers.connections, settings.web_base_url)
     return SocialModule(service, flow)
