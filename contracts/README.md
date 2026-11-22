@@ -1,8 +1,18 @@
 # Contratos compartidos — Issues #3, #4 y #5
 
-Este directorio contiene la especificación OpenAPI (`openapi.yaml`) y los payloads JSON (`fixtures/`) para trabajar en paralelo sin bloquearnos por auth/signup ni onboarding.
+Este directorio contiene la especificación OpenAPI (`openapi.yaml`) y los payloads JSON (`fixtures/`) para trabajar en paralelo.
+
+SDD onboarding (no es el backend entero): `docs/features/onboarding/`. Motor y publicación: `docs/spec-funcional.md` y `docs/spec-tecnica.md`.
 
 ## División rápida de endpoints (`/api/v1`)
+
+### Issue #3 + #4 — Sesión y onboarding (antes del logro)
+- `POST /session` — crea sesión anónima; respuesta incluye `session_id` (enviar como header `X-Session-Id`).
+- `GET/PATCH /session/profile` — profesión, muestra de escritura, `revision`, `ready_for_achievement`.
+- `PUT /session/profile/photo` — asocia `photo_id` de `POST /media`.
+- `POST /session/cv` — CV opcional para portfolio posterior.
+- `POST /session/profile/sync-style` — importa posts propios vía Issue #5 cuando `can_read_posts`.
+- `POST /session/profile/complete` — congela `voice_context` y habilita `POST /achievements`.
 
 ### Issue #3 — Juan (Ingesta modular `text`/`audio`/`mcp` + Revisión + Borradores)
 - `POST /media` — sube imagen privada opcional y devuelve `photo_id`.
@@ -14,7 +24,7 @@ Este directorio contiene la especificación OpenAPI (`openapi.yaml`) y los paylo
 - `GET /drafts/{id}` y `PATCH /drafts/{id}` — lee y edita cada borrador por separado con su propio `revision`.
 
 ### Issue #5 — Mayko (OAuth LinkedIn/X + Publicación idempotente)
-- `GET /social/{platform}/connection` — devuelve estado real (`connected`, `disconnected`, `expired`, `access_unavailable`) y capacidades (`can_publish_text`, `can_publish_image`).
+- `GET /social/{platform}/connection` — devuelve estado real y capacidades (`can_publish_text`, `can_publish_image`, `can_read_posts`).
 - `POST /social/{platform}/connection` — inicia OAuth con `state` y scopes mínimos; devuelve `authorization_url` (o `503` con `access_unavailable` si el proveedor bloquea permisos).
 - `GET /social/{platform}/callback` — recibe callback OAuth, cifra token en servidor y redirige al front.
 - `POST /drafts/{id}/publications` — requiere header `Idempotency-Key` y body `{ "draft_revision": <int>, "confirm_publish": true }`.
@@ -53,3 +63,7 @@ Reglas críticas para #5:
 6. `06-handoff-publishable-draft-to-social.json` — Payload interno `#3 -> #5` para Mayko (con foto y sólo texto).
 7. `07-social-connections.response.json` — Estados de conexión (`connected` y `access_unavailable`).
 8. `08-publications-states.response.json` — Request + respuestas `succeeded`, `unknown` y `failed`.
+9. `09-session-create.response.json` — Respuesta `POST /session`.
+10. `10-author-profile-in-progress.response.json` — Perfil sin listo para logro.
+11. `11-author-profile-complete.response.json` — Onboarding completo con `voice_context`.
+12. `12-onboarding-handoff-to-achievement.json` — Headers y requests tras complete (drafts sin `voice_context` en body).

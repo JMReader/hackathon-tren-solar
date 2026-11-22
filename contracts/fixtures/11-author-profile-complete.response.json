@@ -1,0 +1,43 @@
+{
+  "session_id": "ses_01J9ONBOARD01",
+  "onboarding_status": "complete",
+  "revision": 4,
+  "ready_for_achievement": true,
+  "profession": "Diseñadora UX/UI",
+  "photo_id": "med_photo_01",
+  "writing_sample": null,
+  "cv_document": {
+    "cv_id": "cv_01J9DOC01",
+    "mime_type": "application/pdf",
+    "size_bytes": 204800
+  },
+  "voice_context": {
+    "language": "es-AR",
+    "author_hint": "Diseñadora UX/UI",
+    "sample_posts": {
+      "linkedin": [
+        "La semana pasada rediseñé el checkout de un proyecto de la facu."
+      ],
+      "x": [
+        "diseñar formularios cortos parece fácil hasta que te toca pelear cada campo que sobra."
+      ]
+    },
+    "preferences": {
+      "use_emojis": false,
+      "use_hashtags": false
+    }
+  },
+  "style_sync": {
+    "last_attempt_at": "2026-11-22T14:00:00Z",
+    "linkedin": {
+      "status": "succeeded",
+      "posts_imported": 3,
+      "message": null
+    },
+    "x": {
+      "status": "unavailable",
+      "posts_imported": 0,
+      "message": "can_read_posts es false en este entorno"
+    }
+  }
+}

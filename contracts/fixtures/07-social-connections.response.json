@@ -4,6 +4,7 @@
     "status": "connected",
     "can_publish_text": true,
     "can_publish_image": true,
+    "can_read_posts": true,
     "account_handle": "Ana Gómez",
     "reason": null
   },
@@ -12,6 +13,7 @@
     "status": "access_unavailable",
     "can_publish_text": false,
     "can_publish_image": false,
+    "can_read_posts": false,
     "account_handle": null,
     "reason": "La app de X no tiene habilitado el permiso de escritura (tweet.write) en este entorno. Podés copiar el borrador y descargar la foto."
   }

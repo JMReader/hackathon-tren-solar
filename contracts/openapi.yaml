@@ -6,12 +6,15 @@ info:
     Contrato compartido entre Issue #3 (ingesta modular texto/audio/MCP, extracción,
     revisión y borradores LinkedIn/X), Issue #4 (frontend Next.js) e Issue #5
     (conexiones OAuth y publicación idempotente en LinkedIn y X).
-    En este corte no se exige registro/login ni onboarding persistido.
+    Sesión anónima (sin contraseña) con onboarding persistido de autor antes del logro.
+    Ver tag `session` y decisión de equipo en el cerebro (onboarding UI aprobado).
 servers:
   - url: http://localhost:8000/api/v1
     description: Desarrollo local FastAPI
 
 tags:
+  - name: session
+    description: Sesión anónima y perfil de autor / onboarding (Issue #3, UI Issue #4)
   - name: media
     description: Carga privada de imagen adjunta (Issue #3)
   - name: achievements
@@ -22,11 +25,183 @@ tags:
     description: Estado de conexión OAuth y publicación por red (Issue #5 - Mayko)
 
 paths:
+  /session:
+    post:
+      tags: [session]
+      summary: Crear sesión anónima del autor (sin registro con contraseña)
+      operationId: createSession
+      responses:
+        "201":
+          description: Sesión creada; el cliente debe enviar `X-Session-Id` en llamadas siguientes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionCreated"
+
+  /session/profile:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    get:
+      tags: [session]
+      summary: Consultar perfil de onboarding y si puede iniciar el logro
+      operationId: getAuthorProfile
+      responses:
+        "200":
+          description: Perfil actual
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      tags: [session]
+      summary: Actualizar profesión y/o muestra de escritura (estilo)
+      operationId: updateAuthorProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAuthorProfileRequest"
+      responses:
+        "200":
+          description: Perfil actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/RevisionConflict"
+
+  /session/profile/photo:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    put:
+      tags: [session]
+      summary: Asociar foto de perfil ya subida vía POST /media
+      operationId: setAuthorProfilePhoto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetAuthorProfilePhotoRequest"
+      responses:
+        "200":
+          description: Foto asociada al perfil
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/RevisionConflict"
+
+  /session/cv:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    post:
+      tags: [session]
+      summary: Subir CV privado (opcional; reservado para portfolio #6)
+      operationId: uploadCv
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: CV almacenado y asociado al perfil
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorProfile"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /session/profile/sync-style:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    post:
+      tags: [session]
+      summary: Refrescar muestras de estilo desde redes conectadas (delega en Issue #5)
+      operationId: syncAuthorStyleFromSocial
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncStyleRequest"
+      responses:
+        "200":
+          description: Perfil con voice_context actualizado o parcial si alguna red falló
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorProfile"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "503":
+          description: Ninguna red pudo aportar lectura de posts; el cliente debe usar writing_sample
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorProfile"
+
+  /session/profile/complete:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+    post:
+      tags: [session]
+      summary: Marcar onboarding completo y congelar snapshot voice_context
+      operationId: completeAuthorOnboarding
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompleteOnboardingRequest"
+      responses:
+        "200":
+          description: Onboarding completo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorProfile"
+        "400":
+          description: Faltan campos obligatorios (profesión, foto o fuente de estilo)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/RevisionConflict"
+
   /media:
     post:
       tags: [media]
       summary: Subir foto privada para asociar a un logro o publicación
       operationId: uploadMedia
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
       requestBody:
         required: true
         content:
@@ -49,12 +224,16 @@ paths:
                 $ref: "#/components/schemas/MediaAsset"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /achievements:
     post:
       tags: [achievements]
       summary: Crear logro e iniciar extracción de hechos (texto, audio o MCP)
       operationId: createAchievement
+      parameters:
+        - $ref: "#/components/parameters/SessionId"
       requestBody:
         required: true
         content:
@@ -73,12 +252,21 @@ paths:
                 $ref: "#/components/schemas/Achievement"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          description: Onboarding incompleto (`ready_for_achievement` es false)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
 
   /achievements/{id}:
     parameters:
       - $ref: "#/components/parameters/AchievementId"
+      - $ref: "#/components/parameters/SessionId"
     get:
       tags: [achievements]
       summary: Consultar estado, texto/transcripción, hechos y preguntas abiertas
@@ -90,6 +278,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Achievement"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
     patch:
@@ -109,6 +299,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Achievement"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -117,6 +309,7 @@ paths:
   /achievements/{id}/approve:
     parameters:
       - $ref: "#/components/parameters/AchievementId"
+      - $ref: "#/components/parameters/SessionId"
     post:
       tags: [achievements]
       summary: Aprobar explícitamente una revisión concreta del logro
@@ -134,6 +327,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Achievement"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -142,6 +337,7 @@ paths:
   /achievements/{id}/drafts:
     parameters:
       - $ref: "#/components/parameters/AchievementId"
+      - $ref: "#/components/parameters/SessionId"
     post:
       tags: [drafts]
       summary: Generar borradores independientes para LinkedIn y X desde una revisión aprobada
@@ -161,6 +357,8 @@ paths:
                 $ref: "#/components/schemas/GenerateDraftsResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -169,6 +367,7 @@ paths:
   /drafts/{id}:
     parameters:
       - $ref: "#/components/parameters/DraftId"
+      - $ref: "#/components/parameters/SessionId"
     get:
       tags: [drafts]
       summary: Obtener un borrador individual (LinkedIn o X)
@@ -180,6 +379,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Draft"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
     patch:
@@ -201,6 +402,8 @@ paths:
                 $ref: "#/components/schemas/Draft"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -330,6 +533,14 @@ paths:
 
 components:
   parameters:
+    SessionId:
+      name: X-Session-Id
+      in: header
+      required: true
+      description: Identificador de sesión anónima devuelto por POST /session.
+      schema:
+        type: string
+        examples: [ses_01J9PROFILE1]
     AchievementId:
       name: id
       in: path
@@ -392,8 +603,151 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ApiError"
+    Unauthorized:
+      description: Falta o es inválido el header X-Session-Id
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
 
   schemas:
+    OnboardingStatus:
+      type: string
+      enum: [not_started, in_progress, complete]
+
+    SessionCreated:
+      type: object
+      required: [session_id, expires_at]
+      properties:
+        session_id:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+
+    CvDocument:
+      type: object
+      required: [cv_id, mime_type]
+      properties:
+        cv_id:
+          type: string
+        mime_type:
+          type: string
+          examples: [application/pdf]
+        size_bytes:
+          type: [integer, "null"]
+
+    AuthorProfile:
+      type: object
+      required:
+        - session_id
+        - onboarding_status
+        - revision
+        - ready_for_achievement
+        - profession
+        - photo_id
+        - writing_sample
+        - cv_document
+        - voice_context
+        - style_sync
+      properties:
+        session_id:
+          type: string
+        onboarding_status:
+          $ref: "#/components/schemas/OnboardingStatus"
+        revision:
+          type: integer
+          minimum: 1
+        ready_for_achievement:
+          type: boolean
+          description: >
+            true cuando hay profession, photo_id y al menos una fuente de estilo
+            (writing_sample o sample_posts en voice_context).
+        profession:
+          type: [string, "null"]
+        photo_id:
+          type: [string, "null"]
+        writing_sample:
+          type: [string, "null"]
+          description: Texto libre para imitar tono cuando no hay posts de red.
+        cv_document:
+          oneOf:
+            - $ref: "#/components/schemas/CvDocument"
+            - type: "null"
+        voice_context:
+          oneOf:
+            - $ref: "#/components/schemas/VoiceContext"
+            - type: "null"
+        style_sync:
+          type: object
+          required: [last_attempt_at, linkedin, x]
+          properties:
+            last_attempt_at:
+              type: [string, "null"]
+              format: date-time
+            linkedin:
+              $ref: "#/components/schemas/StyleSyncResult"
+            x:
+              $ref: "#/components/schemas/StyleSyncResult"
+
+    StyleSyncResult:
+      type: object
+      required: [status, posts_imported]
+      properties:
+        status:
+          type: string
+          enum: [skipped, succeeded, unavailable, failed]
+        posts_imported:
+          type: integer
+          minimum: 0
+        message:
+          type: [string, "null"]
+
+    UpdateAuthorProfileRequest:
+      type: object
+      required: [revision]
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+        profession:
+          type: [string, "null"]
+          minLength: 2
+        writing_sample:
+          type: [string, "null"]
+          description: Mínimo 20 caracteres si se envía y no hay posts de red.
+
+    SetAuthorProfilePhotoRequest:
+      type: object
+      required: [revision, photo_id]
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+        photo_id:
+          type: string
+
+    SyncStyleRequest:
+      type: object
+      properties:
+        platforms:
+          type: array
+          items:
+            $ref: "#/components/schemas/Platform"
+          default: [linkedin, x]
+        max_posts_per_platform:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 5
+
+    CompleteOnboardingRequest:
+      type: object
+      required: [revision]
+      properties:
+        revision:
+          type: integer
+          minimum: 1
     Platform:
       type: string
       enum: [linkedin, x]
@@ -564,7 +918,7 @@ components:
           default: es-AR
         author_hint:
           type: [string, "null"]
-          description: Breve descripción verificada del rol/contexto del autor.
+          description: Profesión u otro contexto de rol declarado en onboarding; sólo estilo.
         sample_posts:
           type: object
           properties:
@@ -602,6 +956,9 @@ components:
           oneOf:
             - $ref: "#/components/schemas/VoiceContext"
             - type: "null"
+          description: >
+            Si se omite en el request, el servidor usa el snapshot del perfil de sesión
+            cuando onboarding_status es complete.
 
     Draft:
       type: object
@@ -705,7 +1062,7 @@ components:
 
     SocialConnectionStatus:
       type: object
-      required: [platform, status, can_publish_text, can_publish_image]
+      required: [platform, status, can_publish_text, can_publish_image, can_read_posts]
       properties:
         platform:
           $ref: "#/components/schemas/Platform"
@@ -715,6 +1072,11 @@ components:
           type: boolean
         can_publish_image:
           type: boolean
+        can_read_posts:
+          type: boolean
+          description: >
+            Si true, Issue #5 puede listar posts recientes propios para voice_context.
+            Independiente de can_publish_text.
         account_handle:
           type: [string, "null"]
         reason:
