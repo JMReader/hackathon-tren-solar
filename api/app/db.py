@@ -271,6 +271,14 @@ class Store:
                                (achievement_id,)).fetchone()
         return self._row_to_achievement(row) if row else None
 
+    def list_achievements(self, session_id: str) -> list[Achievement]:
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT * FROM achievements WHERE session_id=? ORDER BY updated_at DESC",
+                (session_id,),
+            ).fetchall()
+        return [self._row_to_achievement(row) for row in rows]
+
     def achievement_session(self, achievement_id: str) -> str | None:
         with self._conn() as conn:
             row = conn.execute("SELECT session_id FROM achievements WHERE id=?",

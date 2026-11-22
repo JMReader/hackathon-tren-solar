@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { apiFetch } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogBackdrop, DialogContent, DialogDescription, DialogDismiss, DialogFooter, DialogTitle } from "@/components/ui/dialog"
 import { Radio, RadioGroup } from "@/components/ui/radio"
@@ -18,12 +19,7 @@ const priceBands: { value: NonNullable<ProInterest["price_band_ars_month"]>; lab
 ]
 
 async function sendInterest(body: ProInterest) {
-  const response = await fetch("/api/v1/pro-interest", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  })
-  if (!response.ok) throw new Error(`pro-interest ${response.status}`)
+  await apiFetch<void>("/pro-interest", { method: "POST", json: body })
 }
 
 export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; onClose: () => void }) {

@@ -8,6 +8,7 @@ import { Button, buttonStyles } from "@/components/ui/button"
 import { Radio, RadioGroup } from "@/components/ui/radio"
 import { SegmentedControl, SegmentedControlItem } from "@/components/ui/segmented-control"
 import { Switch } from "@/components/ui/switch"
+import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 import { findPalette, findTemplate, palettes, templates } from "../catalog"
 import { PortfolioView } from "../templates"
@@ -18,12 +19,34 @@ import { TemplateThumbnail } from "./thumbnails"
 
 type Device = "mobile" | "desktop"
 
-export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
+type PortfolioEditorProps = {
+  portfolio: PublicPortfolio
+  isDemo?: boolean
+  publicSlug?: string | null
+  hasCv?: boolean
+  onTemplateChange?: (templateId: string) => Promise<void>
+  onPaletteChange?: (paletteId: string) => Promise<void>
+  onCvDownloadableChange?: (value: boolean) => Promise<void>
+  onPublish?: () => Promise<void>
+}
+
+export function PortfolioEditor({
+  portfolio,
+  isDemo = false,
+  publicSlug = null,
+  hasCv = false,
+  onTemplateChange,
+  onPaletteChange,
+  onCvDownloadableChange,
+  onPublish,
+}: PortfolioEditorProps) {
   const [templateId, setTemplateId] = useState(portfolio.template_id)
   const [paletteId, setPaletteId] = useState(portfolio.palette.id)
-  const [cvDownloadable, setCvDownloadable] = useState(false)
+  const [cvDownloadable, setCvDownloadable] = useState(portfolio.cv_url !== null)
   const [device, setDevice] = useState<Device>("mobile")
   const [proDoor, setProDoor] = useState<ProDoorRequest | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [publishing, setPublishing] = useState(false)
 
   const palette = findPalette(paletteId) ?? portfolio.palette
   const preview: PublicPortfolio = {
@@ -32,7 +55,73 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
     palette,
     cv_url: cvDownloadable ? "#cv" : null,
   }
-  const publicHref = `/p/${portfolio.slug}?plantilla=${templateId}&paleta=${paletteId}`
+
+  const publicHref = publicSlug
+    ? `/p/${publicSlug}`
+    : isDemo
+      ? `/p/${portfolio.slug}?plantilla=${templateId}&paleta=${paletteId}`
+      : null
+
+  async function applyTemplate(id: string) {
+    setTemplateId(id)
+    if (!onTemplateChange) return
+    setSaving(true)
+    try {
+      await onTemplateChange(id)
+    } catch {
+      toast.error("No se pudo guardar la plantilla")
+      setTemplateId(portfolio.template_id)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function applyPalette(id: string) {
+    setPaletteId(id)
+    if (!onPaletteChange) return
+    setSaving(true)
+    try {
+      await onPaletteChange(id)
+    } catch {
+      toast.error("No se pudo guardar la paleta")
+      setPaletteId(portfolio.palette.id)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function applyCvDownloadable(next: boolean) {
+    setCvDownloadable(next)
+    if (!onCvDownloadableChange) return
+    setSaving(true)
+    try {
+      await onCvDownloadableChange(next)
+    } catch {
+      toast.error("No se pudo actualizar el CV")
+      setCvDownloadable(!next)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handlePublish() {
+    if (!onPublish) return
+    if (!hasCv) {
+      toast.error("Subí tu CV en el onboarding", {
+        description: "Es obligatorio para publicar el portfolio.",
+      })
+      return
+    }
+    setPublishing(true)
+    try {
+      await onPublish()
+      toast.success("Portfolio publicado")
+    } catch {
+      toast.error("No se pudo publicar", { description: "Revisá tu CV y volvé a intentar." })
+    } finally {
+      setPublishing(false)
+    }
+  }
 
   return (
     <div className="flex min-h-dvh flex-col bg-night lg:h-dvh lg:flex-row">
@@ -42,7 +131,7 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
             <h1 className="font-display text-[28px] leading-tight font-normal tracking-display text-ink">Tu portfolio</h1>
             <p className="mt-1 text-sm text-ink-muted">Elegí cómo se ve. Los hechos son los que ya aprobaste.</p>
           </div>
-          <Badge variant="neutral">Datos de ejemplo</Badge>
+          {isDemo && <Badge variant="neutral">Datos de ejemplo</Badge>}
         </header>
 
         <section aria-labelledby="pf-template" className="px-6 pt-8">
@@ -58,7 +147,7 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
                 setProDoor({ trigger: "template", itemId: template.id, itemName: template.name })
                 return
               }
-              setTemplateId(template.id)
+              void applyTemplate(template.id)
             }}
             className="mt-3 grid grid-cols-2 gap-2.5"
           >
@@ -86,7 +175,12 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
 
         <section aria-labelledby="pf-palette" className="px-6 pt-8">
           <h2 id="pf-palette" className="text-sm font-semibold text-ink">Colores</h2>
-          <RadioGroup aria-labelledby="pf-palette" value={paletteId} onValueChange={(next) => next && setPaletteId(next)} className="mt-3 grid grid-cols-2 gap-2">
+          <RadioGroup
+            aria-labelledby="pf-palette"
+            value={paletteId}
+            onValueChange={(next) => next && void applyPalette(next)}
+            className="mt-3 grid grid-cols-2 gap-2"
+          >
             {palettes.map((option) => (
               <label
                 key={option.id}
@@ -119,13 +213,13 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
               <span className="block text-sm text-ink">Permitir descargar tu CV</span>
               <span className="mt-0.5 block text-[13px] leading-snug text-ink-muted">Sin esto, tu CV sigue privado aunque publiques la página.</span>
             </span>
-            <Switch checked={cvDownloadable} onCheckedChange={(next) => setCvDownloadable(next)} className="mt-0.5" />
+            <Switch checked={cvDownloadable} onCheckedChange={(next) => void applyCvDownloadable(next)} className="mt-0.5" />
           </label>
         </section>
       </aside>
 
       <main className="flex min-h-[48rem] flex-1 flex-col gap-4 p-4 lg:min-h-0 lg:p-6">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <SegmentedControl aria-label="Vista previa" value={device} onValueChange={(next) => next && setDevice(next as Device)} className="bg-slate">
             <SegmentedControlItem value="mobile" className="text-on-dark data-checked:text-ink hover:text-inverse data-checked:hover:text-ink">
               <Smartphone aria-hidden /> Celular
@@ -134,9 +228,22 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
               <Monitor aria-hidden /> Escritorio
             </SegmentedControlItem>
           </SegmentedControl>
-          <Link href={publicHref} target="_blank" className={buttonStyles({ variant: "dark", size: "sm" })}>
-            Abrir página <ExternalLink aria-hidden />
-          </Link>
+          <div className="flex items-center gap-2">
+            {!isDemo && onPublish && !publicSlug && (
+              <Button size="sm" variant="dark" disabled={publishing || saving} onClick={() => void handlePublish()}>
+                Publicar
+              </Button>
+            )}
+            {publicHref ? (
+              <Link href={publicHref} target="_blank" className={buttonStyles({ variant: "dark", size: "sm" })}>
+                Abrir página <ExternalLink aria-hidden />
+              </Link>
+            ) : (
+              !isDemo && (
+                <span className="text-[13px] text-on-dark">Publicá para obtener tu enlace.</span>
+              )
+            )}
+          </div>
         </div>
 
         <div className="flex min-h-0 flex-1 items-start justify-center">
