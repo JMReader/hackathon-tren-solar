@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import { Check, ChevronLeft, FileText, ImagePlus } from "lucide-react"
-import type { AuthorProfile, Platform } from "@/lib/api/types"
+import type { AuthorProfile, Platform, StyleSyncResult } from "@/lib/api/types"
 import {
   useCompleteOnboarding,
   useConnectSocial,
@@ -616,7 +616,7 @@ function SocialCard({
 }: {
   platform: Platform
   sessionId: string
-  imported: { status: string; posts_imported: number }
+  imported: StyleSyncResult
 }) {
   const connection = useSocialConnection(platform, sessionId)
   const connect = useConnectSocial(platform, sessionId)
@@ -648,11 +648,21 @@ function SocialCard({
       {status?.reason && (
         <p className="text-xs leading-relaxed text-ink-muted">{status.reason}</p>
       )}
-      {imported.posts_imported > 0 && (
+      {imported.posts_imported > 0 ? (
         <p className="text-xs font-medium text-accent-deep">
           Importamos {imported.posts_imported} posts tuyos.
         </p>
+      ) : (
+        state === "connected" &&
+        imported.message && (
+          <p className="text-xs leading-relaxed text-ink-muted">
+            {imported.message}
+          </p>
+        )
       )}
+      {platform === "linkedin" &&
+        state === "connected" &&
+        status?.can_read_posts && <LinkedInImport sessionId={sessionId} />}
       <div>
         <Button
           variant="outline"
@@ -668,6 +678,42 @@ function SocialCard({
         </Button>
       </div>
     </div>
+  )
+}
+
+function LinkedInImport({ sessionId }: { sessionId: string }) {
+  const sync = useSyncStyle(sessionId)
+  const [url, setUrl] = useState("")
+  const value = url.trim()
+
+  return (
+    <form
+      className="flex gap-2"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (value)
+          sync.mutate({ platforms: ["linkedin"], linkedin_profile_url: value })
+      }}
+    >
+      <Input
+        name="linkedin_profile_url"
+        inputMode="url"
+        autoComplete="url"
+        value={url}
+        placeholder="linkedin.com/in/tu-perfil"
+        aria-label="URL de tu perfil de LinkedIn"
+        onChange={(e) => setUrl(e.target.value)}
+      />
+      <Button
+        type="submit"
+        variant="outline"
+        size="sm"
+        className="shrink-0"
+        disabled={!value || sync.isPending}
+      >
+        {sync.isPending ? "Importando…" : "Importar posts"}
+      </Button>
+    </form>
   )
 }
 
