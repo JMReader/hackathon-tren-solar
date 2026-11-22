@@ -1,0 +1,144 @@
+/* Toasts: Sonner-style stack. 400ms `ease` on purpose — slower and softer than the rest of the UI. */
+[data-slot="toast-region"] {
+  --toast-gap: 10px;
+  --toast-peek: 12px;
+  position: fixed;
+  inset: auto;
+  z-index: 60;
+  width: 360px;
+  max-width: calc(100vw - 2rem);
+  height: var(--toast-front-height);
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  list-style: none;
+
+  &[data-side="bottom"] {
+    bottom: 1.5rem;
+  }
+  &[data-side="top"] {
+    top: 1.5rem;
+  }
+  &[data-align="end"] {
+    right: 1.5rem;
+  }
+  &[data-align="start"] {
+    left: 1.5rem;
+  }
+  &[data-align="center"] {
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  &[data-expanded] {
+    height: calc(var(--toast-stack-height) + (var(--toast-count) - 1) * var(--toast-gap));
+  }
+}
+
+[data-slot="toast"] {
+  --y: calc(var(--toast-index) * var(--toast-peek) * -1);
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: calc(100 - var(--toast-index));
+  height: var(--toast-height);
+  overflow: hidden;
+  translate: var(--toast-swipe-x, 0px) calc(var(--y) + var(--toast-swipe-y, 0px));
+  scale: calc(1 - var(--toast-index) * 0.05);
+  transition-property: translate, scale, opacity, height;
+  transition-duration: 400ms;
+  transition-timing-function: ease;
+  user-select: none;
+
+  &:not([data-front], [data-expanded]) {
+    height: var(--toast-front-height);
+  }
+
+  &[data-expanded] {
+    --y: calc(-1 * (var(--toast-offset) + var(--toast-index) * var(--toast-gap)));
+    scale: 1;
+  }
+
+  &[data-starting-style] {
+    transition: none;
+  }
+
+  &[data-starting-style][data-front] {
+    --y: 110%;
+  }
+
+  &:is([data-starting-style]:not([data-front]), [data-ending-style]) {
+    opacity: 0;
+  }
+
+  &[data-ending-style][data-swipe-direction="right"] {
+    translate: 110% var(--y);
+  }
+
+  &[data-swiping] {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-property: opacity, height;
+  }
+}
+
+/* Drawer: the drawer drives its own translate, so only layout lives here. */
+[data-slot="drawer-backdrop"][data-hidden] {
+  display: none;
+}
+
+[data-slot="drawer-viewport"] {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+
+  & > * {
+    pointer-events: auto;
+  }
+}
+
+/* Sliding indicators: skip the first placement so they don't fly in on load. */
+:is([data-slot="tabs-indicator"], [data-slot="segmented-control-indicator"]) {
+  position: absolute;
+  z-index: 0;
+  transition-property: translate, width, height;
+  transition-duration: 220ms;
+  transition-timing-function: var(--ease-out);
+
+  &[data-activation-direction="none"] {
+    transition: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+[data-slot="tabs-indicator"] {
+  top: 0;
+  left: 0;
+  width: var(--active-tab-width);
+  height: var(--active-tab-height);
+  translate: var(--active-tab-left) var(--active-tab-top);
+}
+
+[data-slot="segmented-control-indicator"] {
+  top: 0;
+  left: 0;
+  width: var(--segmented-control-indicator-width);
+  height: var(--segmented-control-indicator-height);
+  translate: var(--segmented-control-indicator-left) var(--segmented-control-indicator-top);
+}
+
+/* Onboarding: keep toasts above the wizard action bar. */
+body:has([data-onboarding-actions]) [data-slot="toast-region"][data-side="bottom"] {
+  bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}

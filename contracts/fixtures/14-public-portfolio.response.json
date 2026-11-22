@@ -1,0 +1,42 @@
+{
+  "slug": "lucia-tolaba-ux",
+  "display_name": "Lucía Tolaba (dato sintético)",
+  "headline": "Diseñadora UX/UI",
+  "photo_url": "/api/v1/p/lucia-tolaba-ux/media/med_photo_01",
+  "template_id": "esencial",
+  "palette": {
+    "id": "azul-salina",
+    "name": "Azul salina",
+    "tier": "free",
+    "scheme": "light",
+    "tokens": {
+      "bg": "#F4F7F9",
+      "surface": "#FFFFFF",
+      "ink": "#16242E",
+      "muted": "#4F6170",
+      "accent": "#1F5F8B",
+      "on_accent": "#FFFFFF"
+    }
+  },
+  "items": [
+    {
+      "title": "App de turnos para una clínica de Jujuy",
+      "occurred_on": "2026-11",
+      "photo_url": "/api/v1/p/lucia-tolaba-ux/media/med_01J9X8A7B6",
+      "facts": [
+        {
+          "category": "project",
+          "text": "Equipo de 3 personas construyó una app de turnos médicos en React para una clínica local en Jujuy.",
+          "source": "transcript"
+        },
+        {
+          "category": "role",
+          "text": "Diseñó todas las pantallas en Figma, el flujo de reserva en 3 pasos y maquetó los componentes base en React.",
+          "source": "user"
+        }
+      ]
+    }
+  ],
+  "cv_url": null,
+  "published_at": "2026-11-22T18:00:00Z"
+}

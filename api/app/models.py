@@ -127,6 +127,7 @@ class UpdateAchievementRequest(BaseModel):
 
 class ApproveAchievementRequest(BaseModel):
     revision: int = Field(ge=1)
+    add_to_portfolio: bool = False
 
 
 class GenerateDraftsRequest(BaseModel):
@@ -203,6 +204,7 @@ class SetAuthorProfilePhotoRequest(BaseModel):
 class SyncStyleRequest(BaseModel):
     platforms: list[Platform] = ["linkedin", "x"]
     max_posts_per_platform: int = Field(default=5, ge=1, le=20)
+    linkedin_profile_url: str | None = Field(default=None, max_length=300)
 
 
 class CompleteOnboardingRequest(BaseModel):

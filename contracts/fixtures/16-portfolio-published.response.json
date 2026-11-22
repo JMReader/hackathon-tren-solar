@@ -1,0 +1,23 @@
+{
+  "id": "pf_01J9PORT01",
+  "status": "published",
+  "revision": 2,
+  "display_name": "Lucía Tolaba",
+  "headline": "Diseñadora UX/UI",
+  "items": [
+    {
+      "achievement_id": "ach_01J9X8K2M4",
+      "title": "App de turnos para una clínica de Jujuy",
+      "occurred_on": "2026-11",
+      "show_photo": true
+    }
+  ],
+  "template_id": "esencial",
+  "palette_id": "azul-salina",
+  "cv_downloadable": false,
+  "has_cv": true,
+  "slug": "lucia-tolaba-ux",
+  "public_url": "/p/lucia-tolaba-ux",
+  "published_revision": 2,
+  "published_at": "2026-11-22T18:00:00Z"
+}

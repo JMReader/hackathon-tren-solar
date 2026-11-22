@@ -1,5 +1,5 @@
 import json
-from typing import Annotated
+from typing import Annotated, Callable
 
 from fastapi import APIRouter, Depends, Form, Header, Request, UploadFile
 from pydantic import ValidationError
@@ -35,7 +35,11 @@ def _parse(model, body) -> object:
                                  for err in e.errors())) from e
 
 
-def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
+def create_router(
+    service: CoreService,
+    sessions: SessionService,
+    on_approved: Callable[[str, Achievement], object] | None = None,
+) -> APIRouter:
     router = APIRouter()
 
     def require_session(x_session_id: str | None = Header(None)) -> str:
@@ -106,6 +110,10 @@ def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
             photo_id=req.photo_id, source_metadata=req.source_metadata,
         )
 
+    @router.get("/achievements", tags=["achievements"])
+    def list_achievements(session_id: Session) -> list[Achievement]:
+        return service.list_achievements(session_id)
+
     @router.get("/achievements/{achievement_id}", tags=["achievements"])
     def get_achievement(session_id: Session, achievement_id: str) -> Achievement:
         return service.get_achievement(session_id, achievement_id)
@@ -118,7 +126,10 @@ def create_router(service: CoreService, sessions: SessionService) -> APIRouter:
     @router.post("/achievements/{achievement_id}/approve", tags=["achievements"])
     def approve_achievement(session_id: Session, achievement_id: str,
                             req: ApproveAchievementRequest) -> Achievement:
-        return service.approve_achievement(session_id, achievement_id, req)
+        achievement = service.approve_achievement(session_id, achievement_id, req)
+        if req.add_to_portfolio and on_approved is not None:
+            on_approved(session_id, achievement)
+        return achievement
 
     @router.post("/achievements/{achievement_id}/drafts",
                  status_code=201, tags=["drafts"])

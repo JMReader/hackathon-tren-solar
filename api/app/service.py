@@ -123,7 +123,8 @@ class CoreService:
                                     retryable=True)
             else:
                 try:
-                    transcript = self.transcriber.transcribe(audio_path, audio[2])
+                    transcript = self.transcriber.transcribe(
+                        self.media.audio_local_path(audio_path), audio[2])
                     if text:
                         transcript = f"{transcript.strip()} {text.strip()}"
                 except STTError as e:
@@ -175,6 +176,9 @@ class CoreService:
         if a is None or owner != session_id:
             raise not_found("achievement", achievement_id)
         return a
+
+    def list_achievements(self, session_id: str) -> list[Achievement]:
+        return self.store.list_achievements(session_id)
 
     def update_achievement(self, session_id: str, achievement_id: str,
                            req: UpdateAchievementRequest) -> Achievement:

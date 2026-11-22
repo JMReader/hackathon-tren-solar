@@ -1,42 +1,70 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from social.router import create_router as create_social_router
 
 from .config import Settings
 from .db import Store
+from .db_postgres import PostgresStore
 from .errors import ApiError, ProfileResponse
 from .llm.providers import build_llm
-from .media_store import MediaStore
+from .media_store import MediaStore, SupabaseMediaStore
 from .models import ApiErrorBody, ErrorDetail
+from .employer.router import create_employer_router
+from .employer.service import EmployerService
+from .portfolio.router import create_portfolio_router
+from .portfolio.service import PortfolioService
 from .router import create_router
 from .service import CoreService
 from .session_service import SessionService
-from .stt.whisper import build_transcriber
+from .social_wiring import SocialStyleReader, build_social
+from .stt import build_transcriber
 from .style_reader import build_style_reader
+from .supabase_storage import SupabaseMediaBackend
 
 
 class Services:
     def __init__(self, settings: Settings | None = None,
-                 llm=None, transcriber=None, style_reader=None):
+                 llm=None, transcriber=None, style_reader=None,
+                 social_settings=None, social_http=None):
         settings = settings or Settings.from_env()
         self.settings = settings
-        store = Store(settings.db_path)
-        media = MediaStore(settings.media_dir, store,
-                           settings.max_photo_bytes, settings.max_audio_bytes)
+        pg_dsn = settings.postgres_dsn
+        if pg_dsn:
+            store = PostgresStore(pg_dsn)
+        else:
+            store = Store(settings.db_path)
+        if settings.supabase_url and settings.supabase_service_role_key:
+            media_backend = SupabaseMediaBackend(
+                settings.supabase_url, settings.supabase_service_role_key)
+            media = SupabaseMediaStore(media_backend, store,
+                                       settings.max_photo_bytes,
+                                       settings.max_audio_bytes)
+        else:
+            media = MediaStore(settings.media_dir, store,
+                               settings.max_photo_bytes, settings.max_audio_bytes)
         llm = llm if llm is not None else build_llm(settings)
         transcriber = (transcriber if transcriber is not None
                        else build_transcriber(settings))
-        style_reader = (style_reader if style_reader is not None
-                        else build_style_reader(os.environ.get("FAKE_STYLE_POSTS")))
         ttl = int(os.environ.get("SESSION_TTL_HOURS", "24"))
         self.core = CoreService(store, media, llm, transcriber)
+        self.social = build_social(self.core, settings.db_path.parent,
+                                   social_settings, social_http, pg_dsn=pg_dsn)
+        if style_reader is None:
+            fake_posts = os.environ.get("FAKE_STYLE_POSTS")
+            style_reader = (build_style_reader(fake_posts) if fake_posts
+                            else SocialStyleReader(self.social.service))
         self.sessions = SessionService(store, media, style_reader, ttl)
+        self.portfolio = PortfolioService(store, media)
+        self.employer = EmployerService(store, demo_enabled=settings.employer_demo)
 
 
 def create_app(services: Services | None = None,
@@ -77,7 +105,33 @@ def create_app(services: Services | None = None,
             ErrorDetail(code=code, message=str(exc.detail), retryable=False)))
 
     svc = app.state.services
-    app.include_router(create_router(svc.core, svc.sessions), prefix="/api/v1")
+    app.include_router(
+        create_router(svc.core, svc.sessions, on_approved=svc.portfolio.add_achievement),
+        prefix="/api/v1",
+    )
+
+    app.include_router(
+        create_portfolio_router(svc.portfolio, svc.sessions),
+        prefix="/api/v1",
+    )
+
+    app.include_router(
+        create_employer_router(svc.employer, svc.sessions),
+        prefix="/api/v1",
+    )
+
+    def social_owner(x_session_id: str | None = Header(None)) -> str:
+        return svc.sessions.require_session(x_session_id)
+
+    app.include_router(
+        create_social_router(svc.social.service, svc.social.flow, social_owner),
+        prefix="/api/v1",
+    )
+
+    @app.get("/demo", include_in_schema=False)
+    def demo() -> FileResponse:
+        return FileResponse(Path(__file__).resolve().parent.parent / "demo.html")
+
     return app
 
 

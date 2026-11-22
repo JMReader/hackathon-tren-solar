@@ -17,6 +17,7 @@ El PDF aportado por Juan propone **AbreNorte** como marca y el recorrido audio �
 - [Contratos e integración entre #3, #4 y #5](contracts/README.md) (`contracts/openapi.yaml` + `contracts/fixtures/`).
 - [Inspiración y preguntas abiertas](docs/inspiracion.md).
 - [Recorrido y experimento propuestos](docs/mvp-propuesto.md).
+- [Investigación de negocio](docs/investigacion-negocio.md).
 - [Instrucciones para agentes](AGENTS.md).
 
 ## Memoria personal
