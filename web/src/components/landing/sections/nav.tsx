@@ -39,6 +39,9 @@ export function Nav() {
           ))}
         </nav>
         <div className="flex items-center justify-end gap-2">
+          <Button href="/login" variant="glass" size="sm">
+            Ingresar
+          </Button>
           <Button href="/empresas" variant="glass" size="sm">
             Empresas
           </Button>
