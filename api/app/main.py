@@ -3,10 +3,11 @@ from __future__ import annotations
 import os
 
 from fastapi import FastAPI, Header, Request
-from social.router import create_router as create_social_router
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from social.router import create_router as create_social_router
 
 from .config import Settings
 from .db import Store
