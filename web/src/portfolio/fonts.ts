@@ -1,4 +1,4 @@
-import { Archivo, Bricolage_Grotesque, Instrument_Serif } from "next/font/google"
+import { Archivo, Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono } from "next/font/google"
 
 export const archivo = Archivo({
   variable: "--font-archivo",
@@ -21,4 +21,10 @@ export const instrumentSerif = Instrument_Serif({
   preload: false,
 })
 
-export const portfolioFonts = `${archivo.variable} ${bricolage.variable} ${instrumentSerif.variable}`
+export const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains",
+  subsets: ["latin"],
+  preload: false,
+})
+
+export const portfolioFonts = `${archivo.variable} ${bricolage.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable}`

@@ -24,7 +24,7 @@ type PickerProps = {
   palette: Palette
   templateId: string
   paletteId: string
-  onTemplate: (template: PortfolioTemplate, cancel: () => void) => void
+  onTemplate: (template: PortfolioTemplate) => void
   onPalette: (id: string) => void
   onCustomize: () => void
   onDomain: () => void
@@ -40,9 +40,9 @@ function TemplatePicker({ tone, palette, templateId, onTemplate }: PickerProps) 
     <RadioGroup
       aria-label="Plantilla"
       value={templateId}
-      onValueChange={(next, details) => {
+      onValueChange={(next) => {
         const template = next ? findTemplate(next) : undefined
-        if (template) onTemplate(template, () => details.cancel())
+        if (template) onTemplate(template)
       }}
       className={dark ? "gap-1" : "-mx-5 flex-row gap-2.5 overflow-x-auto px-5 pt-0.5 pb-2 [scrollbar-width:none]"}
     >
@@ -72,7 +72,7 @@ function TemplatePicker({ tone, palette, templateId, onTemplate }: PickerProps) 
             style={paletteStyle(palette)}
             className="pressable relative flex w-36 shrink-0 cursor-pointer flex-col overflow-hidden rounded-2xl bg-paper shadow-raised has-data-checked:ring-2 has-data-checked:ring-ink has-focus-visible:ring-2 has-focus-visible:ring-accent-strong"
           >
-            <TemplateThumbnail templateId={template.id} className={cn("aspect-[4/3]", template.tier === "pro" && "opacity-70")} />
+            <TemplateThumbnail templateId={template.id} className="aspect-[4/3]" />
             <span className="flex items-center justify-between gap-2 px-3 py-2.5">
               <span className="text-[13px] font-medium text-ink">{template.name}</span>
               {template.tier === "pro" && (
@@ -140,6 +140,8 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
   const [proDoor, setProDoor] = useState<ProDoorRequest | null>(null)
 
   const palette = findPalette(paletteId) ?? portfolio.palette
+  const template = findTemplate(templateId)
+  const isPro = template?.tier === "pro"
   const preview: PublicPortfolio = {
     ...portfolio,
     template_id: templateId,
@@ -152,14 +154,7 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
     palette,
     templateId,
     paletteId,
-    onTemplate: (template: PortfolioTemplate, cancel: () => void) => {
-      if (template.tier === "pro") {
-        cancel()
-        setProDoor({ trigger: "template", itemId: template.id, itemName: template.name })
-        return
-      }
-      setTemplateId(template.id)
-    },
+    onTemplate: (template: PortfolioTemplate) => setTemplateId(template.id),
     onPalette: setPaletteId,
     onCustomize: () => setProDoor({ trigger: "customize", itemId: null, itemName: null }),
     onDomain: () => setProDoor({ trigger: "domain", itemId: null, itemName: null }),
@@ -198,7 +193,9 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <h1 className="font-display text-2xl tracking-display text-ink sm:text-4xl">Tu portfolio</h1>
-                <p className="mt-1 text-sm leading-relaxed text-ink-muted">Así lo ve quien abre tu link.</p>
+                <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+                  {isPro ? `${template.name} es una plantilla Pro. Podés mirarla, pero todavía no publicarla.` : "Así lo ve quien abre tu link."}
+                </p>
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant="neutral">Datos de ejemplo</Badge>
@@ -246,9 +243,15 @@ export function PortfolioEditor({ portfolio }: { portfolio: PublicPortfolio }) {
               <Switch checked={cvDownloadable} onCheckedChange={(next) => setCvDownloadable(next)} />
               CV descargable
             </label>
-            <Link href={publicHref} target="_blank" className={cn(buttonStyles(), "ml-auto")}>
-              Abrir página <ExternalLink aria-hidden />
-            </Link>
+            {isPro ? (
+              <Button className="ml-auto" onClick={() => setProDoor({ trigger: "template", itemId: template.id, itemName: template.name })}>
+                <Lock aria-hidden /> Quiero esta plantilla
+              </Button>
+            ) : (
+              <Link href={publicHref} target="_blank" className={cn(buttonStyles(), "ml-auto")}>
+                Abrir página <ExternalLink aria-hidden />
+              </Link>
+            )}
           </div>
         </div>
       </div>

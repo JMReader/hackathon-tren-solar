@@ -25,11 +25,6 @@ const priceBands: { value: NonNullable<ProInterest["price_band_ars_month"]>; lab
   { value: "over_10000", label: "Más de $10.000" },
 ]
 
-async function sendInterest(body: ProInterest) {
-  const result = await registerProInterest(body)
-  if (!result.ok) throw new Error("pro-interest inválido")
-}
-
 export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; onClose: () => void }) {
   const [priceBand, setPriceBand] = useState<ProInterest["price_band_ars_month"]>(null)
 
@@ -42,14 +37,11 @@ export function ProDoor({ request, onClose }: { request: ProDoorRequest | null; 
 
   async function answer(response: ProInterest["response"]) {
     if (!request) return
-    try {
-      await sendInterest({ response, trigger: request.trigger, item_id: request.itemId, price_band_ars_month: priceBand })
-      if (response === "interested") toast("Anotamos tu interés", { description: "No te cobramos nada.", type: "success" })
-      onClose()
-      setPriceBand(null)
-    } catch {
-      toast("No pudimos guardar tu respuesta", { description: "Probá de nuevo en un momento.", type: "error" })
-    }
+    const result = await registerProInterest({ response, trigger: request.trigger, item_id: request.itemId, price_band_ars_month: priceBand }).catch(() => ({ ok: false as const }))
+    onClose()
+    setPriceBand(null)
+    if (!result.ok) toast("No pudimos guardar tu respuesta", { description: "Probá de nuevo en un momento.", type: "error" })
+    else if (response === "interested") toast("Anotamos tu interés", { description: "No te cobramos nada.", type: "success" })
   }
 
   return (
