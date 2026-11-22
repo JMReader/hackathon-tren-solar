@@ -44,6 +44,7 @@ export function AppFrame({
         src={screen.src}
         alt={screen.alt}
         placeholder="blur"
+        unoptimized
         sizes="(min-width: 1024px) 700px, 100vw"
         loading={priority ? "eager" : "lazy"}
         className="block h-auto w-full"
