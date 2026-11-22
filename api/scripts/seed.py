@@ -18,6 +18,8 @@ from app.employer.models import CandidateProfileRecord, UpsertDiscoveryConsentRe
 from app.main import Services
 from app.models import Achievement, Fact
 
+from .seed_portfolio import build_published_snapshot, portfolio_items_json
+
 TRANSCRIPT = (
     "Armamos una app en React con diseño UX para una clínica local en Jujuy."
 )
@@ -98,6 +100,14 @@ def load_candidates(services: Services) -> None:
             services.employer.revoke_consent(c["session_id"])
         slug = c.get("slug")
         if slug:
+            ach_id = f"seed_ach_{c['session_id']}"
+            snapshot = build_published_snapshot(
+                slug=slug,
+                display_name=c["display_name"],
+                headline=c.get("role"),
+                achievement=ach,
+                published_at=now,
+            )
             store.save_portfolio({
                 "id": f"seed_pf_{c['session_id']}",
                 "session_id": c["session_id"],
@@ -105,13 +115,15 @@ def load_candidates(services: Services) -> None:
                 "revision": 1,
                 "display_name": c["display_name"],
                 "headline": c.get("role"),
-                "items": "[]",
+                "items": portfolio_items_json(
+                    ach_id, f"Logro: {c.get('role') or 'demo'}",
+                ),
                 "template_id": "recorrido",
-                "palette_id": "selva",
+                "palette_id": "verde-yunga",
                 "cv_downloadable": 0,
                 "slug": slug,
                 "published_revision": 1,
-                "published_snapshot": "{}",
+                "published_snapshot": snapshot,
                 "published_at": now,
                 "created_at": now,
                 "updated_at": now,
