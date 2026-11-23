@@ -272,6 +272,18 @@ export async function uploadMedia(request: Request): Promise<Response> {
 }
 
 /** Stores an image that arrives inside another request (e.g. multipart achievements). */
+const gm = globalThis as typeof globalThis & { __trenSolarMediaFiles?: Map<string, { file: File; owner: string | null }> }
+const mediaFiles = (gm.__trenSolarMediaFiles ??= new Map())
+
+/** GET /media/{id}: private photo for the session that uploaded it (owner unknown → any session). */
+export function getMediaFile(request: Request, photoId: string): Response {
+  const s = requireSession(request)
+  if (s instanceof Response) return s
+  const found = mediaFiles.get(photoId)
+  if (!found || (found.owner && found.owner !== s.id)) return apiError(404, "not_found", "No existe esa imagen")
+  return new Response(found.file, { headers: { "Content-Type": found.file.type, "Cache-Control": "private, max-age=3600" } })
+}
+
 export function saveImage(file: File): MediaAsset | Response {
   if (!IMAGE_TYPES.has(file.type))
     return apiError(
@@ -288,6 +300,7 @@ export function saveImage(file: File): MediaAsset | Response {
     size_bytes: file.size,
   }
   store.media.set(asset.photo_id, asset)
+  mediaFiles.set(asset.photo_id, { file, owner: null })
   return asset
 }
 

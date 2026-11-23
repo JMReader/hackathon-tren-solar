@@ -201,6 +201,28 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '409':
           $ref: '#/components/responses/RevisionConflict'
+  /media/{photo_id}:
+    parameters:
+    - name: photo_id
+      in: path
+      required: true
+      schema:
+        type: string
+    - $ref: '#/components/parameters/SessionId'
+    get:
+      tags:
+      - media
+      summary: Foto privada, sólo para la sesión dueña
+      responses:
+        '200':
+          description: Archivo de imagen
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: No existe o es de otra sesión
   /media:
     post:
       tags:
@@ -295,6 +317,15 @@ paths:
     parameters:
     - $ref: '#/components/parameters/AchievementId'
     - $ref: '#/components/parameters/SessionId'
+    delete:
+      tags:
+      - achievements
+      summary: Borrar un logro, sus borradores y sacarlo del portfolio de la sesión
+      responses:
+        '204':
+          description: Borrado
+        '404':
+          description: No existe o es de otra sesión
     get:
       tags:
       - achievements
@@ -367,6 +398,19 @@ paths:
     parameters:
     - $ref: '#/components/parameters/AchievementId'
     - $ref: '#/components/parameters/SessionId'
+    get:
+      tags:
+      - drafts
+      summary: Borradores generados para el logro, del más nuevo al más viejo
+      responses:
+        '200':
+          description: Lista de borradores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Draft'
     post:
       tags:
       - drafts

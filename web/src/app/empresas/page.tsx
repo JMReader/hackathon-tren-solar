@@ -88,7 +88,7 @@ export default function EmpresasPage() {
     <main className="min-h-screen bg-cream text-ink md:grid md:grid-cols-[300px_1fr]">
       <aside className="bg-night p-6 text-white md:min-h-screen md:p-10">
         <Link href="/" className="font-display text-3xl">
-          Tren Solar
+          chambeAR
         </Link>
         <p className="mt-2 text-sm text-white/70">
           Empresas · Datos de ejemplo

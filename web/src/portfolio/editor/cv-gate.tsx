@@ -18,7 +18,7 @@ export function CvGate({ sessionId, embedded = false, onExample }: { sessionId: 
 
   return (
     <div className={cn("mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 px-4", embedded ? "lg:pt-12" : "justify-center py-10 sm:py-14")}>
-      {!embedded && <p className="font-display text-2xl tracking-display text-inverse">Tren Solar</p>}
+      {!embedded && <p className="font-display text-2xl tracking-display text-inverse">chambeAR</p>}
       <div className="rounded-[22px] bg-paper p-5 shadow-raised sm:p-8">
         <h1 className="font-display text-2xl tracking-display text-ink sm:text-4xl">Primero subí tu CV</h1>
         <p className="mt-2 max-w-[52ch] text-sm leading-relaxed text-ink-muted">

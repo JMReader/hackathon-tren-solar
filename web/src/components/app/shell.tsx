@@ -1,12 +1,14 @@
 "use client"
 
-import { House, LayoutTemplate, Mic, UserRound, type LucideIcon } from "lucide-react"
+import { useQueryClient } from "@tanstack/react-query"
+import { BriefcaseBusiness, House, LayoutTemplate, LogOut, Mic, UserRound, type LucideIcon } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Suspense, type ReactNode } from "react"
 import { SocialSync } from "@/components/social-sync"
 import { useProfile, useSessionId } from "@/lib/api/hooks"
-import { getPhotoPreview } from "@/lib/photo-preview"
+import { getAccountName, signOut } from "@/lib/api/client"
+import { usePhotoUrl } from "@/lib/use-photo-url"
 import { useIsClient } from "@/lib/use-is-client"
 import { cn } from "@/lib/utils"
 
@@ -16,29 +18,68 @@ const NAV: NavItem[] = [
   { href: "/app", label: "Inicio", short: "Inicio", icon: House, match: (p) => p === "/app" },
   { href: "/app/crear", label: "Crear post", short: "Crear", icon: Mic, match: (p) => p.startsWith("/app/crear") },
   { href: "/app/portfolio", label: "Portfolio", short: "Portfolio", icon: LayoutTemplate, match: (p) => p.startsWith("/app/portfolio") },
+  { href: "/app/ofertas", label: "Ofertas", short: "Ofertas", icon: BriefcaseBusiness, match: (p) => p.startsWith("/app/ofertas") },
   { href: "/onboarding", label: "Mi perfil", short: "Perfil", icon: UserRound, match: (p) => p.startsWith("/onboarding") },
 ]
+
+function useSignOut() {
+  const router = useRouter()
+  const queryClient = useQueryClient()
+  return () => {
+    const hadAccount = Boolean(getAccountName())
+    signOut()
+    queryClient.clear()
+    router.replace(hadAccount ? "/login" : "/")
+  }
+}
 
 function UserChip() {
   const { data: sessionId } = useSessionId()
   const { data: profile } = useProfile(sessionId)
   const isClient = useIsClient()
-  const photo = isClient ? getPhotoPreview(profile?.photo_id) : null
+  const account = isClient ? getAccountName() : null
+  const photo = usePhotoUrl(profile?.photo_id)
+  const out = useSignOut()
   return (
-    <div className="flex items-center gap-3">
-      <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate text-on-dark">
-        {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element -- local data URL preview
-          <img src={photo} alt="" className="size-full object-cover" />
-        ) : (
-          <UserRound aria-hidden className="size-5" />
-        )}
-      </span>
-      <span className="min-w-0">
-        <span className="block truncate text-sm text-inverse">{profile?.profession ?? "Tu perfil"}</span>
-        <span className="block text-xs text-on-dark-muted">Sesión anónima · 24 h</span>
-      </span>
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate text-on-dark">
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element -- private photo via blob/data URL
+            <img src={photo} alt="" className="size-full object-cover" />
+          ) : (
+            <UserRound aria-hidden className="size-5" />
+          )}
+        </span>
+        <span className="min-w-0">
+          <span className="block truncate text-sm text-inverse">{account ?? profile?.profession ?? "Tu perfil"}</span>
+          <span className="block truncate text-xs text-on-dark-muted">
+            {account ? (profile?.profession && profile.profession !== account ? profile.profession : "Cuenta de demo") : "Sesión anónima · 24 h"}
+          </span>
+        </span>
+      </div>
+      <button
+        type="button"
+        onClick={out}
+        className="focus-ring pressable flex h-9 items-center gap-2 self-start rounded-full px-3 text-[13px] text-on-dark hover:bg-white/6 hover:text-inverse"
+      >
+        <LogOut aria-hidden className="size-4" /> Cerrar sesión
+      </button>
     </div>
+  )
+}
+
+function MobileSignOut() {
+  const out = useSignOut()
+  return (
+    <button
+      type="button"
+      onClick={out}
+      aria-label="Cerrar sesión"
+      className="focus-ring flex size-10 items-center justify-center rounded-full text-on-dark hover:bg-white/10 hover:text-inverse"
+    >
+      <LogOut aria-hidden className="size-5" />
+    </button>
   )
 }
 
@@ -75,7 +116,7 @@ function BottomNav({ pathname }: { pathname: string }) {
   return (
     <nav
       aria-label="Secciones"
-      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-white/8 bg-night/95 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-sm lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-white/8 bg-night/95 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur-sm lg:hidden"
     >
       {NAV.map((item) => {
         const active = item.match(pathname)
@@ -114,7 +155,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="hidden lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:justify-between lg:px-6 lg:py-10">
         <div className="flex flex-col gap-10">
           <Link href="/" className="focus-ring rounded-md px-2 font-display text-[28px] tracking-display text-inverse">
-            Tren Solar
+            chambeAR
           </Link>
           <Suspense fallback={<SideNav pathname="" />}>
             <WithPath render={(p) => <SideNav pathname={p} />} />
@@ -129,8 +170,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:min-h-dvh lg:bg-cream lg:pb-0">
         <header className="flex items-center justify-between px-4 pt-7 pb-4 lg:hidden">
           <Link href="/" className="font-display text-2xl tracking-display text-inverse">
-            Tren Solar
+            chambeAR
           </Link>
+          <MobileSignOut />
         </header>
         <main className="flex flex-1 flex-col">{children}</main>
       </div>

@@ -70,10 +70,41 @@ export function useAchievementList(sessionId: string | undefined) {
   })
 }
 
-export function useStoredPortfolio(sessionId: string | undefined) {
+/**
+ * Draft ids per network for an achievement: the ones this browser generated, or the
+ * latest ones the API keeps (GET /achievements/{id}/drafts) when logged in elsewhere.
+ */
+export function useDraftIds(achievementId: string | undefined, sessionId: string | undefined) {
+  const local = useAchievementEntries(sessionId).find((e) => e.id === achievementId)?.drafts
+  const remote = useQuery({
+    queryKey: ["achievement-drafts", achievementId],
+    enabled: Boolean(achievementId && sessionId && !local),
+    queryFn: () => apiFetch<Draft[]>(`/achievements/${achievementId}/drafts`),
+  })
+  if (local) return { ids: local, isPending: false }
+  const ids: Partial<Record<Platform, string>> = {}
+  for (const d of remote.data ?? []) ids[d.platform] ??= d.id
+  return { ids: Object.keys(ids).length ? ids : null, isPending: remote.isPending && Boolean(achievementId && sessionId) }
+}
+
+export function useDeleteAchievement(id: string, sessionId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => apiFetch<void>(`/achievements/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: achievementKey(id) })
+      void queryClient.invalidateQueries({ queryKey: listKey(sessionId) })
+      void queryClient.invalidateQueries({ queryKey: ["portfolio-summary"] })
+      void queryClient.invalidateQueries({ queryKey: ["portfolio-draft"] })
+    },
+    onError: (error) => toast.error("No se pudo borrar", { description: apiErrorMessage(error, "Intentá de nuevo.") }),
+  })
+}
+
+export function useStoredPortfolio(sessionId: string | undefined, enabled = true) {
   return useQuery({
     queryKey: ["portfolio-summary", sessionId],
-    enabled: Boolean(sessionId),
+    enabled: Boolean(sessionId) && enabled,
     queryFn: () => fetchCurrentPortfolio().catch(() => null),
   })
 }

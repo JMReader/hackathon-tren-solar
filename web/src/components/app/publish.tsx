@@ -16,7 +16,7 @@ import {
   apiErrorCode,
   apiErrorMessage,
   useAchievement,
-  useAchievementEntries,
+  useDraftIds,
   useAddToPortfolio,
   useApproveAndDraft,
   useAssistedShare,
@@ -28,7 +28,7 @@ import {
 } from "@/lib/api/achievements"
 import { useConnectSocial, useSocialConnection } from "@/lib/api/hooks"
 import type { AuthorProfile, Draft, Platform } from "@/lib/api/types"
-import { getPhotoPreview } from "@/lib/photo-preview"
+import { usePhotoUrl } from "@/lib/use-photo-url"
 import { useIsClient } from "@/lib/use-is-client"
 import { cn } from "@/lib/utils"
 import { getDeclinedAchievements, setAchievementDeclined } from "@/portfolio/storage"
@@ -272,11 +272,10 @@ function DraftCard({
 
 function Drafts({ ids, profile, photo }: { ids: Partial<Record<Platform, string>>; profile?: AuthorProfile; photo: string | null }) {
   const { sessionId } = useAppSession()
-  const isClient = useIsClient()
   const linkedin = useDraft(ids.linkedin, sessionId)
   const x = useDraft(ids.x, sessionId)
   const [active, setActive] = useState<Platform>("linkedin")
-  const avatar = isClient ? getPhotoPreview(profile?.photo_id) : null
+  const avatar = usePhotoUrl(profile?.photo_id)
   const drafts = [linkedin, x]
 
   return (
@@ -313,7 +312,7 @@ export function PublishAchievement() {
   const { sessionId, profile, isLoading } = useAppSession()
   const isClient = useIsClient()
   const achievement = useAchievement(id, sessionId)
-  const entry = useAchievementEntries(sessionId).find((e) => e.id === id)
+  const drafts = useDraftIds(id, sessionId)
   const generate = useApproveAndDraft(id, sessionId)
   const portfolio = useStoredPortfolio(sessionId)
   const inPortfolio = portfolio.data?.items.some((item) => item.achievement_id === id) ?? false
@@ -325,7 +324,7 @@ export function PublishAchievement() {
     setAchievementDeclined(id, value)
     setDeclinedIds(getDeclinedAchievements())
   }
-  const photo = isClient ? getPhotoPreview(achievement.data?.photo_id) : null
+  const photo = usePhotoUrl(achievement.data?.photo_id)
 
   return (
     <AppPage>
@@ -343,8 +342,12 @@ export function PublishAchievement() {
             Contar un logro
           </Link>
         </Card>
-      ) : entry?.drafts ? (
-        <Drafts ids={entry.drafts} profile={profile} photo={photo} />
+      ) : drafts.isPending ? (
+        <div className="mt-8">
+          <PageSkeleton />
+        </div>
+      ) : drafts.ids ? (
+        <Drafts ids={drafts.ids} profile={profile} photo={photo} />
       ) : achievement.data.status !== "approved" ? (
         <Card variant="muted" className="mt-8 items-start gap-3 p-5">
           <p className="text-sm text-ink">Primero revisá y aprobá los hechos.</p>
@@ -361,7 +364,7 @@ export function PublishAchievement() {
         </Card>
       )}
 
-      {achievement.data?.status === "approved" && entry?.drafts && !portfolio.isPending && (
+      {achievement.data?.status === "approved" && drafts.ids && !portfolio.isPending && (
         <Card variant="muted" className="mt-6 gap-4 p-5 sm:flex-row sm:items-center">
           <LayoutTemplate aria-hidden className="size-5 shrink-0 text-ink-muted max-sm:hidden" />
           {inPortfolio ? (

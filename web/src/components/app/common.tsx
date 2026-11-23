@@ -74,8 +74,12 @@ export const CATEGORY_LABEL: Record<FactCategory, string> = {
   context: "Contexto",
 }
 
+export function capitalize(text: string) {
+  return text ? text[0].toLocaleUpperCase("es-AR") + text.slice(1) : text
+}
+
 export function achievementTitle(a: Achievement) {
-  const text = a.facts[0]?.text ?? a.transcript
+  const text = capitalize((a.facts[0]?.text ?? a.transcript).trim())
   return text.length > 90 ? `${text.slice(0, 88).trimEnd()}…` : text || "Logro sin título"
 }
 

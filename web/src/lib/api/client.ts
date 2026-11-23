@@ -20,8 +20,38 @@ export function setSessionId(id: string) {
   window.localStorage.setItem(SESSION_KEY, id)
 }
 
+const ACCOUNT_KEY = "tren-solar.account-name"
+
+/** Name of the demo account used to log in, if any (anonymous sessions have none). */
+export function getAccountName(): string | null {
+  if (typeof window === "undefined") return null
+  return window.localStorage.getItem(ACCOUNT_KEY)
+}
+
+export function setAccountName(name: string) {
+  window.localStorage.setItem(ACCOUNT_KEY, name)
+}
+
+/** Forget everything this browser keeps for the session (ids, previews, portfolio). */
+export function signOut() {
+  for (const key of Object.keys(window.localStorage))
+    if (key.startsWith("tren-solar.")) window.localStorage.removeItem(key)
+  for (const key of Object.keys(window.sessionStorage))
+    if (key.startsWith("tren-solar.")) window.sessionStorage.removeItem(key)
+}
+
 export function clearSessionId() {
   window.localStorage.removeItem(SESSION_KEY)
+}
+
+/** Raw file from the API (e.g. a private photo), with the session header. */
+export async function apiBlob(path: string): Promise<Blob> {
+  const headers = new Headers()
+  const sessionId = getSessionId()
+  if (sessionId) headers.set("X-Session-Id", sessionId)
+  const res = await fetch(`${BASE_URL}${path}`, { headers })
+  if (!res.ok) throw new ApiRequestError(res.status, null)
+  return res.blob()
 }
 
 type ApiInit = Omit<RequestInit, "body"> & {

@@ -25,8 +25,13 @@ def test_media_upload_private(client, auth):
     assert asset["mime_type"] == "image/png"
     assert asset["alt_text"] == "Vista previa del flujo"
     assert asset["size_bytes"] == len(PNG_BYTES)
-    # No hay exposición pública estática: no existe ruta GET de media
-    assert client.get(f"/api/v1/media/{asset['photo_id']}", headers=auth).status_code == 404
+    # Privada: sólo la lee su sesión dueña; otra sesión ve 404 y sin sesión 401
+    own = client.get(f"/api/v1/media/{asset['photo_id']}", headers=auth)
+    assert own.status_code == 200 and own.content == PNG_BYTES
+    other = client.post("/api/v1/session").json()["session_id"]
+    assert client.get(f"/api/v1/media/{asset['photo_id']}",
+                      headers={"X-Session-Id": other}).status_code == 404
+    assert client.get(f"/api/v1/media/{asset['photo_id']}").status_code == 401
 
 
 def test_media_rejects_non_image(client, auth):
@@ -294,3 +299,24 @@ def test_inline_voice_context_overrides_snapshot(client, ready):
     assert resp.status_code == 201
     x = next(d for d in resp.json()["drafts"] if d["platform"] == "x")
     assert x["body"][0].isupper()
+
+
+def test_list_drafts_by_achievement(client, ready):
+    a = approve(client, ready, create_text(client, ready))
+    gen_drafts(client, ready, a)
+    resp = client.get(f"/api/v1/achievements/{a['id']}/drafts", headers=ready)
+    assert resp.status_code == 200, resp.text
+    assert {d["platform"] for d in resp.json()} == {"linkedin", "x"}
+    other = client.post("/api/v1/session").json()["session_id"]
+    assert client.get(f"/api/v1/achievements/{a['id']}/drafts",
+                      headers={"X-Session-Id": other}).status_code == 404
+
+
+def test_delete_achievement(client, ready):
+    a = approve(client, ready, create_text(client, ready))
+    drafts = gen_drafts(client, ready, a)
+    assert client.delete(f"/api/v1/achievements/{a['id']}", headers=ready).status_code == 204
+    assert client.get(f"/api/v1/achievements/{a['id']}", headers=ready).status_code == 404
+    draft_id = drafts["drafts"][0]["id"] if isinstance(drafts, dict) else drafts[0]["id"]
+    assert client.get(f"/api/v1/drafts/{draft_id}", headers=ready).status_code == 404
+    assert all(x["id"] != a["id"] for x in client.get("/api/v1/achievements", headers=ready).json())

@@ -6,7 +6,8 @@ import Link from "next/link"
 import { useState } from "react"
 import { buttonStyles } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
-import { apiFetch } from "@/lib/api/client"
+import { apiFetch, getAccountName } from "@/lib/api/client"
+import { usePhotoUrls } from "@/lib/use-photo-url"
 import type { Achievement, AuthorProfile } from "@/lib/api/types"
 import { useProfile, useSessionId } from "@/lib/api/hooks"
 import { buildEditorPreview, defaultAchievementTitle } from "../build-preview"
@@ -38,10 +39,13 @@ async function loadOrCreatePortfolio(
     setStoredPortfolioId(current.id)
     return current
   }
+  const account = getAccountName()?.trim()
   const displayName =
-    (profile.profession?.trim().length ?? 0) >= 2
-      ? profile.profession!.trim()
-      : "Tu portfolio"
+    account && account.length >= 2
+      ? account
+      : (profile.profession?.trim().length ?? 0) >= 2
+        ? profile.profession!.trim()
+        : "Tu portfolio"
   const created = await createPortfolio({
     display_name: displayName,
     headline: profile.profession,
@@ -97,6 +101,7 @@ export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean 
   })
 
   const approved = (achievementsQuery.data ?? []).filter((a) => a.status === "approved")
+  const photoUrls = usePhotoUrls([profileQuery.data?.photo_id, ...approved.map((a) => a.photo_id)])
   const useDemo =
     !session.isPending &&
     !achievementsQuery.isLoading &&
@@ -152,6 +157,7 @@ export function PortfolioEditorShell({ embedded = false }: { embedded?: boolean 
     record.template_id,
     record.palette_id,
     record.cv_downloadable,
+    (photoId) => (photoId ? (photoUrls.get(photoId) ?? null) : null),
   )
 
   async function persist(patch: Omit<Parameters<typeof updatePortfolio>[1], "revision">) {

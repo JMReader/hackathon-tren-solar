@@ -1,6 +1,6 @@
 // Landing copy. Brand name is a working name: the team has not decided it yet.
 export const BRAND = {
-  name: "Tren Solar",
+  name: "chambeAR",
   tagline: "Tu talento puede llegar más lejos sin que tengas que irte.",
 };
 

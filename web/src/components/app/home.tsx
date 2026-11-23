@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, ChevronRight, LayoutTemplate, Mic } from "lucide-react"
+import { ArrowRight, BriefcaseBusiness, ChevronRight, LayoutTemplate, Mic } from "lucide-react"
 import Link from "next/link"
 import { Orb } from "@/components/audio/orb"
 import { buttonStyles } from "@/components/ui/button"
@@ -24,10 +24,11 @@ export function AppHome() {
   const { sessionId, profile, isLoading, ready } = useAppSession()
   const entries = useAchievementEntries(sessionId)
   const list = useAchievementList(sessionId)
-  const portfolio = useStoredPortfolio(sessionId)
   const achievements = list.data ?? []
   const createdAt = new Map(entries.map((e) => [e.id, e.createdAt]))
   const approvedCount = achievements.filter((a) => a.status === "approved").length
+  // Without approved achievements there is no portfolio yet: skip the 404 from /portfolios/current.
+  const portfolio = useStoredPortfolio(sessionId, approvedCount > 0)
 
   if (isLoading || !profile)
     return (
@@ -158,6 +159,22 @@ export function AppHome() {
                   Ver página
                 </Link>
               )}
+            </div>
+          </Card>
+          <Card variant="muted" className="gap-3 p-5">
+            <span className="flex items-center gap-2 text-[13px] font-medium text-ink">
+              <BriefcaseBusiness aria-hidden className="size-4" /> Ofertas y empresas
+            </span>
+            <p className="text-[13px] leading-relaxed text-ink-muted">
+              Mirá ofertas que encajan con tus logros aprobados y cómo te encuentran las empresas.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/app/ofertas" className={cn(buttonStyles({ variant: "outline", size: "sm" }), "self-start")}>
+                Ver ofertas <ArrowRight aria-hidden />
+              </Link>
+              <Link href="/empresas" className={buttonStyles({ variant: "ghost", size: "sm" })}>
+                Vista de empresas
+              </Link>
             </div>
           </Card>
         </aside>

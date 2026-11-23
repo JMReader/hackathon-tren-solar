@@ -1,7 +1,8 @@
 import json
 from typing import Annotated, Callable
 
-from fastapi import APIRouter, Depends, Form, Header, Request, UploadFile
+from fastapi import APIRouter, Depends, Form, Header, Request, Response, UploadFile
+from fastapi.responses import FileResponse
 from pydantic import ValidationError
 
 from .errors import ApiError
@@ -97,6 +98,11 @@ def create_router(
         return service.upload_media(session_id, data, file.filename,
                                     file.content_type, alt_text)
 
+    @router.get("/media/{photo_id}", tags=["media"], response_class=FileResponse)
+    def get_media(session_id: Session, photo_id: str) -> FileResponse:
+        path, mime = service.photo_file(session_id, photo_id)
+        return FileResponse(path, media_type=mime, headers={"Cache-Control": "private, max-age=3600"})
+
     # --- achievements + drafts ---
 
     @router.post("/achievements", status_code=201, tags=["achievements"])
@@ -119,6 +125,15 @@ def create_router(
     @router.get("/achievements", tags=["achievements"])
     def list_achievements(session_id: Session) -> list[Achievement]:
         return service.list_achievements(session_id)
+
+    @router.get("/achievements/{achievement_id}/drafts", tags=["drafts"])
+    def list_drafts(session_id: Session, achievement_id: str) -> list[Draft]:
+        return service.list_drafts(session_id, achievement_id)
+
+    @router.delete("/achievements/{achievement_id}", status_code=204, tags=["achievements"])
+    def delete_achievement(session_id: Session, achievement_id: str) -> Response:
+        service.delete_achievement(session_id, achievement_id)
+        return Response(status_code=204)
 
     @router.get("/achievements/{achievement_id}", tags=["achievements"])
     def get_achievement(session_id: Session, achievement_id: str) -> Achievement:
