@@ -7,12 +7,20 @@ import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonStyles } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import {
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogClose,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { achievementsIndex } from "@/lib/achievements-index"
-import { useAchievement, useAchievementEntries, useApproveAndDraft, useUpdateFacts } from "@/lib/api/achievements"
+import { useAchievement, useAchievementEntries, useApproveAndDraft, useDeleteAchievement, useDraftIds, useUpdateFacts } from "@/lib/api/achievements"
 import type { Achievement, Fact, OpenQuestion } from "@/lib/api/types"
-import { getPhotoPreview } from "@/lib/photo-preview"
-import { useIsClient } from "@/lib/use-is-client"
+import { usePhotoUrl } from "@/lib/use-photo-url"
 import { cn } from "@/lib/utils"
 import { CATEGORY_LABEL, PageSkeleton, StatusBadge, useAppSession } from "./common"
 import { AppPage, CreateSteps, PageTitle } from "./shell"
@@ -136,7 +144,6 @@ function QuestionCard({
 
 function ReviewBody({ achievement, sessionId }: { achievement: Achievement; sessionId: string }) {
   const router = useRouter()
-  const isClient = useIsClient()
   const update = useUpdateFacts(achievement.id)
   const approve = useApproveAndDraft(achievement.id, sessionId)
   const [adding, setAdding] = useState(false)
@@ -144,7 +151,9 @@ function ReviewBody({ achievement, sessionId }: { achievement: Achievement; sess
   const entry = useAchievementEntries(sessionId).find((e) => e.id === achievement.id)
   const dismissed = new Set(entry?.dismissedQuestions ?? [])
   const questions = achievement.open_questions.filter((q) => !dismissed.has(q.id))
-  const photo = isClient ? getPhotoPreview(achievement.photo_id) : null
+  const photo = usePhotoUrl(achievement.photo_id)
+  const drafts = useDraftIds(achievement.id, sessionId)
+  const remove = useDeleteAchievement(achievement.id, sessionId)
   const busy = update.isPending || approve.isPending
 
   const nextId = () => `fact_user_${Date.now().toString(36)}`
@@ -275,7 +284,29 @@ function ReviewBody({ achievement, sessionId }: { achievement: Achievement; sess
           <Link href="/app/crear" className={cn(buttonStyles({ variant: "ghost" }), "max-sm:px-3")}>
             <ChevronLeft aria-hidden /> Nuevo logro
           </Link>
-          {achievement.status === "approved" && entry?.drafts ? (
+          <AlertDialog>
+            <AlertDialogTrigger className={cn(buttonStyles({ variant: "ghost" }), "text-danger max-sm:px-3")} disabled={busy || remove.isPending}>
+              <Trash2 aria-hidden /> <span className="max-sm:sr-only">Borrar</span>
+            </AlertDialogTrigger>
+            <AlertDialogBackdrop />
+            <AlertDialogContent>
+              <AlertDialogTitle>¿Borrar este logro?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Se borran sus hechos y sus posts, y sale de tu portfolio. Lo que ya publicaste en tus redes no se toca.
+              </AlertDialogDescription>
+              <div className="mt-5 flex justify-end gap-2">
+                <AlertDialogClose>Cancelar</AlertDialogClose>
+                <AlertDialogClose
+                  value="confirm"
+                  className={buttonStyles({ variant: "danger", size: "sm" })}
+                  onClick={() => remove.mutateAsync().then(() => router.push("/app"), () => undefined)}
+                >
+                  Borrar logro
+                </AlertDialogClose>
+              </div>
+            </AlertDialogContent>
+          </AlertDialog>
+          {achievement.status === "approved" && drafts.ids ? (
             <Link href={`/app/crear/${achievement.id}/publicar`} className={cn(buttonStyles({ size: "lg" }), "ml-auto")}>
               Ver mis posts <Check aria-hidden />
             </Link>

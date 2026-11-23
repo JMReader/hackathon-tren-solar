@@ -232,3 +232,13 @@ export function unpublishPortfolio(request: Request, id: string): Response {
 export function findMockPublicPortfolio(slug: string): PublicPortfolio | null {
   return store.published.get(slug) ?? null
 }
+
+/** DELETE /achievements/{id} also takes it out of that session's portfolio. */
+export function removeFromMockPortfolios(sessionId: string, achievementId: string) {
+  for (const row of store.portfolios.values()) {
+    if (row.owner !== sessionId) continue
+    const before = row.items.length
+    row.items = row.items.filter((i) => i.achievement_id !== achievementId)
+    if (row.items.length !== before) row.revision += 1
+  }
+}

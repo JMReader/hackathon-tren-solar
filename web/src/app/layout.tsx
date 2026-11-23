@@ -15,8 +15,8 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Tren Solar",
-  description: "Tu experiencia, lista para compartir",
+  title: { default: "chambeAR", template: "%s · chambeAR" },
+  description: "Contá lo que hiciste y llevá tus oportunidades a donde estás.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -22,6 +22,7 @@ export function buildEditorPreview(
   templateId: string,
   paletteId: string,
   cvDownloadable: boolean,
+  photoUrl: (photoId: string | null | undefined) => string | null = getPhotoPreview,
 ): PublicPortfolio {
   const palette = findPalette(paletteId) ?? palettes[0]
   const byId = new Map(achievements.map((a) => [a.id, a]))
@@ -30,7 +31,7 @@ export function buildEditorPreview(
     display_name: portfolio.display_name,
     headline: portfolio.headline ?? profile.profession,
     // The API keeps photos private until publishing; the editor previews the copies kept in this browser.
-    photo_url: getPhotoPreview(profile.photo_id),
+    photo_url: photoUrl(profile.photo_id),
     template_id: templateId,
     palette,
     cv_url: cvDownloadable ? "#cv" : null,
@@ -40,7 +41,7 @@ export function buildEditorPreview(
       return {
         title: item.title,
         occurred_on: item.occurred_on,
-        photo_url: item.show_photo ? getPhotoPreview(ach?.photo_id) : null,
+        photo_url: item.show_photo ? photoUrl(ach?.photo_id) : null,
         facts:
           ach?.facts.map((f) => ({
             category: factCategory(f.category),
@@ -55,5 +56,6 @@ export function buildEditorPreview(
 export function defaultAchievementTitle(achievement: Achievement): string {
   const text = achievement.facts[0]?.text?.trim()
   if (!text) return "Mi logro"
-  return text.length > 80 ? `${text.slice(0, 77)}...` : text
+  const title = text[0].toLocaleUpperCase("es-AR") + text.slice(1)
+  return title.length > 80 ? `${title.slice(0, 77)}...` : title
 }

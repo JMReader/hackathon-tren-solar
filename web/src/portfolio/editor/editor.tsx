@@ -259,7 +259,7 @@ export function PortfolioEditor({
     <div className="flex flex-1 flex-col lg:grid lg:h-dvh lg:flex-none lg:grid-cols-[380px_1fr] lg:grid-rows-[minmax(0,1fr)]">
       <aside className="hidden bg-night px-10 py-12 [scrollbar-color:var(--color-slate-hover)_transparent] [scrollbar-width:thin] lg:flex lg:flex-col lg:gap-10 lg:overflow-y-auto">
         <header className="flex flex-col gap-2">
-          <p className="font-display text-3xl tracking-display text-inverse">{embedded ? "Diseño" : "Tren Solar"}</p>
+          <p className="font-display text-3xl tracking-display text-inverse">{embedded ? "Diseño" : "chambeAR"}</p>
           <p className="text-sm leading-relaxed text-on-dark-muted">Elegí plantilla y colores. Lo que dice ya lo aprobaste vos.</p>
         </header>
         <section className="-mx-2 flex flex-col gap-3">
@@ -279,7 +279,7 @@ export function PortfolioEditor({
 
       <div className="flex min-w-0 flex-1 flex-col lg:min-h-0 lg:bg-cream">
         <div className={cn("flex flex-col gap-1 px-4 pt-8 lg:hidden", embedded && "hidden")}>
-          <p className="font-display text-2xl tracking-display text-inverse">Tren Solar</p>
+          <p className="font-display text-2xl tracking-display text-inverse">chambeAR</p>
           <p className="text-[13px] text-on-dark-muted">Lo que dice ya lo aprobaste vos.</p>
         </div>
 

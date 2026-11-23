@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/progress"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Spinner } from "@/components/ui/spinner"
+import { toast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 import { VoiceSample } from "./voice-sample"
 
@@ -157,7 +158,7 @@ function Shell({
       <aside className="hidden bg-night px-10 py-12 lg:flex lg:flex-col lg:justify-between">
         <div className="flex flex-col gap-12">
           <header className="flex flex-col gap-2">
-            <p className="font-display text-3xl tracking-display text-inverse">Tren Solar</p>
+            <p className="font-display text-3xl tracking-display text-inverse">chambeAR</p>
             <p className="max-w-[28ch] text-sm leading-relaxed text-on-dark">
               Contanos quién sos y cómo hablás. Nosotros armamos tus posts.
             </p>
@@ -168,7 +169,7 @@ function Shell({
       </aside>
       <div className="flex flex-1 flex-col lg:min-h-dvh lg:bg-cream">
         <div className="flex flex-col gap-3 px-4 pt-8 lg:hidden">
-          <p className="font-display text-2xl tracking-display text-inverse">Tren Solar</p>
+          <p className="font-display text-2xl tracking-display text-inverse">chambeAR</p>
           {mobileHeader}
         </div>
         <div className="flex flex-1 flex-col px-4 pt-5 lg:px-14 lg:pt-14 xl:px-20">
@@ -266,7 +267,12 @@ function Wizard({
 
   const update = useUpdateProfile(sessionId)
   const complete = useCompleteOnboarding(sessionId)
-  const isDone = profile.onboarding_status === "complete"
+  const completed = profile.onboarding_status === "complete"
+  // A complete profile opens the summary; ?step= (e.g. "Editar mi voz") or "Editar" reopens the steps.
+  const [editing, setEditing] = useState(
+    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).has("step"),
+  )
+  const isDone = completed && !editing
   const posts = countSamplePosts(profile)
   const professionOk = profession.trim().length >= 2
   const sampleOk = sample.trim().length >= MIN_SAMPLE
@@ -289,6 +295,13 @@ function Wizard({
     if (n >= 2 && !step1Done) return false
     if (n >= 3 && !step2Done) return false
     return true
+  }
+
+  function startEditing(n: number) {
+    setEditing(true)
+    setVisited(new Set([1, 2, 3]))
+    setStep(n)
+    router.replace(`/onboarding?step=${n}`, { scroll: false })
   }
 
   function goTo(n: number) {
@@ -315,6 +328,10 @@ function Wizard({
         if (sample !== (profile.writing_sample ?? ""))
           await update.mutateAsync({ writing_sample: sample })
         goTo(3)
+      } else if (completed) {
+        toast.success("Perfil actualizado")
+        router.push("/app")
+        return
       } else {
         await complete.mutateAsync()
         router.push("/app/crear")
@@ -370,7 +387,7 @@ function Wizard({
         className="animate-step-in rounded-[22px] bg-paper p-5 shadow-raised motion-reduce:animate-none sm:p-6 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none"
       >
         {isDone ? (
-          <DonePanel profile={profile} sessionId={sessionId} headingRef={headingRef} />
+          <DonePanel profile={profile} sessionId={sessionId} headingRef={headingRef} onEdit={startEditing} />
         ) : (
           <>
             <h1
@@ -438,7 +455,7 @@ function Wizard({
               </Link>
             )}
             <Button className="ml-auto" disabled={!canContinue} onClick={() => next()}>
-              {step === LAST_STEP ? "Terminar" : "Continuar"}
+              {step === LAST_STEP ? (completed ? "Guardar y volver" : "Terminar") : "Continuar"}
             </Button>
           </div>
         </div>
@@ -968,10 +985,12 @@ function DonePanel({
   profile,
   sessionId,
   headingRef,
+  onEdit,
 }: {
   profile: AuthorProfile
   sessionId: string
   headingRef: React.RefObject<HTMLHeadingElement | null>
+  onEdit: (step: number) => void
 }) {
   const noop = async () => {}
   return (
@@ -994,11 +1013,16 @@ function DonePanel({
           <SocialCard platform="linkedin" sessionId={sessionId} imported={profile.style_sync.linkedin} beforeConnect={noop} />
           <SocialCard platform="x" sessionId={sessionId} imported={profile.style_sync.x} beforeConnect={noop} />
         </div>
-        <Link href="/app/crear" className={buttonStyles({ size: "lg" })}>
-          Contar mi primer logro <ArrowRight aria-hidden />
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/app/crear" className={buttonStyles({ size: "lg" })}>
+            Contar un logro <ArrowRight aria-hidden />
+          </Link>
+          <Button variant="outline" size="lg" onClick={() => onEdit(1)}>
+            Editar perfil
+          </Button>
+        </div>
       </div>
-      <ProfileRows profile={profile} />
+      <ProfileRows profile={profile} goToStep={onEdit} />
     </div>
   )
 }

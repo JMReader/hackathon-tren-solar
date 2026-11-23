@@ -270,6 +270,22 @@ class CoreService:
         return GenerateDraftsResponse(
             achievement_id=a.id, achievement_revision=a.revision, drafts=drafts)
 
+    def list_drafts(self, session_id: str, achievement_id: str) -> list[Draft]:
+        self.get_achievement(session_id, achievement_id)
+        return self.store.list_drafts(achievement_id)
+
+    def delete_achievement(self, session_id: str, achievement_id: str) -> None:
+        self.get_achievement(session_id, achievement_id)
+        self.store.delete_achievement(achievement_id, session_id)
+
+    def photo_file(self, session_id: str, photo_id: str) -> tuple[str, str]:
+        """Foto privada para su dueño: (ruta local, mime)."""
+        asset = self.media.resolve_photo(photo_id, session_id)
+        path = self.media.local_path(photo_id)
+        if not path:
+            raise not_found("media", photo_id)
+        return path, asset.mime_type
+
     def get_draft(self, session_id: str, draft_id: str) -> Draft:
         owner = self.store.draft_session(draft_id)
         d = self.store.get_draft(draft_id)

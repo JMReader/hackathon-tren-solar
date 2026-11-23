@@ -95,7 +95,7 @@ class SessionService:
         display_name = str(account.get("display_name") or normalized)
         session_id = self._demo_session(normalized)
         profile, _ = self._load(session_id)
-        if profile.profession != display_name:
+        if not profile.profession:  # no pisar la profesión que cargó la persona
             self.update_profile(session_id, UpdateAuthorProfileRequest(
                 revision=profile.revision, profession=display_name))
         return LoginResponse(session_id=session_id,

@@ -148,7 +148,7 @@ export default function UIPage() {
     <div className="min-h-dvh bg-night">
       <header className="mx-auto max-w-6xl px-6 pt-16 pb-14 text-center sm:pt-24">
         <p className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full bg-slate px-3.5 py-1.5 text-xs font-medium text-on-dark">
-          <span className="size-1.5 rounded-full bg-accent" /> Tren Solar · UI kit
+          <span className="size-1.5 rounded-full bg-accent" /> chambeAR · UI kit
         </p>
         <Display className="mx-auto max-w-3xl text-on-dark">
           De una idea suelta a un <span className="text-inverse">post claro</span>

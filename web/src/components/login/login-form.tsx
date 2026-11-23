@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldControl, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { ApiRequestError, apiFetch, setSessionId } from "@/lib/api/client"
+import { ApiRequestError, apiFetch, setAccountName, setSessionId } from "@/lib/api/client"
 
 const INVALID_MSG = "Correo o contraseña incorrectos"
 
@@ -27,6 +27,7 @@ export function LoginForm() {
         json: { email, password },
       })
       setSessionId(result.session_id)
+      setAccountName(result.display_name)
       router.push("/app")
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 401) {

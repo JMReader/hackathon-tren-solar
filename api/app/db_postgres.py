@@ -287,6 +287,27 @@ class PostgresStore:
             used_fact_ids=json.loads(row["used_fact_ids"]),
         )
 
+    def list_drafts(self, achievement_id: str) -> list[Draft]:
+        with self._conn() as conn:
+            rows = conn.execute(
+                "SELECT id FROM drafts WHERE achievement_id=%s ORDER BY created_at DESC",
+                (achievement_id,)).fetchall()
+        drafts = [self.get_draft(r["id"]) for r in rows]
+        return [d for d in drafts if d is not None]
+
+    def delete_achievement(self, achievement_id: str, session_id: str) -> None:
+        """Borra el logro, sus borradores y lo saca del portfolio de la sesión."""
+        with self._lock, self._conn() as conn:
+            conn.execute("DELETE FROM drafts WHERE achievement_id=%s", (achievement_id,))
+            conn.execute("DELETE FROM achievements WHERE id=%s", (achievement_id,))
+            row = conn.execute(
+                "SELECT id, items FROM portfolios WHERE session_id=%s", (session_id,)).fetchone()
+            if row:
+                items = [i for i in json.loads(row["items"]) if i.get("achievement_id") != achievement_id]
+                conn.execute(
+                    "UPDATE portfolios SET items=%s, revision=revision+1 WHERE id=%s",
+                    (json.dumps(items, ensure_ascii=False), row["id"]))
+
     def draft_session(self, draft_id: str) -> str | None:
         with self._conn() as conn:
             row = conn.execute(

@@ -5,7 +5,7 @@ import { firstName, initials } from "./theme"
 import type { FactCategory, FactSource, PublicPortfolio } from "./types"
 
 const origins: Record<FactSource, { icon: typeof AudioLines; label: string }> = {
-  transcript: { icon: AudioLines, label: "Lo contó por audio" },
+  transcript: { icon: AudioLines, label: "Salió de su relato" },
   user: { icon: PenLine, label: "Lo sumó al revisar" },
   mcp: { icon: GitPullRequest, label: "Viene de su repositorio" },
 }
@@ -95,5 +95,5 @@ export function CvLink({ portfolio, className, ...props }: { portfolio: PublicPo
 }
 
 export function MadeWith({ className }: { className?: string }) {
-  return <p className={cn("text-xs text-(--pf-muted)", className)}>Hecho con Tren Solar.</p>
+  return <p className={cn("text-xs text-(--pf-muted)", className)}>Hecho con chambeAR.</p>
 }

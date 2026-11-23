@@ -15,7 +15,7 @@ export type ProDoorRequest = { trigger: ProInterest["trigger"]; itemId: string |
 export const proBenefits = [
   "Cinco plantillas más, pensadas para destacar",
   "Tus colores, tu tipografía y el orden que quieras",
-  "Tu propio dominio en lugar del link de Tren Solar",
+  "Tu propio dominio en lugar del link de chambeAR",
 ]
 
 const priceBands: { value: NonNullable<ProInterest["price_band_ars_month"]>; label: string }[] = [

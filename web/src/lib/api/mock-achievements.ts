@@ -1,7 +1,7 @@
 // Local mock of /achievements and /drafts, modeled on the backend's FakeTranscriber/FakeLLM.
 // In production /api/* goes to FastAPI (vercel.json), so this only serves `next dev` without NEXT_PUBLIC_API_URL.
 import { apiError, hasMedia, requireSession, saveImage, toProfile } from "./mock-store"
-import { addApprovedToPortfolio } from "./mock-portfolios"
+import { addApprovedToPortfolio, removeFromMockPortfolios } from "./mock-portfolios"
 import type {
   Achievement,
   Draft,
@@ -258,4 +258,24 @@ export async function updateDraft(request: Request, draftId: string): Promise<Re
   d.char_count = body.body.length
   d.revision += 1
   return Response.json(d)
+}
+
+export function listDrafts(request: Request, achievementId: string): Response {
+  const s = requireSession(request)
+  if (s instanceof Response) return s
+  const a = owned(store.achievements, achievementId, s, "logro")
+  if (a instanceof Response) return a
+  const drafts = [...store.drafts.values()].filter((d) => d.owner === s.id && d.value.achievement_id === achievementId)
+  return Response.json(drafts.map((d) => d.value).reverse())
+}
+
+export function deleteAchievement(request: Request, achievementId: string): Response {
+  const s = requireSession(request)
+  if (s instanceof Response) return s
+  const a = owned(store.achievements, achievementId, s, "logro")
+  if (a instanceof Response) return a
+  store.achievements.delete(achievementId)
+  for (const [id, d] of store.drafts) if (d.value.achievement_id === achievementId) store.drafts.delete(id)
+  removeFromMockPortfolios(s.id, achievementId)
+  return new Response(null, { status: 204 })
 }
