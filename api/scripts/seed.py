@@ -4,7 +4,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -44,6 +46,15 @@ def load_employers(services: Services) -> None:
         services.employer._store.save_employer(emp)
 
 
+def _social_handle(c: dict) -> str:
+    """Handle de ejemplo para URLs sociales del seed (slug o nombre)."""
+    if c.get("slug"):
+        return c["slug"]
+    norm = unicodedata.normalize("NFKD", c["display_name"]).encode(
+        "ascii", "ignore").decode()
+    return re.sub(r"[^a-z0-9]+", "-", norm.lower()).strip("-") or "perfil-demo"
+
+
 def load_candidates(services: Services) -> None:
     store = services.core.store
     expires = "2099-12-31T00:00:00Z"
@@ -52,8 +63,15 @@ def load_candidates(services: Services) -> None:
     for c in data["candidates"]:
         store.save_session(c["session_id"], now, expires)
         status = c.get("achievement_status", "approved")
+        evidence = c.get("evidence") or {}
         facts = [
-            Fact(id=f"f{i}", category="tech", text=sk, source="user")
+            Fact(id=f"n{i}", category=ef["category"], text=ef["text"],
+                 source="user")
+            for i, ef in enumerate(c.get("extra_facts") or [], start=1)
+        ]
+        facts += [
+            Fact(id=f"s{i}", category="tech", text=sk, source="user",
+                 source_quote=evidence.get(sk))
             for i, sk in enumerate(c["skills"], start=1)
         ]
         ach = Achievement(
@@ -61,7 +79,7 @@ def load_candidates(services: Services) -> None:
             input_type="text",
             status=status,
             revision=2 if status == "approved" else 1,
-            transcript=TRANSCRIPT,
+            transcript=c.get("transcript") or TRANSCRIPT,
             facts=facts,
             open_questions=[],
         )
@@ -81,6 +99,13 @@ def load_candidates(services: Services) -> None:
         ))
         consent_flag = c.get("consent")
         if consent_flag is True:
+            handle = _social_handle(c)
+            linkedin_url = c.get("linkedin_url")
+            if linkedin_url is None and c.get("linkedin", True):
+                linkedin_url = f"https://www.linkedin.com/in/{handle}"
+            x_url = c.get("x_url")
+            if x_url is None and c.get("x"):
+                x_url = f"https://x.com/{handle}"
             services.employer.upsert_consent(c["session_id"], UpsertDiscoveryConsentRequest(
                 active=True,
                 shared_fields=[
@@ -88,9 +113,11 @@ def load_candidates(services: Services) -> None:
                     "linkedin", "publications_7d",
                 ],
                 share_portfolio=bool(c.get("slug")),
-                share_linkedin=True,
+                share_linkedin=bool(linkedin_url),
+                share_x=bool(x_url),
                 publications_last_7_days=c.get("pubs_7d"),
-                linkedin_url="https://www.linkedin.com/in/demo-example",
+                linkedin_url=linkedin_url,
+                x_url=x_url,
             ))
         elif consent_flag == "revoked":
             services.employer.upsert_consent(c["session_id"], UpsertDiscoveryConsentRequest(
@@ -101,11 +128,18 @@ def load_candidates(services: Services) -> None:
         slug = c.get("slug")
         if slug:
             ach_id = f"seed_ach_{c['session_id']}"
+            template_id = c.get("template_id") or "recorrido"
+            palette_id = c.get("palette_id") or "verde-yunga"
+            item_title = c.get("achievement_title") or (
+                f"Logro: {c.get('role') or 'demo'}")
             snapshot = build_published_snapshot(
                 slug=slug,
                 display_name=c["display_name"],
                 headline=c.get("role"),
                 achievement=ach,
+                item_title=item_title,
+                template_id=template_id,
+                palette_id=palette_id,
                 published_at=now,
             )
             store.save_portfolio({
@@ -115,11 +149,9 @@ def load_candidates(services: Services) -> None:
                 "revision": 1,
                 "display_name": c["display_name"],
                 "headline": c.get("role"),
-                "items": portfolio_items_json(
-                    ach_id, f"Logro: {c.get('role') or 'demo'}",
-                ),
-                "template_id": "recorrido",
-                "palette_id": "verde-yunga",
+                "items": portfolio_items_json(ach_id, item_title),
+                "template_id": template_id,
+                "palette_id": palette_id,
                 "cv_downloadable": 0,
                 "slug": slug,
                 "published_revision": 1,
@@ -185,7 +217,7 @@ def main() -> int:
         return 0
     if args.list:
         data = _load_json("candidates.json")
-        print("Candidatos (12):")
+        print(f"Candidatos ({len(data['candidates'])}):")
         for c in data["candidates"]:
             flag = c.get("consent")
             vis = "visible" if flag is True else ("revocado" if flag == "revoked" else "privado")
@@ -199,7 +231,8 @@ def main() -> int:
         print(f"  Free:  GET .../searches/{search_ids['free']}/matches")
         print(f"  Pro:   GET .../searches/{search_ids['paid']}/matches")
         return 0
-    print("Seed cargado (12 candidatos + búsquedas demo).")
+    data = _load_json("candidates.json")
+    print(f"Seed cargado ({len(data['candidates'])} candidatos + búsquedas demo).")
     return 0
 
 

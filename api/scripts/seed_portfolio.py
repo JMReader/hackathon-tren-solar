@@ -25,6 +25,7 @@ def build_published_snapshot(
     display_name: str,
     headline: str | None,
     achievement: Achievement,
+    item_title: str | None = None,
     template_id: str = "recorrido",
     palette_id: str = "verde-yunga",
     published_at: str,
@@ -46,7 +47,7 @@ def build_published_snapshot(
         "template_id": template_id,
         "palette": palette,
         "items": [{
-            "title": f"Logro: {headline or 'portfolio demo'}",
+            "title": item_title or f"Logro: {headline or 'portfolio demo'}",
             "occurred_on": "2026-11",
             "photo_url": None,
             "facts": facts,

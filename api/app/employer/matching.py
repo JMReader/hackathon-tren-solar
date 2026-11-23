@@ -41,7 +41,8 @@ def skill_evidence(
             token = fact.text.strip()
             if not token:
                 continue
-            by_skill.setdefault(token.casefold(), (ach.id, token))
+            by_skill.setdefault(
+                token.casefold(), (ach.id, fact.source_quote or token))
 
     out: list[SkillEvidence] = []
     for raw in required_skills:
